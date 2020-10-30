@@ -1,20 +1,24 @@
 # Prerequisites
 *.d
 
+
 # Object files
 *.o
 *.ko
 *.obj
 *.elf
 
+
 # Linker output
 *.ilk
 *.map
 *.exp
 
+
 # Precompiled Headers
 *.gch
 *.pch
+
 
 # Libraries
 *.lib
@@ -22,11 +26,13 @@
 *.la
 *.lo
 
+
 # Shared objects (inc. Windows DLLs)
 *.dll
 *.so
 *.so.*
 *.dylib
+
 
 # Executables
 *.exe
@@ -36,11 +42,13 @@
 *.x86_64
 *.hex
 
+
 # Debug files
 *.dSYM/
 *.su
 *.idb
 *.pdb
+
 
 # Kernel Module Compile Results
 *.mod*
@@ -50,3 +58,4 @@ modules.order
 Module.symvers
 Mkfile.old
 dkms.conf
+/Debug/
