@@ -63,8 +63,30 @@ static const uint8_t ucNetMask[4] = {configNET_MASK0, configNET_MASK1, configNET
 static const uint8_t ucGatewayAddress[4] = {configGATEWAY_ADDR0, configGATEWAY_ADDR1, configGATEWAY_ADDR2, configGATEWAY_ADDR3};
 static const uint8_t ucDNSServerAddress[4] = {configDNS_SERVER_ADDR0, configDNS_SERVER_ADDR1, configDNS_SERVER_ADDR2, configDNS_SERVER_ADDR3};
 
+/* Controller input signals */
+typedef enum {
+    CONTROLLER_NONE_SIG,    // not used, first
+    CONTROLLER_START_SIG,
+    CONTROLLER_STOP_SIG,
+    CONTROLLER_PAUSE_SIG,
+    CONTROLLER_EMERGENCY_SIG,
+    CONTROLLER_SHORT_PRESS_SIG,
+    CONTROLLER_LAST_SIG     // not used, last
+} ECtrlInputSignal;
+
+/* Controller states */
+typedef enum {
+    CONTROLLER_NONE_STATE,    // not used, first
+    CONTROLLER_START_STATE,
+    CONTROLLER_STOP_STATE,
+    CONTROLLER_LAST_STATE     // not used, last
+} EControllerState;
+
+/* Queue handlers */
+xQueueHandle xQueueCtrlInputSignalHandle;
+
 /* Task handlers */
-xTaskHandle xTask1Handle, xTask2Handle, xServerWorkTaskHandle;
+xTaskHandle xTask1Handle, xTask2Handle, xServerWorkTaskHandle, xMainControllerTaskHandle;
 extern xTaskHandle xIPTaskHandle;
 
 /* Tasks */
@@ -72,6 +94,7 @@ static void vTask1(void *pvParameters);
 static void vTask2(void *pvParameters);
 static void vServerWorkTask(void *pvParameters);
 void vStartNTPTask( uint16_t usTaskStackSize, UBaseType_t uxTaskPriority );
+void vMainControllerTask(void *pvParameters);
 
 extern hdkif_t hdkif_data[MAX_EMAC_INSTANCE];
 extern void vRegisterFileSystemCLICommands( void );
@@ -115,6 +138,9 @@ void main(void)
 
 	_enable_IRQ();
 
+	/* Register Queues */
+	xQueueCtrlInputSignalHandle = xQueueCreate(10, sizeof(ECtrlInputSignal));
+
 	/* Register some commands to CLI */
 #if ( configGENERATE_RUN_TIME_STATS == 1 )
 	FreeRTOS_CLIRegisterCommand( &xTaskStats );
@@ -134,6 +160,9 @@ void main(void)
 
 	/* Start the command interpreter */
 	vStartUARTCommandInterpreterTask();
+
+	/* Start main controller task */
+	xTaskCreate(vMainControllerTask, "MainController", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 5  | portPRIVILEGE_BIT, &xMainControllerTaskHandle);
 
 	vTaskStartScheduler();
 	while(1);
@@ -232,6 +261,57 @@ static const struct xSERVER_CONFIG xServerConfiguration[] =
 	}
 }
 
+void vMainControllerTask(void *pvParameters){
+    /*
+     * Block task until it gets triggered
+     * One may start/stop/pause/emergency_stop
+     * Use
+     */
+
+    /* xQueueCtrlInputSignalHandle signal */
+    ECtrlInputSignal eMsg;
+
+    /* Controller state */
+    EControllerState eState = CONTROLLER_STOP_STATE;
+
+    /* Remove compiler warning about unused parameter. */
+    ( void ) pvParameters;
+
+    /* USER LED 3 */
+    gioSetBit(gioPORTB, 7, 0);
+
+    while(1)
+    {
+        /* controller logic here */
+        if (xQueueReceive(xQueueCtrlInputSignalHandle, &eMsg, 0) == pdTRUE) {
+            switch(eMsg){
+            case CONTROLLER_SHORT_PRESS_SIG:
+                if(eState == CONTROLLER_STOP_STATE){
+                    eState = CONTROLLER_START_STATE;
+                    gioSetBit(gioPORTB, 7, 1);
+                }
+                else if(eState == CONTROLLER_START_STATE){
+                    eState = CONTROLLER_STOP_STATE;
+                    gioSetBit(gioPORTB, 7, 0);
+                }
+                break;
+            default:
+                break;
+            }
+        }
+
+        /* 10Hz refresh rate */
+        vTaskDelay(pdMS_TO_TICKS(100));
+    }
+}
+
+/* User switch A */
+void gioNotification(gioPORT_t *port, uint32 bit)
+{
+    /* xQueueCtrlInputSignalHandle signal */
+    ECtrlInputSignal eMsg = CONTROLLER_SHORT_PRESS_SIG;
+    xQueueSendToFrontFromISR(xQueueCtrlInputSignalHandle, &eMsg, NULL);
+}
 
 /** ***************************************************************************************************
  * @fn		const char *pcApplicationHostnameHook(void)
