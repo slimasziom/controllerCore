@@ -1,6 +1,7 @@
 /*
  * FreeRTOS+TCP Labs Build 160112 (C) 2016 Real Time Engineers ltd.
  * Authors include Hein Tibosch and Richard Barry
+ * Modifier Krzysztof Klimek
  *
  *******************************************************************************
  ***** NOTE ******* NOTE ******* NOTE ******* NOTE ******* NOTE ******* NOTE ***
@@ -74,6 +75,10 @@
 
 /* FreeRTOS+FAT includes. */
 #include "ff_stdio.h"
+
+/* Application specific configuration */
+#include "APP_config.h"
+#include "APP_queues.h"
 
 #ifndef HTTP_SERVER_BACKLOG
 	#define HTTP_SERVER_BACKLOG			( 12 )
@@ -253,7 +258,33 @@ BaseType_t xRc = 0;
 /*-----------------------------------------------------------*/
 
 static void vProcessRestRequest( xHTTPClient *pxClient ){
-    strcpy( pxClient->pxParent->pcCommandBuffer, "{\"success\": \"ok\", \"result\": {\"status\": \"running\"}}" );
+    const char *pcRestAPIRequest = "main-controller/set/state=";
+
+    /* process rest request and send response */
+    if (strncmp(pxClient->pcRestAPI, pcRestAPIRequest, strlen(pcRestAPIRequest)) == 0)
+    {
+        ECtrlInputSignal eMsg = CONTROLLER_NONE_SIG;
+
+        /* xQueueCtrlInputSignalHandle signal */
+        strncpy(pxClient->pcRestAPI, pxClient->pcRestAPI+strlen(pcRestAPIRequest), strlen(pxClient->pcRestAPI)-strlen(pcRestAPIRequest)+1);
+
+        eMsg = (ECtrlInputSignal) strtol(pxClient->pcRestAPI, NULL, 10);
+
+        xQueueSend(xQueueCtrlInputSignalHandle, &eMsg, NULL);
+
+        snprintf( pxClient->pxParent->pcCommandBuffer,
+            sizeof pxClient->pxParent->pcCommandBuffer,
+            "{\"success\": \"OK\", \"result\": {}}" );
+    }
+    else
+    {
+        snprintf( pxClient->pxParent->pcCommandBuffer,
+            sizeof pxClient->pxParent->pcCommandBuffer,
+            "{\"success\": \"failed\", \"result\": {\"status\": \"not recognized\", \"received\": \"%s\"}}",
+            pxClient->pcRestAPI );
+    }
+
+
 }
 /*-----------------------------------------------------------*/
 
@@ -284,6 +315,7 @@ const char *pcRequest = "/request/";
     /* verify if it is filename read or REST API */
     if (strncmp(pxClient->pcRestAPI, pcRequest, strlen(pcRequest)) == 0)
     {
+        strncpy(pxClient->pcRestAPI, pxClient->pcRestAPI+strlen(pcRequest), strlen(pxClient->pcRestAPI)-strlen(pcRequest)+1);
         /* process rest request and send response */
         vProcessRestRequest( pxClient );
         pxClient->xBytesLeft = strlen(pxClient->pxParent->pcCommandBuffer);

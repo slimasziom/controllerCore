@@ -56,34 +56,15 @@
 #include "ff_stdio.h"
 #include "ff_ramdisk.h"
 
+#include "APP_config.h"
+#include "APP_queues.h"
+
 uint8 emacAddress[6U] =	{0x00U, 0x08U, 0xEEU, 0x03U, 0xA6U, 0x6CU};
 uint32 emacPhyAddress =	1U;
 static const uint8_t ucIPAddress[4] = {configIP_ADDR0, configIP_ADDR1, configIP_ADDR2, configIP_ADDR3};
 static const uint8_t ucNetMask[4] = {configNET_MASK0, configNET_MASK1, configNET_MASK2, configNET_MASK3};
 static const uint8_t ucGatewayAddress[4] = {configGATEWAY_ADDR0, configGATEWAY_ADDR1, configGATEWAY_ADDR2, configGATEWAY_ADDR3};
 static const uint8_t ucDNSServerAddress[4] = {configDNS_SERVER_ADDR0, configDNS_SERVER_ADDR1, configDNS_SERVER_ADDR2, configDNS_SERVER_ADDR3};
-
-/* Controller input signals */
-typedef enum {
-    CONTROLLER_NONE_SIG,    // not used, first
-    CONTROLLER_START_SIG,
-    CONTROLLER_STOP_SIG,
-    CONTROLLER_PAUSE_SIG,
-    CONTROLLER_EMERGENCY_SIG,
-    CONTROLLER_SHORT_PRESS_SIG,
-    CONTROLLER_LAST_SIG     // not used, last
-} ECtrlInputSignal;
-
-/* Controller states */
-typedef enum {
-    CONTROLLER_NONE_STATE,    // not used, first
-    CONTROLLER_START_STATE,
-    CONTROLLER_STOP_STATE,
-    CONTROLLER_LAST_STATE     // not used, last
-} EControllerState;
-
-/* Queue handlers */
-xQueueHandle xQueueCtrlInputSignalHandle;
 
 /* Task handlers */
 xTaskHandle xTask1Handle, xTask2Handle, xServerWorkTaskHandle, xMainControllerTaskHandle;
@@ -294,6 +275,16 @@ void vMainControllerTask(void *pvParameters){
                     eState = CONTROLLER_STOP_STATE;
                     gioSetBit(gioPORTB, 7, 0);
                 }
+                break;
+            case CONTROLLER_START_SIG:
+                eState = CONTROLLER_START_STATE;
+                gioSetBit(gioPORTB, 7, 1);
+                break;
+            case CONTROLLER_STOP_SIG:
+            case CONTROLLER_PAUSE_SIG:
+            case CONTROLLER_EMERGENCY_SIG:
+                eState = CONTROLLER_STOP_STATE;
+                gioSetBit(gioPORTB, 7, 0);
                 break;
             default:
                 break;
