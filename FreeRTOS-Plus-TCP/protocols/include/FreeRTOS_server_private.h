@@ -88,6 +88,8 @@
 	#define ipconfigTCP_FILE_BUFFER_SIZE	( 2048 )
 #endif
 
+#define ipconfigREST_API_BUFFER_SIZE    ( 2048 )
+
 struct xTCP_CLIENT;
 
 typedef BaseType_t ( * FTCPWorkFunction ) ( struct xTCP_CLIENT * /* pxClient */ );
@@ -119,6 +121,7 @@ struct xHTTP_CLIENT
 	const char *pcUrlData;
 	const char *pcRestData;
 	char pcCurrentFilename[ ffconfigMAX_FILENAME ];
+	char pcRestAPI[ ipconfigTCP_COMMAND_BUFFER_SIZE ];
 	size_t xBytesLeft;
 	FF_FILE *pxFileHandle;
 	union {

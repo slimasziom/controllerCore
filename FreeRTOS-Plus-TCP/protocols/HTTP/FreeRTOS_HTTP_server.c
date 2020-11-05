@@ -105,9 +105,9 @@ static BaseType_t prvProcessCmd( xHTTPClient *pxClient, BaseType_t xIndex );
 static const char *pcGetContentsType( const char *apFname );
 static BaseType_t prvOpenUrl( xHTTPClient *pxClient );
 static BaseType_t prvSendFile( xHTTPClient *pxClient );
+static BaseType_t prvSendRestResponse( xHTTPClient *pxClient );
 static BaseType_t prvSendReply( xHTTPClient *pxClient, BaseType_t xCode );
-
-
+static void vProcessRestRequest( xHTTPClient *pxClient );
 
 static const char pcEmptyString[1] = { '\0' };
 
@@ -231,10 +231,37 @@ BaseType_t xRc = 0;
 }
 /*-----------------------------------------------------------*/
 
+static BaseType_t prvSendRestResponse( xHTTPClient *pxClient )
+{
+BaseType_t xRc = 0;
+
+    if( pxClient->bits.bReplySent == pdFALSE )
+    {
+        pxClient->bits.bReplySent = pdTRUE;
+
+        strcpy( pxClient->pxParent->pcContentsType, "application/json" );
+        snprintf( pxClient->pxParent->pcExtraContents, sizeof pxClient->pxParent->pcExtraContents,
+            "Content-Length: %d\r\n", ( int ) pxClient->xBytesLeft);
+
+        xRc = prvSendReply( pxClient, WEB_REPLY_OK );   /* "Requested Rest API action OK" */
+    }
+
+    xRc = FreeRTOS_send( pxClient->xSocket, pxClient->pxParent->pcCommandBuffer, pxClient->xBytesLeft, 0 );
+
+    return xRc;
+}
+/*-----------------------------------------------------------*/
+
+static void vProcessRestRequest( xHTTPClient *pxClient ){
+    strcpy( pxClient->pxParent->pcCommandBuffer, "{\"success\": \"ok\", \"result\": {\"status\": \"running\"}}" );
+}
+/*-----------------------------------------------------------*/
+
 static BaseType_t prvOpenUrl( xHTTPClient *pxClient )
 {
 BaseType_t xRc;
 char pcSlash[ 2 ];
+const char *pcRequest = "/request/";
 
 	pxClient->bits.ulFlags = 0;
 
@@ -249,25 +276,41 @@ char pcSlash[ 2 ];
 		/* The browser provided a starting '/' already */
 		pcSlash[ 0 ] = '\0';
 	}
-	snprintf( pxClient->pcCurrentFilename, sizeof pxClient->pcCurrentFilename, "%s%s%s",
-		pxClient->pcRootDir,
-		pcSlash,
-		pxClient->pcUrlData);
 
-	pxClient->pxFileHandle = ff_fopen( pxClient->pcCurrentFilename, "rb" );
+    snprintf( pxClient->pcRestAPI, sizeof pxClient->pcRestAPI, "%s%s",
+              pcSlash,
+              pxClient->pcUrlData);
 
-	FreeRTOS_printf( ( "Open file '%s': %s\n", pxClient->pcCurrentFilename,
-		pxClient->pxFileHandle != NULL ? "Ok" : strerror( stdioGET_ERRNO() ) ) );
+    /* verify if it is filename read or REST API */
+    if (strncmp(pxClient->pcRestAPI, pcRequest, strlen(pcRequest)) == 0)
+    {
+        /* process rest request and send response */
+        vProcessRestRequest( pxClient );
+        pxClient->xBytesLeft = strlen(pxClient->pxParent->pcCommandBuffer);
+        xRc = prvSendRestResponse( pxClient );
+    }
+    else
+    {
+        snprintf( pxClient->pcCurrentFilename, sizeof pxClient->pcCurrentFilename, "%s%s%s",
+            pxClient->pcRootDir,
+            pcSlash,
+            pxClient->pcUrlData);
 
-	if( pxClient->pxFileHandle == NULL )
-	{
-		xRc = prvSendReply( pxClient, WEB_NOT_FOUND );	/* "404 File not found" */
-	}
-	else
-	{
-		pxClient->xBytesLeft = pxClient->pxFileHandle->ulFileSize;
-		xRc = prvSendFile( pxClient );
-	}
+        pxClient->pxFileHandle = ff_fopen( pxClient->pcCurrentFilename, "rb" );
+
+        FreeRTOS_printf( ( "Open file '%s': %s\n", pxClient->pcCurrentFilename,
+            pxClient->pxFileHandle != NULL ? "Ok" : strerror( stdioGET_ERRNO() ) ) );
+
+        if( pxClient->pxFileHandle == NULL )
+        {
+            xRc = prvSendReply( pxClient, WEB_NOT_FOUND );	/* "404 File not found" */
+        }
+        else
+        {
+            pxClient->xBytesLeft = pxClient->pxFileHandle->ulFileSize;
+            xRc = prvSendFile( pxClient );
+        }
+    }
 
 	return xRc;
 }
