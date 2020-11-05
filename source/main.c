@@ -121,6 +121,7 @@ void main(void)
 
 	/* Register Queues */
 	xQueueCtrlInputSignalHandle = xQueueCreate(10, sizeof(ECtrlInputSignal));
+	xQueueRestAPIResponseHandle = xQueueCreate(10, sizeof(char));
 
 	/* Register some commands to CLI */
 #if ( configGENERATE_RUN_TIME_STATS == 1 )
@@ -143,7 +144,7 @@ void main(void)
 	vStartUARTCommandInterpreterTask();
 
 	/* Start main controller task */
-	xTaskCreate(vMainControllerTask, "MainController", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 5  | portPRIVILEGE_BIT, &xMainControllerTaskHandle);
+	xTaskCreate(vMainControllerTask, "MainController", configMINIMAL_STACK_SIZE * 10, NULL, tskIDLE_PRIORITY + 5  | portPRIVILEGE_BIT, &xMainControllerTaskHandle);
 
 	vTaskStartScheduler();
 	while(1);
@@ -285,6 +286,9 @@ void vMainControllerTask(void *pvParameters){
             case CONTROLLER_EMERGENCY_SIG:
                 eState = CONTROLLER_STOP_STATE;
                 gioSetBit(gioPORTB, 7, 0);
+                break;
+            case CONTROLLER_GET_STATUS_SIG:
+                xQueueSend(xQueueRestAPIResponseHandle, &eState, 0);
                 break;
             default:
                 break;

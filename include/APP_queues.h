@@ -15,5 +15,7 @@
 /* Queue handlers */
 extern xQueueHandle xQueueCtrlInputSignalHandle;
 
+extern xQueueHandle xQueueRestAPIResponseHandle;
+
 
 #endif /* INCLUDE_APP_QUEUES_H_ */

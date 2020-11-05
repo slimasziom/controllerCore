@@ -259,10 +259,12 @@ BaseType_t xRc = 0;
 
 static void vProcessRestRequest( xHTTPClient *pxClient ){
     const char *pcRestAPIRequest = "main-controller/set/state=";
+    const char *pcRestAPIRequestGet = "main-controller/get/state";
 
     /* process rest request and send response */
     if (strncmp(pxClient->pcRestAPI, pcRestAPIRequest, strlen(pcRestAPIRequest)) == 0)
     {
+        BaseType_t xEnqueued = 0;
         ECtrlInputSignal eMsg = CONTROLLER_NONE_SIG;
 
         /* xQueueCtrlInputSignalHandle signal */
@@ -270,11 +272,40 @@ static void vProcessRestRequest( xHTTPClient *pxClient ){
 
         eMsg = (ECtrlInputSignal) strtol(pxClient->pcRestAPI, NULL, 10);
 
-        xQueueSend(xQueueCtrlInputSignalHandle, &eMsg, NULL);
+        xEnqueued = xQueueSend(xQueueCtrlInputSignalHandle, &eMsg, NULL);
 
         snprintf( pxClient->pxParent->pcCommandBuffer,
             sizeof pxClient->pxParent->pcCommandBuffer,
-            "{\"success\": \"OK\", \"result\": {}}" );
+            "{\"success\": \"OK\", \"result\": {\"enqueued\": %d, \"message\": %d}}",
+            xEnqueued,
+            eMsg );
+    }
+
+    else if (strncmp(pxClient->pcRestAPI, pcRestAPIRequestGet, strlen(pcRestAPIRequestGet)) == 0)
+    {
+        ECtrlInputSignal eMsg = CONTROLLER_GET_STATUS_SIG;
+        EControllerState eState;
+
+        if(xQueueSend(xQueueCtrlInputSignalHandle, &eMsg, NULL) == pdTRUE){
+            if(xQueueReceive(xQueueRestAPIResponseHandle, &eState, 1000) == pdTRUE){
+                snprintf( pxClient->pxParent->pcCommandBuffer,
+                    sizeof pxClient->pxParent->pcCommandBuffer,
+                    "{\"success\": \"OK\", \"result\": {\"state\": %d}}",
+                    eState );
+            }
+            else
+            {
+                snprintf( pxClient->pxParent->pcCommandBuffer,
+                    sizeof pxClient->pxParent->pcCommandBuffer,
+                    "{\"success\": \"OK\", \"result\": \"response error\"}" );
+            }
+        }
+        else
+        {
+            snprintf( pxClient->pxParent->pcCommandBuffer,
+                sizeof pxClient->pxParent->pcCommandBuffer,
+                "{\"success\": \"OK\", \"result\": \"send error\"}" );
+        }
     }
     else
     {

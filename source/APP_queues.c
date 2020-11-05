@@ -8,3 +8,5 @@
 #include "APP_queues.h"
 
 xQueueHandle xQueueCtrlInputSignalHandle;
+
+xQueueHandle xQueueRestAPIResponseHandle;

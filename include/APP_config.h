@@ -8,6 +8,8 @@
 #ifndef APP_CONFIG_H_
 #define APP_CONFIG_H_
 
+#define appRestAPI_BUFFER_SIZE ( 1024 )
+
 /* Controller input signals */
 typedef enum {
     CONTROLLER_NONE_SIG,    // not used, first
@@ -16,6 +18,7 @@ typedef enum {
     CONTROLLER_PAUSE_SIG,
     CONTROLLER_EMERGENCY_SIG,
     CONTROLLER_SHORT_PRESS_SIG,
+    CONTROLLER_GET_STATUS_SIG,
     CONTROLLER_LAST_SIG     // not used, last
 } ECtrlInputSignal;
 
