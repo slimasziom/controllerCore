@@ -57,6 +57,7 @@
 
 /* Standard includes. */
 #include <stdint.h>
+#include <stdlib.h>
 
 /* FreeRTOS includes. */
 #include "FreeRTOS.h"
@@ -177,7 +178,7 @@ struct xDHCPMessage
 	uint8_t ucBootFileName[ dhcpBOOT_FILE_NAME_LENGTH ];
 	uint32_t ulDHCPCookie;
 	uint8_t ucFirstOptionByte;
-}
+};
 #include "pack_struct_end.h"
 typedef struct xDHCPMessage DHCPMessage_t;
 
