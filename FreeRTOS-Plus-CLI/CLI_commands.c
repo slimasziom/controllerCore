@@ -361,7 +361,7 @@ BaseType_t xMainControllerCommand( char *pcWriteBuffer, size_t xWriteBufferLen, 
     /* send to queue */
     xReturn = xQueueSend(xQueueCtrlInputSignalHandle, &eSignal, NULL);
 
-    if (xReturn != pdFALSE){
+    if (eSignal==CONTROLLER_GET_STATUS_CLI_SIG){
         /* wait for response */
         if(xQueueReceive(xQueueCLIResponseHandle, &eState, 1000) == pdTRUE){
             snprintf( pcWriteBuffer, xWriteBufferLen, "state: %d\r\n", eState);
@@ -371,7 +371,7 @@ BaseType_t xMainControllerCommand( char *pcWriteBuffer, size_t xWriteBufferLen, 
     }
     else
     {
-        snprintf( pcWriteBuffer, xWriteBufferLen, "error: could not send request");
+        snprintf( pcWriteBuffer, xWriteBufferLen, "executed");
     }
 
 
