@@ -87,4 +87,14 @@ static const CLI_Command_Definition_t xNetStat =
 	( pdCOMMAND_LINE_CALLBACK ) xNetStatCommand,
 	0 /* No parameters are expected. */
 };
+
+BaseType_t xMainControllerCommand(char *pcWriteBuffer, size_t xWriteBufferLen, const char *pcCommandString);
+/* Structure that defines the "main-controller" command line command. */
+static const CLI_Command_Definition_t xMainController =
+{
+    "maincontroller",
+    "\r\nmaincontroller <command>:\r\n Sends command to maincontroller: start/stop/pause/emergency/status\r\n",
+    ( pdCOMMAND_LINE_CALLBACK ) xMainControllerCommand,
+    1 /* No parameters are expected. */
+};
 #endif /* CLI_COMMANDS_H_ */

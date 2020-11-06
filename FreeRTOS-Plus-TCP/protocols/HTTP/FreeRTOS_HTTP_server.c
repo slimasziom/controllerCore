@@ -284,8 +284,9 @@ static void vProcessRestRequest( xHTTPClient *pxClient ){
 
     else if (strncmp(pxClient->pcRestAPI, pcRestAPIRequestGet, strlen(pcRestAPIRequestGet)) == 0)
     {
-        ECtrlInputSignal eMsg = CONTROLLER_GET_STATUS_SIG;
+        ECtrlInputSignal eMsg = CONTROLLER_GET_STATUS_REST_SIG;
         EControllerState eState;
+//        xControllerStateVariables_t xStateVariables;
 
         if(xQueueSend(xQueueCtrlInputSignalHandle, &eMsg, NULL) == pdTRUE){
             if(xQueueReceive(xQueueRestAPIResponseHandle, &eState, 1000) == pdTRUE){

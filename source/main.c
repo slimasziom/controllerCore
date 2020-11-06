@@ -122,6 +122,7 @@ void main(void)
 	/* Register Queues */
 	xQueueCtrlInputSignalHandle = xQueueCreate(10, sizeof(ECtrlInputSignal));
 	xQueueRestAPIResponseHandle = xQueueCreate(10, sizeof(char));
+	xQueueCLIResponseHandle = xQueueCreate(10, sizeof(char));
 
 	/* Register some commands to CLI */
 #if ( configGENERATE_RUN_TIME_STATS == 1 )
@@ -133,6 +134,7 @@ void main(void)
 	FreeRTOS_CLIRegisterCommand( &xPing );
 	FreeRTOS_CLIRegisterCommand( &xNetStat );
 	FreeRTOS_CLIRegisterCommand( &xReset );
+	FreeRTOS_CLIRegisterCommand( &xMainController );
 
 	/* Register some more filesystem related commands, like dir, cd, pwd ... */
 	vRegisterFileSystemCLICommands();
@@ -253,6 +255,11 @@ void vMainControllerTask(void *pvParameters){
     /* xQueueCtrlInputSignalHandle signal */
     ECtrlInputSignal eMsg;
 
+    xAppMsg_t xMsg;
+
+    /* Controller state variables*/
+    xControllerStateVariables_t xStateVariables;
+
     /* Controller state */
     EControllerState eState = CONTROLLER_STOP_STATE;
 
@@ -261,6 +268,8 @@ void vMainControllerTask(void *pvParameters){
 
     /* USER LED 3 */
     gioSetBit(gioPORTB, 7, 0);
+
+
 
     while(1)
     {
@@ -287,8 +296,22 @@ void vMainControllerTask(void *pvParameters){
                 eState = CONTROLLER_STOP_STATE;
                 gioSetBit(gioPORTB, 7, 0);
                 break;
-            case CONTROLLER_GET_STATUS_SIG:
+            case CONTROLLER_GET_STATUS_REST_SIG:
+
+//                /* Example */
+//                xStateVariables.eState=eState;
+//                snprintf( xStateVariables.cModulenName, 20, "Main Controller");
+//                xStateVariables.xSettings.uiPower=93;
+//                xStateVariables.xSettings.bOffset= true;
+//                xStateVariables.xSettings.xOffsetSettings.uiPar_a=32;
+//                xStateVariables.xSettings.xOffsetSettings.uiPar_b=64;
+//                xStateVariables.xSettings.xOffsetSettings.uiPar_c=12;
+//                snprintf( xStateVariables.xSettings.xOffsetSettings.cOffsetType, 20, "default");
+
                 xQueueSend(xQueueRestAPIResponseHandle, &eState, 0);
+                break;
+            case CONTROLLER_GET_STATUS_CLI_SIG:
+                xQueueSend(xQueueCLIResponseHandle, &eState, 0);
                 break;
             default:
                 break;

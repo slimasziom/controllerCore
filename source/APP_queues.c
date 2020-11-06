@@ -10,3 +10,5 @@
 xQueueHandle xQueueCtrlInputSignalHandle;
 
 xQueueHandle xQueueRestAPIResponseHandle;
+
+xQueueHandle xQueueCLIResponseHandle;

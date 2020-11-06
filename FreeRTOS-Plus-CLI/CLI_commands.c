@@ -10,6 +10,12 @@
 #include "HL_emac.h"
 #include "HL_mdio.h"
 #include "HL_phy_dp83640.h"
+
+
+/* Application specific configuration */
+#include "APP_config.h"
+#include "APP_queues.h"
+
 extern hdkif_t hdkif_data[MAX_EMAC_INSTANCE];
 
 
@@ -324,3 +330,51 @@ BaseType_t xNetStatCommand( char *pcWriteBuffer, size_t xWriteBufferLen, const c
 	snprintf( pcWriteBuffer, xWriteBufferLen, "FreeRTOS_netstat() called - output uses FreeRTOS_printf\r\n" );
 	return pdFALSE;
 	}
+
+BaseType_t xMainControllerCommand( char *pcWriteBuffer, size_t xWriteBufferLen, const char *pcCommandString )
+{
+    char * pcParameter;
+    BaseType_t lParameterStringLength, xReturn;
+    uint8_t eSignal = CONTROLLER_NONE_SIG;
+    EControllerState eState = CONTROLLER_NONE_STATE;
+
+    ( void ) pcWriteBuffer;
+    ( void ) xWriteBufferLen;
+    ( void ) pcCommandString;
+
+    xReturn = pdFALSE;
+
+        /* Obtain the IP address string. */
+    pcParameter = ( char * ) FreeRTOS_CLIGetParameter
+                            (
+                                pcCommandString,        /* The command string itself. */
+                                1,                      /* Return the first parameter. */
+                                &lParameterStringLength /* Store the parameter string length. */
+                            );
+    /* check which command was sent */
+    eSignal = uiThreadSignalFromCommand(xMainControllerMapping, pcParameter);
+
+    if (eSignal == 0){
+        snprintf( pcWriteBuffer, xWriteBufferLen, "wrong parameter\r\n");
+        return pdFALSE;
+    }
+    /* send to queue */
+    xReturn = xQueueSend(xQueueCtrlInputSignalHandle, &eSignal, NULL);
+
+    if (xReturn != pdFALSE){
+        /* wait for response */
+        if(xQueueReceive(xQueueCLIResponseHandle, &eState, 1000) == pdTRUE){
+            snprintf( pcWriteBuffer, xWriteBufferLen, "state: %d\r\n", eState);
+        }else{
+            snprintf( pcWriteBuffer, xWriteBufferLen, "error: No response");
+        }
+    }
+    else
+    {
+        snprintf( pcWriteBuffer, xWriteBufferLen, "error: could not send request");
+    }
+
+
+    return pdFALSE;
+
+}
