@@ -57,7 +57,7 @@ uint8_t uiThreadSignalFromCommand(xThreadMapping_t *xThread, char *pcCommandStri
     uint8_t eSignal = 0;
     BaseType_t x;
 
-    for( x = 0; x < 6; x++ )
+    for( x = 0; x < ARRAY_SIZE( xMainControllerMapping ); x++ )
     {
         if (strcmp(xThread[x].cCommand, pcCommandString) == 0){
             eSignal = xThread[x].eSignal;
@@ -73,7 +73,7 @@ const char * pcStateNameFromThread(uint8_t eState)
     const char *pcStateName = xMainControllerMapping[0].cState;
     BaseType_t x;
 
-    for( x = 0; x < 6; x++ )
+    for( x = 0; x < ARRAY_SIZE( xMainControllerMapping ); x++ )
         {
             if (xMainControllerMapping[x].eState == eState){
                 pcStateName = xMainControllerMapping[x].cState;
