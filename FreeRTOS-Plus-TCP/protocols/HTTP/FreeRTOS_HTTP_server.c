@@ -266,29 +266,28 @@ static void vProcessRestRequest( xHTTPClient *pxClient ){
     if (strncmp(pxClient->pcRestAPI, pcRestAPIRequest, strlen(pcRestAPIRequest)) == 0)
     {
         BaseType_t xEnqueued = 0;
-        ECtrlInputSignal eMsg = CONTROLLER_NONE_SIG;
+        xAppMsgBaseType_t xMsg = {NULL, CONTROLLER_NONE_SIG};
 
         /* xQueueCtrlInputSignalHandle signal */
         strncpy(pxClient->pcRestAPI, pxClient->pcRestAPI+strlen(pcRestAPIRequest), strlen(pxClient->pcRestAPI)-strlen(pcRestAPIRequest)+1);
 
-        eMsg = (ECtrlInputSignal) strtol(pxClient->pcRestAPI, NULL, 10);
+        xMsg.eSignal = (ECtrlInputSignal) strtol(pxClient->pcRestAPI, NULL, 10);
 
-        xEnqueued = xQueueSend(xQueueCtrlInputSignalHandle, &eMsg, NULL);
+        xEnqueued = xQueueSend(xQueueCtrlInputSignalHandle, &xMsg, NULL);
 
         snprintf( pxClient->pxParent->pcCommandBuffer,
             sizeof pxClient->pxParent->pcCommandBuffer,
             "{\"success\": \"OK\", \"result\": {\"enqueued\": %d, \"message\": %d}}",
             xEnqueued,
-            eMsg );
+            xMsg.eSignal );
     }
 
     else if (strncmp(pxClient->pcRestAPI, pcRestAPIRequestGet, strlen(pcRestAPIRequestGet)) == 0)
     {
-        ECtrlInputSignal eMsg = CONTROLLER_GET_STATUS_REST_SIG;
-//        EControllerState eState;
         xControllerStateVariables_t xStateVariables;
+        xAppMsgBaseType_t xMsg = {xQueueRestAPIResponseHandle, CONTROLLER_GET_STATUS_SIG};
 
-        if(xQueueSend(xQueueCtrlInputSignalHandle, &eMsg, NULL) == pdTRUE){
+        if(xQueueSend(xQueueCtrlInputSignalHandle, &xMsg, NULL) == pdTRUE){
             if(xQueueReceive(xQueueRestAPIResponseHandle, &xStateVariables, 1000) == pdTRUE){
                 snprintf( pxClient->pxParent->pcCommandBuffer, sizeof pxClient->pxParent->pcCommandBuffer,
                           "{\"success\": \"OK\", \"result\": "

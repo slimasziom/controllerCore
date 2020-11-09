@@ -120,7 +120,7 @@ void main(void)
 	_enable_IRQ();
 
 	/* Register Queues */
-	xQueueCtrlInputSignalHandle = xQueueCreate(10, sizeof(ECtrlInputSignal));
+	xQueueCtrlInputSignalHandle = xQueueCreate(10, sizeof(xAppMsgBaseType_t));
 	xQueueRestAPIResponseHandle = xQueueCreate(10, sizeof(xControllerStateVariables_t));
 	xQueueCLIResponseHandle = xQueueCreate(10, sizeof(xControllerStateVariables_t));
 
@@ -253,7 +253,7 @@ void vMainControllerTask(void *pvParameters){
      */
 
     /* xQueueCtrlInputSignalHandle signal */
-    ECtrlInputSignal eMsg;
+    xAppMsgBaseType_t xMsg;
 
     /* Controller state variables*/
     xControllerStateVariables_t xStateVariables;
@@ -277,8 +277,8 @@ void vMainControllerTask(void *pvParameters){
     while(1)
     {
         /* controller logic here */
-        if (xQueueReceive(xQueueCtrlInputSignalHandle, &eMsg, 0) == pdTRUE) {
-            switch(eMsg){
+        if (xQueueReceive(xQueueCtrlInputSignalHandle, &xMsg, 0) == pdTRUE) {
+            switch(xMsg.eSignal){
             case CONTROLLER_SHORT_PRESS_SIG:
                 if(xStateVariables.eState == CONTROLLER_STOP_STATE){
                     xStateVariables.eState = CONTROLLER_RUNNING_STATE;
@@ -299,11 +299,8 @@ void vMainControllerTask(void *pvParameters){
                 xStateVariables.eState = CONTROLLER_STOP_STATE;
                 gioSetBit(gioPORTB, 7, 0);
                 break;
-            case CONTROLLER_GET_STATUS_REST_SIG:
-                xQueueSend(xQueueRestAPIResponseHandle, &xStateVariables, 0);
-                break;
-            case CONTROLLER_GET_STATUS_CLI_SIG:
-                xQueueSend(xQueueCLIResponseHandle, &xStateVariables, 0);
+            case CONTROLLER_GET_STATUS_SIG:
+                xQueueSend(xMsg.pxReturnQueue, &xStateVariables, 0);
                 break;
             default:
                 break;

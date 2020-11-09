@@ -11,13 +11,12 @@
 /* FreeRTOS headers */
 #include "FreeRTOS.h"
 #include "os_queue.h"
+#include "APP_config.h"
 
 typedef struct {
-    QueueHandle_t xQueue;
-    uint8_t uiSignal;
-    char *pMsg;
-    void *pStruct;
-} xAppMsg_t;
+    QueueHandle_t *pxReturnQueue;
+    ECtrlInputSignal eSignal;
+} xAppMsgBaseType_t;
 
 /* Queue handlers */
 extern xQueueHandle xQueueCtrlInputSignalHandle;

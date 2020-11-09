@@ -335,7 +335,7 @@ BaseType_t xMainControllerCommand( char *pcWriteBuffer, size_t xWriteBufferLen, 
 {
     char * pcParameter;
     BaseType_t lParameterStringLength, xReturn;
-    uint8_t eSignal = CONTROLLER_NONE_SIG;
+    xAppMsgBaseType_t xMsg = {xQueueCLIResponseHandle, CONTROLLER_NONE_SIG};
     xControllerStateVariables_t xStateVariables;
 
     ( void ) pcWriteBuffer;
@@ -356,20 +356,20 @@ BaseType_t xMainControllerCommand( char *pcWriteBuffer, size_t xWriteBufferLen, 
     ( void ) lParameterStringLength;
 
     /* check which command was sent */
-    eSignal = uiThreadSignalFromCommand(xMainControllerMapping, pcParameter);
+    xMsg.eSignal = (ECtrlInputSignal) uiThreadSignalFromCommand(xMainControllerMapping, pcParameter);
 
-    if (eSignal == 0)
+    if (xMsg.eSignal == 0)
     {
         snprintf( pcWriteBuffer, xWriteBufferLen, "wrong parameter\r\n");
         return pdFALSE;
     }
     /* send to queue */
-    xReturn = xQueueSend(xQueueCtrlInputSignalHandle, &eSignal, NULL);
+    xReturn = xQueueSend(xQueueCtrlInputSignalHandle, &xMsg, NULL);
 
     ( void ) xReturn;
 
     /* receive if status is requested */
-    if (eSignal==CONTROLLER_GET_STATUS_CLI_SIG)
+    if (xMsg.eSignal==CONTROLLER_GET_STATUS_SIG)
     {
         /* wait for response */
         if(xQueueReceive(xQueueCLIResponseHandle, &xStateVariables, 1000) == pdTRUE)

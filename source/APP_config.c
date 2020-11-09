@@ -44,23 +44,22 @@ xThreadMapping_t xMainControllerMapping[] =
     { CONTROLLER_STOP_SIG,              CONTROLLER_STOP_STATE,          "stop",         "stopped"   },
     { CONTROLLER_PAUSE_SIG,             CONTROLLER_PAUSED_STATE,        "pause",        "paused"    },
     { CONTROLLER_EMERGENCY_SIG,         CONTROLLER_EMERGENCY_STATE,     "emergency",    "emergency" },
-    { CONTROLLER_GET_STATUS_CLI_SIG,    CONTROLLER_NONE_STATE,          "status",       ""          },
-    { CONTROLLER_GET_STATUS_REST_SIG,   CONTROLLER_NONE_STATE,          "status",       ""          }
+    { CONTROLLER_GET_STATUS_SIG,        CONTROLLER_NONE_STATE,          "status",       ""          }
 };
 
 #if !defined( ARRAY_SIZE )
     #define ARRAY_SIZE(x) ( BaseType_t ) (sizeof ( x ) / sizeof ( x )[ 0 ] )
 #endif
 
-uint8_t uiThreadSignalFromCommand(xThreadMapping_t *xThread, char *pcCommandString)
+ECtrlInputSignal uiThreadSignalFromCommand(xThreadMapping_t *xThread, char *pcCommandString)
 {
-    uint8_t eSignal = 0;
+    ECtrlInputSignal eSignal = CONTROLLER_NONE_SIG;
     BaseType_t x;
 
     for( x = 0; x < ARRAY_SIZE( xMainControllerMapping ); x++ )
     {
         if (strcmp(xThread[x].cCommand, pcCommandString) == 0){
-            eSignal = xThread[x].eSignal;
+            eSignal = (ECtrlInputSignal) xThread[x].eSignal;
             break;
         }
     }
@@ -68,7 +67,7 @@ uint8_t uiThreadSignalFromCommand(xThreadMapping_t *xThread, char *pcCommandStri
 }
 /*-----------------------------------------------------------*/
 
-const char * pcStateNameFromThread(uint8_t eState)
+const char * pcStateNameFromThread(ECtrlInputSignal eState)
 {
     const char *pcStateName = xMainControllerMapping[0].cState;
     BaseType_t x;
