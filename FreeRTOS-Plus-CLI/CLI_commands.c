@@ -366,6 +366,8 @@ BaseType_t xMainControllerCommand( char *pcWriteBuffer, size_t xWriteBufferLen, 
     /* send to queue */
     xReturn = xQueueSend(xQueueCtrlInputSignalHandle, &eSignal, NULL);
 
+    ( void ) xReturn;
+
     /* receive if status is requested */
     if (eSignal==CONTROLLER_GET_STATUS_CLI_SIG)
     {
@@ -375,7 +377,7 @@ BaseType_t xMainControllerCommand( char *pcWriteBuffer, size_t xWriteBufferLen, 
             snprintf( pcWriteBuffer, xWriteBufferLen,
                       "Module: %s\r\n"
                       "State: %d\n\r"
-                      "Settings\n\r"
+                      "Settings:\n\r"
                       "    Power: %d\n\r"
                       "    Offset: %d\n\r"
                       "    Offset Settings:\n\r"
@@ -383,7 +385,7 @@ BaseType_t xMainControllerCommand( char *pcWriteBuffer, size_t xWriteBufferLen, 
                       "        Parameter A: %d\n\r"
                       "        Parameter B: %d\n\r"
                       "        Parameter C: %d\n\r",
-                      xStateVariables.cModulenName,
+                      xStateVariables.cModuleName,
                       xStateVariables.eState,
                       xStateVariables.xSettings.uiPower,
                       xStateVariables.xSettings.bOffset,
