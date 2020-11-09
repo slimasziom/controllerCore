@@ -122,7 +122,7 @@ void main(void)
 	/* Register Queues */
 	xQueueCtrlInputSignalHandle = xQueueCreate(10, sizeof(ECtrlInputSignal));
 	xQueueRestAPIResponseHandle = xQueueCreate(10, sizeof(char));
-	xQueueCLIResponseHandle = xQueueCreate(10, sizeof(char));
+	xQueueCLIResponseHandle = xQueueCreate(10, sizeof(xControllerStateVariables_t));
 
 	/* Register some commands to CLI */
 #if ( configGENERATE_RUN_TIME_STATS == 1 )
@@ -255,13 +255,8 @@ void vMainControllerTask(void *pvParameters){
     /* xQueueCtrlInputSignalHandle signal */
     ECtrlInputSignal eMsg;
 
-    xAppMsg_t xMsg;
-
     /* Controller state variables*/
     xControllerStateVariables_t xStateVariables;
-
-    /* Controller state */
-    EControllerState eState = CONTROLLER_STOP_STATE;
 
     /* Remove compiler warning about unused parameter. */
     ( void ) pvParameters;
@@ -269,7 +264,15 @@ void vMainControllerTask(void *pvParameters){
     /* USER LED 3 */
     gioSetBit(gioPORTB, 7, 0);
 
-
+    /* Controller initial state variables */
+    xStateVariables.eState=CONTROLLER_STOP_STATE;
+    snprintf( xStateVariables.cModulenName, 20, "Main Controller");
+    xStateVariables.xSettings.uiPower=93;
+    xStateVariables.xSettings.bOffset= true;
+    xStateVariables.xSettings.xOffsetSettings.uiPar_a=32;
+    xStateVariables.xSettings.xOffsetSettings.uiPar_b=64;
+    xStateVariables.xSettings.xOffsetSettings.uiPar_c=12;
+    snprintf( xStateVariables.xSettings.xOffsetSettings.cOffsetType, 20, "default");
 
     while(1)
     {
@@ -277,41 +280,30 @@ void vMainControllerTask(void *pvParameters){
         if (xQueueReceive(xQueueCtrlInputSignalHandle, &eMsg, 0) == pdTRUE) {
             switch(eMsg){
             case CONTROLLER_SHORT_PRESS_SIG:
-                if(eState == CONTROLLER_STOP_STATE){
-                    eState = CONTROLLER_START_STATE;
+                if(xStateVariables.eState == CONTROLLER_STOP_STATE){
+                    xStateVariables.eState = CONTROLLER_START_STATE;
                     gioSetBit(gioPORTB, 7, 1);
                 }
-                else if(eState == CONTROLLER_START_STATE){
-                    eState = CONTROLLER_STOP_STATE;
+                else if(xStateVariables.eState == CONTROLLER_START_STATE){
+                    xStateVariables.eState = CONTROLLER_STOP_STATE;
                     gioSetBit(gioPORTB, 7, 0);
                 }
                 break;
             case CONTROLLER_START_SIG:
-                eState = CONTROLLER_START_STATE;
+                xStateVariables.eState = CONTROLLER_START_STATE;
                 gioSetBit(gioPORTB, 7, 1);
                 break;
             case CONTROLLER_STOP_SIG:
             case CONTROLLER_PAUSE_SIG:
             case CONTROLLER_EMERGENCY_SIG:
-                eState = CONTROLLER_STOP_STATE;
+                xStateVariables.eState = CONTROLLER_STOP_STATE;
                 gioSetBit(gioPORTB, 7, 0);
                 break;
             case CONTROLLER_GET_STATUS_REST_SIG:
-
-//                /* Example */
-//                xStateVariables.eState=eState;
-//                snprintf( xStateVariables.cModulenName, 20, "Main Controller");
-//                xStateVariables.xSettings.uiPower=93;
-//                xStateVariables.xSettings.bOffset= true;
-//                xStateVariables.xSettings.xOffsetSettings.uiPar_a=32;
-//                xStateVariables.xSettings.xOffsetSettings.uiPar_b=64;
-//                xStateVariables.xSettings.xOffsetSettings.uiPar_c=12;
-//                snprintf( xStateVariables.xSettings.xOffsetSettings.cOffsetType, 20, "default");
-
-                xQueueSend(xQueueRestAPIResponseHandle, &eState, 0);
+                xQueueSend(xQueueRestAPIResponseHandle, &xStateVariables.eState, 0);
                 break;
             case CONTROLLER_GET_STATUS_CLI_SIG:
-                xQueueSend(xQueueCLIResponseHandle, &eState, 0);
+                xQueueSend(xQueueCLIResponseHandle, &xStateVariables, 0);
                 break;
             default:
                 break;

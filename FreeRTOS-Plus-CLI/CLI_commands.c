@@ -336,36 +336,64 @@ BaseType_t xMainControllerCommand( char *pcWriteBuffer, size_t xWriteBufferLen, 
     char * pcParameter;
     BaseType_t lParameterStringLength, xReturn;
     uint8_t eSignal = CONTROLLER_NONE_SIG;
-    EControllerState eState = CONTROLLER_NONE_STATE;
+    xControllerStateVariables_t xStateVariables;
 
     ( void ) pcWriteBuffer;
     ( void ) xWriteBufferLen;
     ( void ) pcCommandString;
 
+
     xReturn = pdFALSE;
 
-        /* Obtain the IP address string. */
+    /* Obtain the signal string. */
     pcParameter = ( char * ) FreeRTOS_CLIGetParameter
                             (
                                 pcCommandString,        /* The command string itself. */
                                 1,                      /* Return the first parameter. */
                                 &lParameterStringLength /* Store the parameter string length. */
                             );
+
+    ( void ) lParameterStringLength;
+
     /* check which command was sent */
     eSignal = uiThreadSignalFromCommand(xMainControllerMapping, pcParameter);
 
-    if (eSignal == 0){
+    if (eSignal == 0)
+    {
         snprintf( pcWriteBuffer, xWriteBufferLen, "wrong parameter\r\n");
         return pdFALSE;
     }
     /* send to queue */
     xReturn = xQueueSend(xQueueCtrlInputSignalHandle, &eSignal, NULL);
 
-    if (eSignal==CONTROLLER_GET_STATUS_CLI_SIG){
+    /* receive if status is requested */
+    if (eSignal==CONTROLLER_GET_STATUS_CLI_SIG)
+    {
         /* wait for response */
-        if(xQueueReceive(xQueueCLIResponseHandle, &eState, 1000) == pdTRUE){
-            snprintf( pcWriteBuffer, xWriteBufferLen, "state: %d\r\n", eState);
-        }else{
+        if(xQueueReceive(xQueueCLIResponseHandle, &xStateVariables, 1000) == pdTRUE)
+        {
+            snprintf( pcWriteBuffer, xWriteBufferLen,
+                      "Module: %s\r\n"
+                      "State: %d\n\r"
+                      "Settings\n\r"
+                      "    Power: %d\n\r"
+                      "    Offset: %d\n\r"
+                      "    Offset Settings:\n\r"
+                      "        Type: %s\n\r"
+                      "        Parameter A: %d\n\r"
+                      "        Parameter B: %d\n\r"
+                      "        Parameter C: %d\n\r",
+                      xStateVariables.cModulenName,
+                      xStateVariables.eState,
+                      xStateVariables.xSettings.uiPower,
+                      xStateVariables.xSettings.bOffset,
+                      xStateVariables.xSettings.xOffsetSettings.cOffsetType,
+                      xStateVariables.xSettings.xOffsetSettings.uiPar_a,
+                      xStateVariables.xSettings.xOffsetSettings.uiPar_b,
+                      xStateVariables.xSettings.xOffsetSettings.uiPar_c);
+        }
+        else
+        {
             snprintf( pcWriteBuffer, xWriteBufferLen, "error: No response");
         }
     }
@@ -373,7 +401,6 @@ BaseType_t xMainControllerCommand( char *pcWriteBuffer, size_t xWriteBufferLen, 
     {
         snprintf( pcWriteBuffer, xWriteBufferLen, "executed");
     }
-
 
     return pdFALSE;
 
