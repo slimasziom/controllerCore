@@ -121,7 +121,7 @@ void main(void)
 
 	/* Register Queues */
 	xQueueCtrlInputSignalHandle = xQueueCreate(10, sizeof(ECtrlInputSignal));
-	xQueueRestAPIResponseHandle = xQueueCreate(10, sizeof(char));
+	xQueueRestAPIResponseHandle = xQueueCreate(10, sizeof(xControllerStateVariables_t));
 	xQueueCLIResponseHandle = xQueueCreate(10, sizeof(xControllerStateVariables_t));
 
 	/* Register some commands to CLI */
@@ -266,7 +266,7 @@ void vMainControllerTask(void *pvParameters){
 
     /* Controller initial state variables */
     xStateVariables.eState=CONTROLLER_STOP_STATE;
-    snprintf( xStateVariables.cModulenName, 20, "Main Controller");
+    snprintf( xStateVariables.cModuleName, 20, "Main Controller");
     xStateVariables.xSettings.uiPower=93;
     xStateVariables.xSettings.bOffset= true;
     xStateVariables.xSettings.xOffsetSettings.uiPar_a=32;
@@ -300,7 +300,7 @@ void vMainControllerTask(void *pvParameters){
                 gioSetBit(gioPORTB, 7, 0);
                 break;
             case CONTROLLER_GET_STATUS_REST_SIG:
-                xQueueSend(xQueueRestAPIResponseHandle, &xStateVariables.eState, 0);
+                xQueueSend(xQueueRestAPIResponseHandle, &xStateVariables, 0);
                 break;
             case CONTROLLER_GET_STATUS_CLI_SIG:
                 xQueueSend(xQueueCLIResponseHandle, &xStateVariables, 0);

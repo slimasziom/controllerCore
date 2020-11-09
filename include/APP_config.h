@@ -12,7 +12,7 @@
 #include "stdlib.h"
 #include "stdint.h"
 
-#define appRestAPI_BUFFER_SIZE ( 1024 )
+#define appRestAPI_BUFFER_SIZE ( 2048 )
 #define appCOMMAND_LENGTH (32)
 
 /* Controller input signals */
@@ -56,7 +56,7 @@ typedef struct {
 /* Controller thread struct */
 typedef struct {
     uint8_t eState;
-    char cModulenName[20];
+    char cModuleName[20];
     xCtsv_t xSettings;
 } xControllerStateVariables_t;
 

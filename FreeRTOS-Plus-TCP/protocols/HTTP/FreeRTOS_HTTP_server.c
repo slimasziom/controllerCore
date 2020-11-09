@@ -285,15 +285,43 @@ static void vProcessRestRequest( xHTTPClient *pxClient ){
     else if (strncmp(pxClient->pcRestAPI, pcRestAPIRequestGet, strlen(pcRestAPIRequestGet)) == 0)
     {
         ECtrlInputSignal eMsg = CONTROLLER_GET_STATUS_REST_SIG;
-        EControllerState eState;
-//        xControllerStateVariables_t xStateVariables;
+//        EControllerState eState;
+        xControllerStateVariables_t xStateVariables;
 
         if(xQueueSend(xQueueCtrlInputSignalHandle, &eMsg, NULL) == pdTRUE){
-            if(xQueueReceive(xQueueRestAPIResponseHandle, &eState, 1000) == pdTRUE){
-                snprintf( pxClient->pxParent->pcCommandBuffer,
-                    sizeof pxClient->pxParent->pcCommandBuffer,
-                    "{\"success\": \"OK\", \"result\": {\"state\": %d}}",
-                    eState );
+            if(xQueueReceive(xQueueRestAPIResponseHandle, &xStateVariables, 1000) == pdTRUE){
+//                snprintf( pxClient->pxParent->pcCommandBuffer,
+//                    sizeof pxClient->pxParent->pcCommandBuffer,
+//                    "{\"success\": \"OK\", \"result\": {\"state\": %d}}",
+//                    eState );
+                snprintf( pxClient->pxParent->pcCommandBuffer, sizeof pxClient->pxParent->pcCommandBuffer,
+                          "{\"success\": \"OK\", \"result\": "
+                              "{"
+                                  "\"Module\": \"%s\","
+                                  "\"State\": %d,"
+                                  "\"Settings\": "
+                                  "{"
+                                      "\"Power\": %d,"
+                                      "\"Offset\": %d,"
+                                      "\"Offset Settings\": "
+                                      "{"
+                                          "\"Type\": \"%s\","
+                                          "\"Parameter A\": %d, "
+                                          "\"Parameter B\": %d, "
+                                          "\"Parameter C\": %d "
+                                      "}"
+                                  "}"
+                              "}"
+                          "}",
+                          xStateVariables.cModuleName,
+                          xStateVariables.eState,
+                          xStateVariables.xSettings.uiPower,
+                          xStateVariables.xSettings.bOffset,
+                          xStateVariables.xSettings.xOffsetSettings.cOffsetType,
+                          xStateVariables.xSettings.xOffsetSettings.uiPar_a,
+                          xStateVariables.xSettings.xOffsetSettings.uiPar_b,
+                          xStateVariables.xSettings.xOffsetSettings.uiPar_c);
+
             }
             else
             {
