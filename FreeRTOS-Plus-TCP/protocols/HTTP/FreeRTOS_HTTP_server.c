@@ -302,7 +302,7 @@ static void vProcessRestRequest( xHTTPClient *pxClient ){
                                   "\"Settings\": "
                                   "{"
                                       "\"Power\": %d,"
-                                      "\"Offset\": %d,"
+                                      "\"Offset\": %s,"
                                       "\"Offset Settings\": "
                                       "{"
                                           "\"Type\": \"%s\","
@@ -316,7 +316,7 @@ static void vProcessRestRequest( xHTTPClient *pxClient ){
                           xStateVariables.cModuleName,
                           xStateVariables.eState,
                           xStateVariables.xSettings.uiPower,
-                          xStateVariables.xSettings.bOffset,
+                          xStateVariables.xSettings.bOffset ? "true" : "false",
                           xStateVariables.xSettings.xOffsetSettings.cOffsetType,
                           xStateVariables.xSettings.xOffsetSettings.uiPar_a,
                           xStateVariables.xSettings.xOffsetSettings.uiPar_b,

@@ -379,7 +379,7 @@ BaseType_t xMainControllerCommand( char *pcWriteBuffer, size_t xWriteBufferLen, 
                       "State: %d\n\r"
                       "Settings:\n\r"
                       "    Power: %d\n\r"
-                      "    Offset: %d\n\r"
+                      "    Offset: %s\n\r"
                       "    Offset Settings:\n\r"
                       "        Type: %s\n\r"
                       "        Parameter A: %d\n\r"
@@ -388,7 +388,7 @@ BaseType_t xMainControllerCommand( char *pcWriteBuffer, size_t xWriteBufferLen, 
                       xStateVariables.cModuleName,
                       xStateVariables.eState,
                       xStateVariables.xSettings.uiPower,
-                      xStateVariables.xSettings.bOffset,
+                      xStateVariables.xSettings.bOffset ? "true" : "false",
                       xStateVariables.xSettings.xOffsetSettings.cOffsetType,
                       xStateVariables.xSettings.xOffsetSettings.uiPar_a,
                       xStateVariables.xSettings.xOffsetSettings.uiPar_b,
