@@ -376,7 +376,7 @@ BaseType_t xMainControllerCommand( char *pcWriteBuffer, size_t xWriteBufferLen, 
         {
             snprintf( pcWriteBuffer, xWriteBufferLen,
                       "Module: %s\r\n"
-                      "State: %d\n\r"
+                      "State: %s\n\r"
                       "Settings:\n\r"
                       "    Power: %d\n\r"
                       "    Offset: %s\n\r"
@@ -386,7 +386,7 @@ BaseType_t xMainControllerCommand( char *pcWriteBuffer, size_t xWriteBufferLen, 
                       "        Parameter B: %d\n\r"
                       "        Parameter C: %d\n\r",
                       xStateVariables.cModuleName,
-                      xStateVariables.eState,
+                      pcStateNameFromThread(xStateVariables.eState),
                       xStateVariables.xSettings.uiPower,
                       xStateVariables.xSettings.bOffset ? "true" : "false",
                       xStateVariables.xSettings.xOffsetSettings.cOffsetType,

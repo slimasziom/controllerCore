@@ -290,15 +290,11 @@ static void vProcessRestRequest( xHTTPClient *pxClient ){
 
         if(xQueueSend(xQueueCtrlInputSignalHandle, &eMsg, NULL) == pdTRUE){
             if(xQueueReceive(xQueueRestAPIResponseHandle, &xStateVariables, 1000) == pdTRUE){
-//                snprintf( pxClient->pxParent->pcCommandBuffer,
-//                    sizeof pxClient->pxParent->pcCommandBuffer,
-//                    "{\"success\": \"OK\", \"result\": {\"state\": %d}}",
-//                    eState );
                 snprintf( pxClient->pxParent->pcCommandBuffer, sizeof pxClient->pxParent->pcCommandBuffer,
                           "{\"success\": \"OK\", \"result\": "
                               "{"
                                   "\"Module\": \"%s\","
-                                  "\"State\": %d,"
+                                  "\"State\": \"%s\","
                                   "\"Settings\": "
                                   "{"
                                       "\"Power\": %d,"
@@ -314,14 +310,13 @@ static void vProcessRestRequest( xHTTPClient *pxClient ){
                               "}"
                           "}",
                           xStateVariables.cModuleName,
-                          xStateVariables.eState,
+                          pcStateNameFromThread(xStateVariables.eState),
                           xStateVariables.xSettings.uiPower,
                           xStateVariables.xSettings.bOffset ? "true" : "false",
                           xStateVariables.xSettings.xOffsetSettings.cOffsetType,
                           xStateVariables.xSettings.xOffsetSettings.uiPar_a,
                           xStateVariables.xSettings.xOffsetSettings.uiPar_b,
                           xStateVariables.xSettings.xOffsetSettings.uiPar_c);
-
             }
             else
             {

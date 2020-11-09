@@ -266,7 +266,7 @@ void vMainControllerTask(void *pvParameters){
 
     /* Controller initial state variables */
     xStateVariables.eState=CONTROLLER_STOP_STATE;
-    snprintf( xStateVariables.cModuleName, 20, "Main Controller");
+    snprintf( xStateVariables.cModuleName, 20, "main-controller");
     xStateVariables.xSettings.uiPower=93;
     xStateVariables.xSettings.bOffset= true;
     xStateVariables.xSettings.xOffsetSettings.uiPar_a=32;
@@ -281,16 +281,16 @@ void vMainControllerTask(void *pvParameters){
             switch(eMsg){
             case CONTROLLER_SHORT_PRESS_SIG:
                 if(xStateVariables.eState == CONTROLLER_STOP_STATE){
-                    xStateVariables.eState = CONTROLLER_START_STATE;
+                    xStateVariables.eState = CONTROLLER_RUNNING_STATE;
                     gioSetBit(gioPORTB, 7, 1);
                 }
-                else if(xStateVariables.eState == CONTROLLER_START_STATE){
+                else if(xStateVariables.eState == CONTROLLER_RUNNING_STATE){
                     xStateVariables.eState = CONTROLLER_STOP_STATE;
                     gioSetBit(gioPORTB, 7, 0);
                 }
                 break;
-            case CONTROLLER_START_SIG:
-                xStateVariables.eState = CONTROLLER_START_STATE;
+            case CONTROLLER_RUN_SIG:
+                xStateVariables.eState = CONTROLLER_RUNNING_STATE;
                 gioSetBit(gioPORTB, 7, 1);
                 break;
             case CONTROLLER_STOP_SIG:

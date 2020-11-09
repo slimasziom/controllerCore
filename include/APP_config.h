@@ -18,7 +18,7 @@
 /* Controller input signals */
 typedef enum {
     CONTROLLER_NONE_SIG,    // not used, first
-    CONTROLLER_START_SIG,
+    CONTROLLER_RUN_SIG,
     CONTROLLER_STOP_SIG,
     CONTROLLER_PAUSE_SIG,
     CONTROLLER_EMERGENCY_SIG,
@@ -31,9 +31,9 @@ typedef enum {
 /* Controller states */
 typedef enum {
     CONTROLLER_NONE_STATE,    // not used, first
-    CONTROLLER_START_STATE,
+    CONTROLLER_RUNNING_STATE,
     CONTROLLER_STOP_STATE,
-    CONTROLLER_PAUSE_STATE,
+    CONTROLLER_PAUSED_STATE,
     CONTROLLER_EMERGENCY_STATE,
     CONTROLLER_LAST_STATE     // not used, last
 } EControllerState;
@@ -72,6 +72,6 @@ extern xThreadMapping_t xMainControllerMapping[];
 
 /* Move to APP_thread_processing */
 uint8_t uiThreadSignalFromCommand(xThreadMapping_t *xThread, char *pcCommandString);
-//char * pcStateNameFromThread(uint8_t sState);
+const char * pcStateNameFromThread(uint8_t eState);
 
 #endif /* INCLUDE_APP_CONFIG_H_ */

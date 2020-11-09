@@ -39,9 +39,10 @@
 
 xThreadMapping_t xMainControllerMapping[] =
 {
-    { CONTROLLER_START_SIG,             CONTROLLER_START_STATE,         "start",        "started"   },
+    { CONTROLLER_NONE_SIG,              CONTROLLER_NONE_STATE,          "unknown",      "unknown"   },
+    { CONTROLLER_RUN_SIG,               CONTROLLER_RUNNING_STATE,       "run",          "running"   },
     { CONTROLLER_STOP_SIG,              CONTROLLER_STOP_STATE,          "stop",         "stopped"   },
-    { CONTROLLER_PAUSE_SIG,             CONTROLLER_PAUSE_STATE,         "pause",        "paused"    },
+    { CONTROLLER_PAUSE_SIG,             CONTROLLER_PAUSED_STATE,        "pause",        "paused"    },
     { CONTROLLER_EMERGENCY_SIG,         CONTROLLER_EMERGENCY_STATE,     "emergency",    "emergency" },
     { CONTROLLER_GET_STATUS_CLI_SIG,    CONTROLLER_NONE_STATE,          "status",       ""          },
     { CONTROLLER_GET_STATUS_REST_SIG,   CONTROLLER_NONE_STATE,          "status",       ""          }
@@ -56,7 +57,7 @@ uint8_t uiThreadSignalFromCommand(xThreadMapping_t *xThread, char *pcCommandStri
     uint8_t eSignal = 0;
     BaseType_t x;
 
-    for( x = 0; x < 5; x++ )
+    for( x = 0; x < 6; x++ )
     {
         if (strcmp(xThread[x].cCommand, pcCommandString) == 0){
             eSignal = xThread[x].eSignal;
@@ -67,12 +68,19 @@ uint8_t uiThreadSignalFromCommand(xThreadMapping_t *xThread, char *pcCommandStri
 }
 /*-----------------------------------------------------------*/
 
-//const char * pcStateNameFromThread(uint8_t eState)
-//{
-//    char *pcStateName;
-//
-//
-//
-//    return NULL;
-//}
+const char * pcStateNameFromThread(uint8_t eState)
+{
+    const char *pcStateName = xMainControllerMapping[0].cState;
+    BaseType_t x;
+
+    for( x = 0; x < 6; x++ )
+        {
+            if (xMainControllerMapping[x].eState == eState){
+                pcStateName = xMainControllerMapping[x].cState;
+                break;
+            }
+        }
+
+    return pcStateName;
+}
 /*-----------------------------------------------------------*/
