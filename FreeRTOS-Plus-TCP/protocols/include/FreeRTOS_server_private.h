@@ -120,8 +120,8 @@ struct xHTTP_CLIENT
 
 	const char *pcUrlData;
 	const char *pcRestData;
+    const char *pcRestAPI;
 	char pcCurrentFilename[ ffconfigMAX_FILENAME ];
-	char pcRestAPI[ ipconfigTCP_COMMAND_BUFFER_SIZE ];
 	size_t xBytesLeft;
 	FF_FILE *pxFileHandle;
 	union {

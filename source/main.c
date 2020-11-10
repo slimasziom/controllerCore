@@ -44,7 +44,10 @@
 #include "UDPCommandConsole.h"		/* FreeRTOS-Plus-UDP-Console includes. */
 #include "CLI_commands.h"			/* CLI commands */
 
-/* TCPIP related headers */
+/* REST related headers */
+#include "FreeRTOS_REST.h"
+#include "REST_commands.h"           /* REST commands */
+
 #include "FreeRTOSIPConfig.h"
 #include "FreeRTOS_IP.h"
 #include "FreeRTOS_IP_Private.h"
@@ -138,6 +141,9 @@ void main(void)
 
 	/* Register some more filesystem related commands, like dir, cd, pwd ... */
 	vRegisterFileSystemCLICommands();
+
+	/* Register some commands to REST */
+    FreeRTOS_RESTRegisterCommand( &xMainControllerRest );
 
 	xTaskCreate(vTask1, "HeartBeat", configMINIMAL_STACK_SIZE * 10, NULL, tskIDLE_PRIORITY + 3  | portPRIVILEGE_BIT, &xTask1Handle);
 	FreeRTOS_IPInit(ucIPAddress, ucNetMask, ucGatewayAddress, ucDNSServerAddress, emacAddress);
@@ -464,6 +470,7 @@ void vApplicationPingReplyHook(ePingReplyStatus_t eStatus, uint16_t usIdentifier
 {
 static const char *pcSuccess = "Ping reply received - identifier %d\r\n";
 static const char *pcInvalidChecksum = "Ping reply received with invalid checksum - identifier %d\r\n";
+
 static const char *pcInvalidData = "Ping reply received with invalid data - identifier %d\r\n";
 
 	switch(eStatus)

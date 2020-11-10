@@ -77,9 +77,13 @@
 /* FreeRTOS+FAT includes. */
 #include "ff_stdio.h"
 
+/* Example includes. */
+#include "REST_commands.h"
+
 /* Application specific configuration */
 #include "APP_config.h"
 #include "APP_queues.h"
+
 
 #ifndef HTTP_SERVER_BACKLOG
 	#define HTTP_SERVER_BACKLOG			( 12 )
@@ -101,7 +105,7 @@
 	#define vsnprintf	_vsnprintf
 #endif
 
-/* Some defines to make the code more readbale */
+/* Some defines to make the code more readable */
 #define pcCOMMAND_BUFFER	pxClient->pxParent->pcCommandBuffer
 #define pcNEW_DIR			pxClient->pxParent->pcNewDir
 #define pcFILE_BUFFER		pxClient->pxParent->pcFileBuffer
@@ -113,7 +117,6 @@ static BaseType_t prvOpenUrl( xHTTPClient *pxClient );
 static BaseType_t prvSendFile( xHTTPClient *pxClient );
 static BaseType_t prvSendRestResponse( xHTTPClient *pxClient );
 static BaseType_t prvSendReply( xHTTPClient *pxClient, BaseType_t xCode );
-static void vProcessRestRequest( xHTTPClient *pxClient );
 
 static const char pcEmptyString[1] = { '\0' };
 
@@ -258,127 +261,37 @@ BaseType_t xRc = 0;
 }
 /*-----------------------------------------------------------*/
 
-static void vProcessRestRequest( xHTTPClient *pxClient ){
-    const char *pcRestAPIRequest = "main-controller?state=";
-    const char *pcRestAPIRequestGet = "main-controller?status";
-    BaseType_t x;
-    portBASE_TYPE xReturned;
-    char pcCommandBufferTemp[ ipconfigTCP_COMMAND_BUFFER_SIZE ];
-
-    /* process rest request and send response */
-    if (strncmp(pxClient->pcRestAPI, pcRestAPIRequest, strlen(pcRestAPIRequest)) == 0)
-    {
-        BaseType_t xEnqueued = 0;
-        xAppMsgBaseType_t xMsg = {NULL, CONTROLLER_NONE_SIG};
-
-        /* xQueueCtrlInputSignalHandle signal */
-        strncpy(pxClient->pcRestAPI, pxClient->pcRestAPI+strlen(pcRestAPIRequest), strlen(pxClient->pcRestAPI)-strlen(pcRestAPIRequest)+1);
-
-        xMsg.eSignal = (ECtrlInputSignal) uiThreadSignalFromCommand(xMainControllerMapping, pxClient->pcRestAPI);
-
-        xEnqueued = xQueueSend(xQueueCtrlInputSignalHandle, &xMsg, NULL);
-
-        snprintf( pxClient->pxParent->pcCommandBuffer,
-            sizeof pxClient->pxParent->pcCommandBuffer,
-            "{\"success\": \"OK\", \"result\": {\"enqueued\": %d, \"message\": %d}}",
-            xEnqueued,
-            xMsg.eSignal );
-    }
-
-    else if (strncmp(pxClient->pcRestAPI, pcRestAPIRequestGet, strlen(pcRestAPIRequestGet)) == 0)
-    {
-        xControllerStateVariables_t xStateVariables;
-        xAppMsgBaseType_t xMsg = {xQueueRestAPIResponseHandle, CONTROLLER_GET_STATUS_SIG};
-
-        if(xQueueSend(xQueueCtrlInputSignalHandle, &xMsg, NULL) == pdTRUE){
-            if(xQueueReceive(xQueueRestAPIResponseHandle, &xStateVariables, 1000) == pdTRUE){
-                snprintf( pxClient->pxParent->pcCommandBuffer, sizeof pxClient->pxParent->pcCommandBuffer,
-                          "{\"success\": \"OK\", \"result\": "
-                              "{"
-                                  "\"Module\": \"%s\","
-                                  "\"State\": \"%s\","
-                                  "\"Settings\": "
-                                  "{"
-                                      "\"Power\": %d,"
-                                      "\"Offset\": %s,"
-                                      "\"Offset Settings\": "
-                                      "{"
-                                          "\"Type\": \"%s\","
-                                          "\"Parameter A\": %d, "
-                                          "\"Parameter B\": %d, "
-                                          "\"Parameter C\": %d "
-                                      "}"
-                                  "}"
-                              "}"
-                          "}",
-                          xStateVariables.cModuleName,
-                          pcStateNameFromThread(xStateVariables.eState),
-                          xStateVariables.xSettings.uiPower,
-                          xStateVariables.xSettings.bOffset ? "true" : "false",
-                          xStateVariables.xSettings.xOffsetSettings.cOffsetType,
-                          xStateVariables.xSettings.xOffsetSettings.uiPar_a,
-                          xStateVariables.xSettings.xOffsetSettings.uiPar_b,
-                          xStateVariables.xSettings.xOffsetSettings.uiPar_c);
-            }
-            else
-            {
-                snprintf( pxClient->pxParent->pcCommandBuffer,
-                    sizeof pxClient->pxParent->pcCommandBuffer,
-                    "{\"success\": \"OK\", \"result\": \"response error\"}" );
-            }
-        }
-        else
-        {
-            snprintf( pxClient->pxParent->pcCommandBuffer,
-                sizeof pxClient->pxParent->pcCommandBuffer,
-                "{\"success\": \"OK\", \"result\": \"send error\"}" );
-        }
-    }
-    else
-    {
-        snprintf( pxClient->pxParent->pcCommandBuffer,
-            sizeof pxClient->pxParent->pcCommandBuffer,
-            "{\"success\": \"failed\", \"result\": {\"status\": \"not recognized\", \"received\": \"%s\"}}",
-            pxClient->pcRestAPI );
-    }
-}
-/*-----------------------------------------------------------*/
-
 static BaseType_t prvOpenUrl( xHTTPClient *pxClient )
 {
 BaseType_t xRc;
 char pcSlash[ 2 ];
-const char *pcRequest = "/request/";
+const char *pcRestRequest = "/request/";
 
 	pxClient->bits.ulFlags = 0;
 
-	if( pxClient->pcUrlData[ 0 ] != '/' )
-	{
-		/* Insert a slah before the file name */
-		pcSlash[ 0 ] = '/';
-		pcSlash[ 1 ] = '\0';
-	}
-	else
-	{
-		/* The browser provided a starting '/' already */
-		pcSlash[ 0 ] = '\0';
-	}
-
-    snprintf( pxClient->pcRestAPI, sizeof pxClient->pcRestAPI, "%s%s",
-              pcSlash,
-              pxClient->pcUrlData);
-
     /* verify if it is filename read or REST API */
-    if (strncmp(pxClient->pcRestAPI, pcRequest, strlen(pcRequest)) == 0)
+    if (strncmp(pxClient->pcUrlData, pcRestRequest, strlen(pcRestRequest)) == 0)
     {
-        strncpy(pxClient->pcRestAPI, pxClient->pcRestAPI+strlen(pcRequest), strlen(pxClient->pcRestAPI)-strlen(pcRequest)+1);
+        pxClient->pcRestAPI = pxClient->pcUrlData + strlen(pcRestRequest);
         /* process rest request and send response */
-        vProcessRestRequest( pxClient );
+        FreeRTOS_RESTProcessCommand( pxClient->pcRestAPI, pcCOMMAND_BUFFER, sizeof ( pcCOMMAND_BUFFER ) );
         pxClient->xBytesLeft = strlen(pxClient->pxParent->pcCommandBuffer);
         xRc = prvSendRestResponse( pxClient );
     }
     else
     {
+        if( pxClient->pcUrlData[ 0 ] != '/' )
+        {
+            /* Insert a slah before the file name */
+            pcSlash[ 0 ] = '/';
+            pcSlash[ 1 ] = '\0';
+        }
+        else
+        {
+            /* The browser provided a starting '/' already */
+            pcSlash[ 0 ] = '\0';
+        }
+
         snprintf( pxClient->pcCurrentFilename, sizeof pxClient->pcCurrentFilename, "%s%s%s",
             pxClient->pcRootDir,
             pcSlash,
