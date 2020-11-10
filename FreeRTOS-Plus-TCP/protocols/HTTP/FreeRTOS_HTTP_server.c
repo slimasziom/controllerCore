@@ -259,8 +259,11 @@ BaseType_t xRc = 0;
 /*-----------------------------------------------------------*/
 
 static void vProcessRestRequest( xHTTPClient *pxClient ){
-    const char *pcRestAPIRequest = "main-controller/set/state=";
-    const char *pcRestAPIRequestGet = "main-controller/get/state";
+    const char *pcRestAPIRequest = "main-controller?state=";
+    const char *pcRestAPIRequestGet = "main-controller?status";
+    BaseType_t x;
+    portBASE_TYPE xReturned;
+    char pcCommandBufferTemp[ ipconfigTCP_COMMAND_BUFFER_SIZE ];
 
     /* process rest request and send response */
     if (strncmp(pxClient->pcRestAPI, pcRestAPIRequest, strlen(pcRestAPIRequest)) == 0)
@@ -271,7 +274,7 @@ static void vProcessRestRequest( xHTTPClient *pxClient ){
         /* xQueueCtrlInputSignalHandle signal */
         strncpy(pxClient->pcRestAPI, pxClient->pcRestAPI+strlen(pcRestAPIRequest), strlen(pxClient->pcRestAPI)-strlen(pcRestAPIRequest)+1);
 
-        xMsg.eSignal = (ECtrlInputSignal) strtol(pxClient->pcRestAPI, NULL, 10);
+        xMsg.eSignal = (ECtrlInputSignal) uiThreadSignalFromCommand(xMainControllerMapping, pxClient->pcRestAPI);
 
         xEnqueued = xQueueSend(xQueueCtrlInputSignalHandle, &xMsg, NULL);
 
@@ -338,8 +341,6 @@ static void vProcessRestRequest( xHTTPClient *pxClient ){
             "{\"success\": \"failed\", \"result\": {\"status\": \"not recognized\", \"received\": \"%s\"}}",
             pxClient->pcRestAPI );
     }
-
-
 }
 /*-----------------------------------------------------------*/
 
