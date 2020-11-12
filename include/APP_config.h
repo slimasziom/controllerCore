@@ -18,6 +18,8 @@
 /* Controller input signals */
 typedef enum {
     CONTROLLER_NONE_SIG,    // not used, first
+    CONTROLLER_ENTRY_SIG,
+    CONTROLLER_EXIT_SIG,
     CONTROLLER_RUN_SIG,
     CONTROLLER_STOP_SIG,
     CONTROLLER_PAUSE_SIG,

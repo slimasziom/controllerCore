@@ -80,6 +80,21 @@ static void vServerWorkTask(void *pvParameters);
 void vStartNTPTask( uint16_t usTaskStackSize, UBaseType_t uxTaskPriority );
 void vMainControllerTask(void *pvParameters);
 
+void vMainControllerFSMTask(void *pvParameters);
+/* The structure that defines FSM structure */
+typedef struct
+{
+    QueueHandle_t *pxEventQueue;
+//    void *pvActiveStateFunction(FSM_MainController_Definition_t * const me, QueueHandle_t *pxEventQueue );
+    xControllerStateVariables_t xStateVariables;
+
+} FSM_MainController_Definition_t;
+
+void * vMainControllerIdleState(FSM_MainController_Definition_t * const me, xAppMsgBaseType_t *pxEventQueue );
+void * vMainControllerStartState(FSM_MainController_Definition_t * const me, xAppMsgBaseType_t *pxEventQueue );
+void * vMainControllerEmergencyState(FSM_MainController_Definition_t * const me, xAppMsgBaseType_t *pxEventQueue );
+void * vMainControllerPauseState(FSM_MainController_Definition_t * const me, xAppMsgBaseType_t *pxEventQueue );
+
 extern hdkif_t hdkif_data[MAX_EMAC_INSTANCE];
 extern void vRegisterFileSystemCLICommands( void );
 extern void vCreateAndVerifyExampleFiles( const char *pcMountPath );
@@ -151,8 +166,13 @@ void main(void)
 	/* Start the command interpreter */
 	vStartUARTCommandInterpreterTask();
 
-	/* Start main controller task */
-	xTaskCreate(vMainControllerTask, "MainController", configMINIMAL_STACK_SIZE * 10, NULL, tskIDLE_PRIORITY + 5  | portPRIVILEGE_BIT, &xMainControllerTaskHandle);
+//	/* Start main controller task */
+//	xTaskCreate(vMainControllerTask, "MainController", configMINIMAL_STACK_SIZE * 10, NULL, tskIDLE_PRIORITY + 5  | portPRIVILEGE_BIT, &xMainControllerTaskHandle);
+
+    /* Start main controller task */
+    xTaskCreate(vMainControllerFSMTask, "MainControllerFSM", configMINIMAL_STACK_SIZE * 10, NULL, tskIDLE_PRIORITY + 5  | portPRIVILEGE_BIT, &xMainControllerTaskHandle);
+
+
 
 	vTaskStartScheduler();
 	while(1);
@@ -316,6 +336,155 @@ void vMainControllerTask(void *pvParameters){
         /* 10Hz refresh rate */
         vTaskDelay(pdMS_TO_TICKS(100));
     }
+}
+
+void vMainControllerFSMTask(void *pvParameters){
+    FSM_MainController_Definition_t me;
+    xAppMsgBaseType_t xMsg;
+    void *(*activeState)(FSM_MainController_Definition_t * const me, xAppMsgBaseType_t *pxEventQueue ) = &vMainControllerIdleState;
+    me.xStateVariables.eState=CONTROLLER_STOP_STATE;
+
+//    void *nextState = NULL;
+    void *(*nextState)(FSM_MainController_Definition_t * const me, xAppMsgBaseType_t *pxEventQueue ) = NULL;
+    /* Initialization */
+    me.xStateVariables.xSettings.uiPower=93;
+    me.xStateVariables.xSettings.bOffset= true;
+    me.xStateVariables.xSettings.xOffsetSettings.uiPar_a=32;
+    me.xStateVariables.xSettings.xOffsetSettings.uiPar_b=64;
+    me.xStateVariables.xSettings.xOffsetSettings.uiPar_c=12;
+    snprintf( me.xStateVariables.cModuleName, 20, "main-controller-fsm");
+    snprintf( me.xStateVariables.xSettings.xOffsetSettings.cOffsetType, 20, "default");
+
+    me.pxEventQueue = xQueueCtrlInputSignalHandle;
+
+    /* FSM execution */
+    while(1)
+        {
+            /* controller logic here */
+            if (xQueueReceive(me.pxEventQueue, &xMsg, 0) == pdTRUE)
+            {
+                nextState = (*activeState)(&me, &xMsg);     //TODO: remove warning
+                if (nextState != NULL){
+                    xMsg.eSignal = CONTROLLER_EXIT_SIG;
+                    (*activeState)(&me, &xMsg);
+                    activeState = nextState;
+                    xMsg.eSignal = CONTROLLER_ENTRY_SIG;
+                    (*activeState)(&me, &xMsg);
+                }
+            }
+        /* 10Hz refresh rate */
+        vTaskDelay(pdMS_TO_TICKS(100));
+        }
+}
+
+
+void * vMainControllerIdleState(FSM_MainController_Definition_t * const me, xAppMsgBaseType_t *pxEventQueue ){
+    void *state;
+    switch(pxEventQueue->eSignal){
+    case CONTROLLER_ENTRY_SIG:
+        me->xStateVariables.eState = CONTROLLER_STOP_STATE;
+        break;
+    case CONTROLLER_RUN_SIG:
+    case CONTROLLER_SHORT_PRESS_SIG:
+        state = &vMainControllerStartState;
+        break;
+    case CONTROLLER_EMERGENCY_SIG:
+        state = &vMainControllerEmergencyState;
+        break;
+    case CONTROLLER_GET_STATUS_SIG:
+        xQueueSend(pxEventQueue->pxReturnQueue, &me->xStateVariables, 0);
+        state = NULL;
+        break;
+    default:
+        state = NULL;
+        break;
+    }
+
+    return state;
+}
+void * vMainControllerStartState(FSM_MainController_Definition_t * const me, xAppMsgBaseType_t *pxEventQueue ){
+    void *state;
+    switch(pxEventQueue->eSignal){
+    case CONTROLLER_ENTRY_SIG:
+        me->xStateVariables.eState = CONTROLLER_RUNNING_STATE;
+        gioSetBit(gioPORTB, 7, 1);
+        state = NULL;
+        break;
+    case CONTROLLER_STOP_SIG:
+    case CONTROLLER_SHORT_PRESS_SIG:
+        state = &vMainControllerIdleState;
+        break;
+    case CONTROLLER_PAUSE_SIG:
+        state = &vMainControllerPauseState;
+        break;
+    case CONTROLLER_EMERGENCY_SIG:
+        state = &vMainControllerEmergencyState;
+        break;
+    case CONTROLLER_GET_STATUS_SIG:
+        xQueueSend(pxEventQueue->pxReturnQueue, &me->xStateVariables, 0);
+        state = NULL;
+        break;
+    case CONTROLLER_EXIT_SIG:
+        gioSetBit(gioPORTB, 7, 0);
+        state = NULL;
+        break;
+    default:
+        state = NULL;
+        break;
+    }
+
+    return state;
+}
+void * vMainControllerEmergencyState(FSM_MainController_Definition_t * const me, xAppMsgBaseType_t *pxEventQueue ){
+    void *state;
+    switch(pxEventQueue->eSignal){
+    case CONTROLLER_ENTRY_SIG:
+        me->xStateVariables.eState = CONTROLLER_EMERGENCY_STATE;
+        break;
+    case CONTROLLER_RUN_SIG:
+    case CONTROLLER_SHORT_PRESS_SIG:
+        state = &vMainControllerStartState;
+        break;
+    case CONTROLLER_STOP_SIG:
+        state = &vMainControllerIdleState;
+        break;
+    case CONTROLLER_GET_STATUS_SIG:
+        xQueueSend(pxEventQueue->pxReturnQueue, &me->xStateVariables, 0);
+        state = NULL;
+        break;
+    default:
+        state = NULL;
+        break;
+    }
+
+    return state;
+}
+void * vMainControllerPauseState(FSM_MainController_Definition_t * const me, xAppMsgBaseType_t *pxEventQueue ){
+    void *state;
+    switch(pxEventQueue->eSignal){
+    case CONTROLLER_ENTRY_SIG:
+        me->xStateVariables.eState = CONTROLLER_PAUSED_STATE;
+        break;
+    case CONTROLLER_RUN_SIG:
+    case CONTROLLER_SHORT_PRESS_SIG:
+        state = &vMainControllerStartState;
+        break;
+    case CONTROLLER_STOP_SIG:
+        state = &vMainControllerIdleState;
+        break;
+    case CONTROLLER_EMERGENCY_SIG:
+        state = &vMainControllerEmergencyState;
+        break;
+    case CONTROLLER_GET_STATUS_SIG:
+        xQueueSend(pxEventQueue->pxReturnQueue, &me->xStateVariables, 0);
+        state = NULL;
+        break;
+    default:
+        state = NULL;
+        break;
+    }
+
+    return state;
 }
 
 /* User switch A */
