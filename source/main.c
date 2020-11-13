@@ -84,7 +84,8 @@ void vMainControllerFSMTask(void *pvParameters);
 /* The structure that defines FSM structure */
 typedef struct
 {
-    QueueHandle_t *pxEventQueue;
+    QueueHandle_t xEventQueue;
+    TimerHandle_t *pxTimer;
 //    void *pvActiveStateFunction(FSM_MainController_Definition_t * const me, QueueHandle_t *pxEventQueue );
     xControllerStateVariables_t xStateVariables;
 
@@ -94,6 +95,11 @@ void * vMainControllerIdleState(FSM_MainController_Definition_t * const me, xApp
 void * vMainControllerStartState(FSM_MainController_Definition_t * const me, xAppMsgBaseType_t *pxEventQueue );
 void * vMainControllerEmergencyState(FSM_MainController_Definition_t * const me, xAppMsgBaseType_t *pxEventQueue );
 void * vMainControllerPauseState(FSM_MainController_Definition_t * const me, xAppMsgBaseType_t *pxEventQueue );
+
+TimerHandle_t xTimerMainControllerHandle = NULL;
+void vFSMTimerFunctionCallback(TimerHandle_t xTimer);
+void vFSMTimerStart(TimerHandle_t *xTimer, uint32_t uiPeriod);
+void vFSMTimerStop(TimerHandle_t *xTimer);
 
 extern hdkif_t hdkif_data[MAX_EMAC_INSTANCE];
 extern void vRegisterFileSystemCLICommands( void );
@@ -355,13 +361,14 @@ void vMainControllerFSMTask(void *pvParameters){
     snprintf( me.xStateVariables.cModuleName, 20, "main-controller-fsm");
     snprintf( me.xStateVariables.xSettings.xOffsetSettings.cOffsetType, 20, "default");
 
-    me.pxEventQueue = xQueueCtrlInputSignalHandle;
+    me.xEventQueue = xQueueCtrlInputSignalHandle;
+    me.pxTimer = &xTimerMainControllerHandle;
 
     /* FSM execution */
     while(1)
         {
             /* controller logic here */
-            if (xQueueReceive(me.pxEventQueue, &xMsg, 0) == pdTRUE)
+            if (xQueueReceive(me.xEventQueue, &xMsg, 0) == pdTRUE)
             {
                 nextState = (*activeState)(&me, &xMsg);     //TODO: remove warning
                 if (nextState != NULL){
@@ -376,7 +383,6 @@ void vMainControllerFSMTask(void *pvParameters){
         vTaskDelay(pdMS_TO_TICKS(100));
         }
 }
-
 
 void * vMainControllerIdleState(FSM_MainController_Definition_t * const me, xAppMsgBaseType_t *pxEventQueue ){
     void *state;
@@ -464,6 +470,7 @@ void * vMainControllerPauseState(FSM_MainController_Definition_t * const me, xAp
     switch(pxEventQueue->eSignal){
     case CONTROLLER_ENTRY_SIG:
         me->xStateVariables.eState = CONTROLLER_PAUSED_STATE;
+        vFSMTimerStart(me->pxTimer, pdMS_TO_TICKS(500));
         break;
     case CONTROLLER_RUN_SIG:
     case CONTROLLER_SHORT_PRESS_SIG:
@@ -479,12 +486,35 @@ void * vMainControllerPauseState(FSM_MainController_Definition_t * const me, xAp
         xQueueSend(pxEventQueue->pxReturnQueue, &me->xStateVariables, 0);
         state = NULL;
         break;
+    case CONTROLLER_EXIT_SIG:
+        vFSMTimerStop(me->pxTimer);
+        gioSetBit(gioPORTB, 7, 0);
     default:
         state = NULL;
         break;
     }
 
     return state;
+}
+
+void vFSMTimerFunctionCallback(TimerHandle_t xTimer){
+    gioToggleBit(gioPORTB, 7);
+}
+
+void vFSMTimerStart(TimerHandle_t *xTimer, uint32_t uiPeriod){
+    //create software timer
+    if((*xTimer) == NULL){
+        (*xTimer) = xTimerCreate("FSM-TIMER", uiPeriod, pdTRUE, NULL, vFSMTimerFunctionCallback);
+        xTimerStart((*xTimer), portMAX_DELAY);
+    }else{
+        if(xTimerIsTimerActive((*xTimer)) == pdFALSE)
+        xTimerStart((*xTimer), portMAX_DELAY);
+    }
+}
+
+void vFSMTimerStop(TimerHandle_t *xTimer){
+    if((*xTimer) != NULL && xTimerIsTimerActive(xTimer) == pdTRUE)
+    xTimerStop((*xTimer), portMAX_DELAY);
 }
 
 /* User switch A */
