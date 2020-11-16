@@ -47,6 +47,19 @@ xThreadMapping_t xMainControllerMapping[] =
     { CONTROLLER_GET_STATUS_SIG,        CONTROLLER_NONE_STATE,          "status",       ""          }
 };
 
+xThreadMapping_t xTinyBmsMapping[] =
+{
+    { BMS_NONE_SIG,                     BMS_NONE_STATE,                 "unknown",          "unknown"       },
+    { BMS_OFFLINE_SIG,                  BMS_OFFLINE_STATE,              "go-offline",       "offline"       },
+    { BMS_CHARGING_SIG,                 BMS_CHARGING_STATE,             "charge",           "charging"      },
+    { BMS_FULLY_CHARGED_SIG,            BMS_FULLY_CHARGED_STATE,        "finish-charge",    "charged"       },
+    { BMS_DISCHARGING_SIG,              BMS_DISCHARGING_STATE,          "discharge",        "discharging"   },
+    { BMS_REGENERATION_SIG,             BMS_REGENERATION_STATE,         "regenerate",       "regenerating"  },
+    { BMS_IDLE_SIG,                     BMS_IDLE_STATE,                 "go-idle",          "idle"          },
+    { BMS_FAULT_SIG,                    BMS_FAULT_STATE,                "go-fault",         "fault"         },
+    { BMS_GET_STATUS_SIG,               BMS_NONE_STATE,                 "status",           ""              }
+};
+
 #if !defined( ARRAY_SIZE )
     #define ARRAY_SIZE(x) ( BaseType_t ) (sizeof ( x ) / sizeof ( x )[ 0 ] )
 #endif

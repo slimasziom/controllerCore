@@ -9,6 +9,8 @@
 
 xQueueHandle xQueueCtrlInputSignalHandle;
 
+xQueueHandle xQueueBmsInputSignalHandle;
+
 xQueueHandle xQueueRestAPIResponseHandle;
 
 xQueueHandle xQueueCLIResponseHandle;
