@@ -95,7 +95,7 @@ typedef enum {
     BMS_LAST_STATE            // not used, last
 } EBmsState;
 
-/* Bms thread settings struct */
+/* Bms thread live data struct */
 typedef struct {
     uint16_t uiCellVoltages[NUMBER_OF_CELLS];       // reg: 0-15; res: 0.1mV
     /****************************** RESERVED *******************************/

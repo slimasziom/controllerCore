@@ -69,7 +69,7 @@ ECtrlInputSignal uiThreadSignalFromCommand(xThreadMapping_t *xThread, char *pcCo
     ECtrlInputSignal eSignal = CONTROLLER_NONE_SIG;
     BaseType_t x;
 
-    for( x = 0; x < ARRAY_SIZE( xMainControllerMapping ); x++ )
+    for( x = 0; x < ARRAY_SIZE( xThread ); x++ )
     {
         if (strcmp(xThread[x].cCommand, pcCommandString) == 0){
             eSignal = (ECtrlInputSignal) xThread[x].eSignal;

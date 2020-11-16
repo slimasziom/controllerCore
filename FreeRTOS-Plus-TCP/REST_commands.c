@@ -20,6 +20,7 @@ extern hdkif_t hdkif_data[MAX_EMAC_INSTANCE];
 
 /* Helper functions */
 static void xMainControllerRESTStatusToJson( char *pcWriteBuffer, size_t xWriteBufferLen, xControllerStateVariables_t *xStateVariables);
+static void xTinyBmsRESTStatusToJson( char *pcWriteBuffer, size_t xWriteBufferLen, xBmsStateVariables_t *xStateVariables);
 
 //#if ( configGENERATE_RUN_TIME_STATS == 1 )
 ///*-----------------------------------------------------------*/
@@ -332,6 +333,38 @@ static void xMainControllerRESTStatusToJson( char *pcWriteBuffer, size_t xWriteB
 //    return pdFALSE;
 //    }
 
+
+void xMainControllerRESTStatusToJson( char *pcWriteBuffer, size_t xWriteBufferLen, xControllerStateVariables_t *xStateVariables){
+    snprintf( pcWriteBuffer, xWriteBufferLen,
+      "{\"success\": \"OK\", \"result\": "
+          "{"
+              "\"Module\": \"%s\","
+              "\"State\": \"%s\","
+              "\"Settings\": "
+              "{"
+                  "\"Power\": %d,"
+                  "\"Offset\": %s,"
+                  "\"Offset Settings\": "
+                  "{"
+                      "\"Type\": \"%s\","
+                      "\"Parameter A\": %d, "
+                      "\"Parameter B\": %d, "
+                      "\"Parameter C\": %d "
+                  "}"
+              "}"
+          "}"
+      "}",
+      xStateVariables->cModuleName,
+      pcStateNameFromThread(xStateVariables->eState),
+      xStateVariables->xSettings.uiPower,
+      xStateVariables->xSettings.bOffset ? "true" : "false",
+      xStateVariables->xSettings.xOffsetSettings.cOffsetType,
+      xStateVariables->xSettings.xOffsetSettings.uiPar_a,
+      xStateVariables->xSettings.xOffsetSettings.uiPar_b,
+      xStateVariables->xSettings.xOffsetSettings.uiPar_c);
+}
+/*-----------------------------------------------------------*/
+
 BaseType_t xMainControllerREST( char *pcWriteBuffer, size_t xWriteBufferLen, const char *pcCommandString )
 {
     BaseType_t lParameterStringLength, xReturn;
@@ -386,32 +419,176 @@ BaseType_t xMainControllerREST( char *pcWriteBuffer, size_t xWriteBufferLen, con
 }
 /*-----------------------------------------------------------*/
 
-void xMainControllerRESTStatusToJson( char *pcWriteBuffer, size_t xWriteBufferLen, xControllerStateVariables_t *xStateVariables){
+static void xTinyBmsRESTStatusToJson( char *pcWriteBuffer, size_t xWriteBufferLen, xBmsStateVariables_t *xStateVariables){
     snprintf( pcWriteBuffer, xWriteBufferLen,
       "{\"success\": \"OK\", \"result\": "
           "{"
-              "\"Module\": \"%s\","
-              "\"State\": \"%s\","
+              "\"Module\": \"%s\", "
+              "\"State\": \"%s\", "
+              "\"Live-Data\": "
+              "{"
+                  "\"Cell-Voltages\": "
+                      "{"
+                          "\"0\": %d, "
+                          "\"1\": %d, "
+                          "\"2\": %d, "
+                          "\"3\": %d, "
+                          "\"4\": %d, "
+                          "\"5\": %d, "
+                          "\"6\": %d, "
+                          "\"7\": %d, "
+                          "\"8\": %d, "
+                          "\"9\": %d, "
+                          "\"10\": %d, "
+                          "\"11\": %d, "
+                          "\"12\": %d, "
+                          "\"13\": %d, "
+                          "\"14\": %d, "
+                          "\"15\": %d, "
+                      "} "
+                  "\"Lifetime-Counter\": %d, "
+                  "\"Time-Left\": %d, "
+                  "\"Battery-Pack-Voltage\": %f, "
+                  "\"Battery-Pack-Current\": %f, "
+                  "\"Min-Cell-Voltage\": %d, "
+                  "\"Max-Cell-Voltage\": %d, "
+                  "\"Ext-Sensor-Temp-1\": %d, "
+                  "\"Ext-Sensor-Temp-2\": %d, "
+                  "\"Distance-Left\": %d, "
+                  "\"SOC\": %d, "
+                  "\"Int-Sensor-Temp\": %d, "
+                  "\"Online-Status\": %d, "
+                  "\"Balancing-Decision-Bits\": %d, "
+                  "\"Real-Balancing-Bits\": %d, "
+                  "\"No-Detected-Cells\": %d, "
+                  "\"Speed\": %f, "
+              "}"
               "\"Settings\": "
               "{"
-                  "\"Power\": %d,"
-                  "\"Offset\": %s,"
-                  "\"Offset Settings\": "
-                  "{"
-                      "\"Type\": \"%s\","
-                      "\"Parameter A\": %d, "
-                      "\"Parameter B\": %d, "
-                      "\"Parameter C\": %d "
-                  "}"
+                  "\"Fully-Charged-Voltage\": %d, "
+                  "\"Fully-Discharged-Voltage\": %d, "
+                  "\"Early-Balancing-Threshold\": %d, "
+                  "\"Charge-Finished-Current\": %d, "
+                  "\"Battery-Capacity\": %d, "
+                  "\"Number-Of-Series-Cells\": %d, "
+                  "\"Allowed-Disbalance\": %d, "
+                  "\"Pulses-Per-Unit\": %d, "
+                  "\"Distance-Unit-Name\": %d, "
+                  "\"Over-Voltage-Cutoff\": %d, "
+                  "\"Under-Voltage-Cutoff\": %d, "
+                  "\"Discharge-Over-Current-Cutoff\": %d, "
+                  "\"Charge-Over-Current-Cutoff\": %d, "
+                  "\"OverHeat-Cutoff\": %d, "
+                  "\"Low-Temp-Charger-Cutoff\": %d, "
               "}"
           "}"
       "}",
       xStateVariables->cModuleName,
       pcStateNameFromThread(xStateVariables->eState),
-      xStateVariables->xSettings.uiPower,
-      xStateVariables->xSettings.bOffset ? "true" : "false",
-      xStateVariables->xSettings.xOffsetSettings.cOffsetType,
-      xStateVariables->xSettings.xOffsetSettings.uiPar_a,
-      xStateVariables->xSettings.xOffsetSettings.uiPar_b,
-      xStateVariables->xSettings.xOffsetSettings.uiPar_c);
+      /* live-data cells */
+      xStateVariables->xBmsLiveData.uiCellVoltages[0],
+      xStateVariables->xBmsLiveData.uiCellVoltages[1],
+      xStateVariables->xBmsLiveData.uiCellVoltages[2],
+      xStateVariables->xBmsLiveData.uiCellVoltages[3],
+      xStateVariables->xBmsLiveData.uiCellVoltages[4],
+      xStateVariables->xBmsLiveData.uiCellVoltages[5],
+      xStateVariables->xBmsLiveData.uiCellVoltages[6],
+      xStateVariables->xBmsLiveData.uiCellVoltages[7],
+      xStateVariables->xBmsLiveData.uiCellVoltages[8],
+      xStateVariables->xBmsLiveData.uiCellVoltages[9],
+      xStateVariables->xBmsLiveData.uiCellVoltages[10],
+      xStateVariables->xBmsLiveData.uiCellVoltages[11],
+      xStateVariables->xBmsLiveData.uiCellVoltages[12],
+      xStateVariables->xBmsLiveData.uiCellVoltages[13],
+      xStateVariables->xBmsLiveData.uiCellVoltages[14],
+      xStateVariables->xBmsLiveData.uiCellVoltages[15],
+      /* live-data other */
+      xStateVariables->xBmsLiveData.uiLifetimeCounter,
+      xStateVariables->xBmsLiveData.uiTimeLeft,
+      xStateVariables->xBmsLiveData.fBatteryPackVoltage,
+      xStateVariables->xBmsLiveData.fBatteryPackCurrent,
+      xStateVariables->xBmsLiveData.uiBatteryMinCellVoltage,
+      xStateVariables->xBmsLiveData.uiBatteryMaxCellVoltage,
+      xStateVariables->xBmsLiveData.iExtSensorTemp1,
+      xStateVariables->xBmsLiveData.iExtSensorTemp2,
+      xStateVariables->xBmsLiveData.uiDistanceLeftToEmptyBat,
+      xStateVariables->xBmsLiveData.uiStateOfCharge,
+      xStateVariables->xBmsLiveData.iTempInternal,
+      xStateVariables->xBmsLiveData.eOnlineStatus,
+      xStateVariables->xBmsLiveData.uiBalancingDecisionBits,
+      xStateVariables->xBmsLiveData.uiRealBalancingBits,
+      xStateVariables->xBmsLiveData.uiNoDetectedCells,
+      xStateVariables->xBmsLiveData.fSpeed,
+      /* settings */
+      xStateVariables->xBmsSettings.uiFullyChargedVoltage,
+      xStateVariables->xBmsSettings.uiFullyDischargedVoltage,
+      xStateVariables->xBmsSettings.uiEarlyBalancingThreshold,
+      xStateVariables->xBmsSettings.uiChargeFinishedCurrent,
+      xStateVariables->xBmsSettings.uiBatteryCapacity,
+      xStateVariables->xBmsSettings.uiNumberOfSeriesCells,
+      xStateVariables->xBmsSettings.uiAllowedDisbalance,
+      xStateVariables->xBmsSettings.uiPulsesPerUnit,
+      xStateVariables->xBmsSettings.uiDistanceUnitName,
+      xStateVariables->xBmsSettings.uiOverVoltageCutoff,
+      xStateVariables->xBmsSettings.uiUnderVoltageCutoff,
+      xStateVariables->xBmsSettings.uiDischargeOverCurrentCutoff,
+      xStateVariables->xBmsSettings.uiChargeOverCurrentCutoff,
+      xStateVariables->xBmsSettings.iOverHeatCutoff,
+      xStateVariables->xBmsSettings.iLowTempChargerCutoff);
 }
+/*-----------------------------------------------------------*/
+
+BaseType_t xTinyBmsREST(char *pcWriteBuffer, size_t xWriteBufferLen, const char *pcCommandString){
+    BaseType_t lParameterStringLength, xReturn;
+    xBmsStateVariables_t xStateVariables;
+    xAppMsgBaseType_t xMsg = {xQueueRestAPIResponseHandle, BMS_GET_STATUS_SIG};
+    char * pcParameter;
+
+    /* Obtain the signal string. */
+    pcParameter = ( char * ) FreeRTOS_RESTGetParameter
+                            (
+                                pcCommandString,        /* The command string itself. */
+                                1,                      /* Return the first parameter. */
+                                &lParameterStringLength /* Store the parameter string length. */
+                            );
+
+    ( void ) lParameterStringLength;
+
+    xReturn = pdFALSE;
+    ( void ) pcWriteBuffer;
+    ( void ) xWriteBufferLen;
+    ( void ) pcCommandString;
+
+    xMsg.eSignal = (EBmsInputSignal) uiThreadSignalFromCommand(xTinyBmsMapping, pcParameter);
+
+    switch(xMsg.eSignal){
+    case BMS_OFFLINE_SIG:
+    case BMS_CHARGING_SIG:
+    case BMS_FULLY_CHARGED_SIG:
+    case BMS_DISCHARGING_SIG:
+    case BMS_REGENERATION_SIG:
+    case BMS_IDLE_SIG:
+    case BMS_FAULT_SIG:
+        xQueueSend(xQueueBmsInputSignalHandle, &xMsg, NULL);
+        snprintf( pcWriteBuffer, xWriteBufferLen, "{\"success\": \"OK\", \"result\": {\"message\": \"executed\"}}" );
+        break;
+    case BMS_GET_STATUS_SIG:
+        if(xQueueSend(xQueueBmsInputSignalHandle, &xMsg, NULL) == pdTRUE){
+            if(xQueueReceive(xQueueRestAPIResponseHandle, &xStateVariables, 1000) == pdTRUE){
+                xTinyBmsRESTStatusToJson(pcWriteBuffer, xWriteBufferLen, &xStateVariables);
+            }
+            else
+            {
+                snprintf( pcWriteBuffer, xWriteBufferLen, "{\"success\": \"OK\", \"result\": \"response error\"}" );
+            }
+        }
+        else
+        {
+            snprintf( pcWriteBuffer, xWriteBufferLen, "{\"success\": \"OK\", \"result\": \"send error\"}" );
+        }
+        break;
+    }
+
+    return xReturn;
+}
+/*-----------------------------------------------------------*/

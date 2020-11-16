@@ -98,4 +98,14 @@ static const REST_Command_Definition_t xMainControllerRest =
     1 /* No parameters are expected. */
 };
 
+BaseType_t xTinyBmsREST(char *pcWriteBuffer, size_t xWriteBufferLen, const char *pcCommandString);
+/* Structure that defines the "main-controller" REST command. */
+static const REST_Command_Definition_t xTinyBmsRest =
+{
+    "tiny-bms",
+    "{\"use\": \"tiny-bms?<command>: Sends command to tiny-bms: go-offline/charge/finish-charge/discharge/regenerate/go-idle/go-fault/status\"}",
+    ( pdREST_API_CALLBACK ) xTinyBmsREST,
+    1 /* No parameters are expected. */
+};
+
 #endif /* REST_COMMANDS_H_ */

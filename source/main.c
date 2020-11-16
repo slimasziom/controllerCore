@@ -63,6 +63,7 @@
 #include "APP_queues.h"
 
 #include "FSM_maincontroller.h"
+#include "FSM_tinybms.h"
 
 uint8 emacAddress[6U] =	{0x00U, 0x08U, 0xEEU, 0x03U, 0xA6U, 0x6CU};
 uint32 emacPhyAddress =	1U;
@@ -126,6 +127,7 @@ void main(void)
 
 	/* Register Queues */
 	xQueueCtrlInputSignalHandle = xQueueCreate(10, sizeof(xAppMsgBaseType_t));
+	xQueueBmsInputSignalHandle = xQueueCreate(10, sizeof(xAppMsgBaseType_t));
 	xQueueRestAPIResponseHandle = xQueueCreate(10, sizeof(xControllerStateVariables_t));
 	xQueueCLIResponseHandle = xQueueCreate(10, sizeof(xControllerStateVariables_t));
 
@@ -146,6 +148,7 @@ void main(void)
 
 	/* Register some commands to REST */
     FreeRTOS_RESTRegisterCommand( &xMainControllerRest );
+    FreeRTOS_RESTRegisterCommand( &xTinyBmsRest );
 
 	xTaskCreate(vTask1, "HeartBeat", configMINIMAL_STACK_SIZE * 10, NULL, tskIDLE_PRIORITY + 3  | portPRIVILEGE_BIT, &xTask1Handle);
 	FreeRTOS_IPInit(ucIPAddress, ucNetMask, ucGatewayAddress, ucDNSServerAddress, emacAddress);
@@ -159,6 +162,8 @@ void main(void)
     /* Start main controller task */
     xTaskCreate(vMainControllerFSMTask, "MainControllerFSM", configMINIMAL_STACK_SIZE * 10, NULL, tskIDLE_PRIORITY + 5  | portPRIVILEGE_BIT, &xMainControllerTaskHandle);
 
+    /* Start tiny bms task */
+    xTaskCreate(vTinyBmsFSMTask, "TinyBmsFSM", configMINIMAL_STACK_SIZE * 10, NULL, tskIDLE_PRIORITY + 4  | portPRIVILEGE_BIT, &xMainControllerTaskHandle);
 
 
 	vTaskStartScheduler();
