@@ -81,7 +81,6 @@ static void vTask1(void *pvParameters);
 static void vTask2(void *pvParameters);
 static void vServerWorkTask(void *pvParameters);
 void vStartNTPTask( uint16_t usTaskStackSize, UBaseType_t uxTaskPriority );
-void vMainControllerTask(void *pvParameters);
 
 extern hdkif_t hdkif_data[MAX_EMAC_INSTANCE];
 extern void vRegisterFileSystemCLICommands( void );
@@ -128,8 +127,8 @@ void main(void)
 	/* Register Queues */
 	xQueueCtrlInputSignalHandle = xQueueCreate(10, sizeof(xAppMsgBaseType_t));
 	xQueueBmsInputSignalHandle = xQueueCreate(10, sizeof(xAppMsgBaseType_t));
-	xQueueRestAPIResponseHandle = xQueueCreate(10, sizeof(xControllerStateVariables_t));
-	xQueueCLIResponseHandle = xQueueCreate(10, sizeof(xControllerStateVariables_t));
+	xQueueRestAPIResponseHandle = xQueueCreate(10, sizeof(xBmsStateVariables_t));
+	xQueueCLIResponseHandle = xQueueCreate(10, sizeof(xBmsStateVariables_t));
 
 	/* Register some commands to CLI */
 #if ( configGENERATE_RUN_TIME_STATS == 1 )
@@ -155,9 +154,6 @@ void main(void)
 
 	/* Start the command interpreter */
 	vStartUARTCommandInterpreterTask();
-
-//	/* Start main controller task */
-//	xTaskCreate(vMainControllerTask, "MainController", configMINIMAL_STACK_SIZE * 10, NULL, tskIDLE_PRIORITY + 5  | portPRIVILEGE_BIT, &xMainControllerTaskHandle);
 
     /* Start main controller task */
     xTaskCreate(vMainControllerFSMTask, "MainControllerFSM", configMINIMAL_STACK_SIZE * 10, NULL, tskIDLE_PRIORITY + 5  | portPRIVILEGE_BIT, &xMainControllerTaskHandle);
@@ -263,78 +259,11 @@ static const struct xSERVER_CONFIG xServerConfiguration[] =
 	}
 }
 
-void vMainControllerTask(void *pvParameters){
-    /*
-     * Block task until it gets triggered
-     * One may start/stop/pause/emergency_stop
-     * Use
-     */
-
-    /* xQueueCtrlInputSignalHandle signal */
-    xAppMsgBaseType_t xMsg;
-
-    /* Controller state variables*/
-    xControllerStateVariables_t xStateVariables;
-
-    /* Remove compiler warning about unused parameter. */
-    ( void ) pvParameters;
-
-    /* USER LED 3 */
-    gioSetBit(gioPORTB, 7, 0);
-
-    /* Controller initial state variables */
-    xStateVariables.eState=CONTROLLER_STOP_STATE;
-    snprintf( xStateVariables.cModuleName, 20, "main-controller");
-    xStateVariables.xSettings.uiPower=93;
-    xStateVariables.xSettings.bOffset= true;
-    xStateVariables.xSettings.xOffsetSettings.uiPar_a=32;
-    xStateVariables.xSettings.xOffsetSettings.uiPar_b=64;
-    xStateVariables.xSettings.xOffsetSettings.uiPar_c=12;
-    snprintf( xStateVariables.xSettings.xOffsetSettings.cOffsetType, 20, "default");
-
-    while(1)
-    {
-        /* controller logic here */
-        if (xQueueReceive(xQueueCtrlInputSignalHandle, &xMsg, 0) == pdTRUE) {
-            switch(xMsg.eSignal){
-            case CONTROLLER_SHORT_PRESS_SIG:
-                if(xStateVariables.eState == CONTROLLER_STOP_STATE){
-                    xStateVariables.eState = CONTROLLER_RUNNING_STATE;
-                    gioSetBit(gioPORTB, 7, 1);
-                }
-                else if(xStateVariables.eState == CONTROLLER_RUNNING_STATE){
-                    xStateVariables.eState = CONTROLLER_STOP_STATE;
-                    gioSetBit(gioPORTB, 7, 0);
-                }
-                break;
-            case CONTROLLER_RUN_SIG:
-                xStateVariables.eState = CONTROLLER_RUNNING_STATE;
-                gioSetBit(gioPORTB, 7, 1);
-                break;
-            case CONTROLLER_STOP_SIG:
-            case CONTROLLER_PAUSE_SIG:
-            case CONTROLLER_EMERGENCY_SIG:
-                xStateVariables.eState = CONTROLLER_STOP_STATE;
-                gioSetBit(gioPORTB, 7, 0);
-                break;
-            case CONTROLLER_GET_STATUS_SIG:
-                xQueueSend(xMsg.pxReturnQueue, &xStateVariables, 0);
-                break;
-            default:
-                break;
-            }
-        }
-
-        /* 10Hz refresh rate */
-        vTaskDelay(pdMS_TO_TICKS(100));
-    }
-}
-
 /* User switch A */
 void gioNotification(gioPORT_t *port, uint32 bit)
 {
     /* xQueueCtrlInputSignalHandle signal */
-    ECtrlInputSignal eMsg = CONTROLLER_SHORT_PRESS_SIG;
+    ESignal eMsg = SHORT_PRESS_SIG;
     xQueueSendToFrontFromISR(xQueueCtrlInputSignalHandle, &eMsg, NULL);
 }
 

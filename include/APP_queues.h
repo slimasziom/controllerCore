@@ -15,7 +15,7 @@
 
 typedef struct {
     QueueHandle_t *pxReturnQueue;
-    ECtrlInputSignal eSignal;
+    ESignal eSignal;
 } xAppMsgBaseType_t;
 
 /* Queue handlers */

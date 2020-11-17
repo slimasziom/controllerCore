@@ -34,12 +34,18 @@ void vTinyBmsFSMTask(void *pvParameters){
     void *(*activeState)(FSM_TinyBms_Definition_t * const me, xAppMsgBaseType_t *pxEventQueue ) = &vTinyBmsOfflineState;
 //    void *nextState = NULL;
     void *(*nextState)(FSM_TinyBms_Definition_t * const me, xAppMsgBaseType_t *pxEventQueue ) = NULL;
-    /* Initialization */
-    me.xStateVariables.eState=BMS_NONE_STATE;
-    snprintf( me.xStateVariables.cModuleName, 20, "bms-fsm");
-
     me.xEventQueue = xQueueBmsInputSignalHandle;
     me.pxTimer = &xTimerTinyBmsHandle;
+
+    /* Initialization */
+    me.xStateVariables.eState=NONE_STATE;
+    snprintf( me.xStateVariables.cModuleName, 20, "bms-fsm");
+    /* init state variables */
+    vTinyBmsFSMTaskInit(&me);
+
+    /* init first state */
+    xMsg.eSignal = ENTRY_SIG;
+    (*activeState)(&me, &xMsg);
 
     /* FSM execution */
     while(1)
@@ -49,10 +55,10 @@ void vTinyBmsFSMTask(void *pvParameters){
             {
                 nextState = (*activeState)(&me, &xMsg);     //TODO: remove warning
                 if (nextState != NULL){
-                    xMsg.eSignal = CONTROLLER_EXIT_SIG;
+                    xMsg.eSignal = EXIT_SIG;
                     (*activeState)(&me, &xMsg);
                     activeState = nextState;
-                    xMsg.eSignal = CONTROLLER_ENTRY_SIG;
+                    xMsg.eSignal = ENTRY_SIG;
                     (*activeState)(&me, &xMsg);
                 }
             }
@@ -66,33 +72,33 @@ void * vTinyBmsOfflineState(FSM_TinyBms_Definition_t * const me, xAppMsgBaseType
     state = NULL;
 
     switch(pxEventQueue->eSignal){
-    case BMS_ENTRY_SIG:
-        me->xStateVariables.eState = BMS_OFFLINE_STATE;
+    case ENTRY_SIG:
+        me->xStateVariables.eState = OFFLINE_STATE;
         //request bms version
 //        vFSMTimerStart(me->pxTimer, pdMS_TO_TICKS(1000));   //check every 1s until bms responds
         break;
-    case BMS_IDLE_SIG:
+    case IDLE_SIG:
         state = &vTinyBmsIdleState;
         break;
-    case BMS_CHARGING_SIG:
+    case CHARGING_SIG:
         state = &vTinyBmsChargingState;
         break;
-    case BMS_FULLY_CHARGED_SIG:
+    case FULLY_CHARGED_SIG:
         state = &vTinyBmsFullyChargedState;
         break;
-    case BMS_DISCHARGING_SIG:
+    case DISCHARGING_SIG:
         state = &vTinyBmsDischargingState;
         break;
-    case BMS_REGENERATION_SIG:
+    case REGENERATION_SIG:
         state = &vTinyBmsRegenerationState;
         break;
-    case BMS_FAULT_SIG:
+    case FAULT_SIG:
         state = &vTinyBmsFaultState;
         break;
-    case BMS_GET_STATUS_SIG:
+    case GET_STATUS_SIG:
         xQueueSend(pxEventQueue->pxReturnQueue, &me->xStateVariables, 0);
         break;
-    case BMS_EXIT_SIG:
+    case EXIT_SIG:
 //        vFSMTimerStop(me->pxTimer);
     default:
         break;
@@ -107,33 +113,33 @@ void * vTinyBmsIdleState(FSM_TinyBms_Definition_t * const me, xAppMsgBaseType_t 
     state = NULL;
 
     switch(pxEventQueue->eSignal){
-    case CONTROLLER_ENTRY_SIG:
-        me->xStateVariables.eState = BMS_IDLE_STATE;
+    case ENTRY_SIG:
+        me->xStateVariables.eState = IDLE_STATE;
         //request bms live data
 //        vFSMTimerStart(me->pxTimer, pdMS_TO_TICKS(1000));   //check every 1s
         break;
-    case BMS_OFFLINE_SIG:
+    case OFFLINE_SIG:
         state = &vTinyBmsOfflineState;
         break;
-    case BMS_CHARGING_SIG:
+    case CHARGING_SIG:
         state = &vTinyBmsChargingState;
         break;
-    case BMS_FULLY_CHARGED_SIG:
+    case FULLY_CHARGED_SIG:
         state = &vTinyBmsFullyChargedState;
         break;
-    case BMS_DISCHARGING_SIG:
+    case DISCHARGING_SIG:
         state = &vTinyBmsDischargingState;
         break;
-    case BMS_REGENERATION_SIG:
+    case REGENERATION_SIG:
         state = &vTinyBmsRegenerationState;
         break;
-    case BMS_FAULT_SIG:
+    case FAULT_SIG:
         state = &vTinyBmsFaultState;
         break;
-    case BMS_GET_STATUS_SIG:
+    case GET_STATUS_SIG:
         xQueueSend(pxEventQueue->pxReturnQueue, &me->xStateVariables, 0);
         break;
-    case BMS_EXIT_SIG:
+    case EXIT_SIG:
 //        vFSMTimerStop(me->pxTimer);
     default:
         break;
@@ -148,33 +154,33 @@ void * vTinyBmsChargingState(FSM_TinyBms_Definition_t * const me, xAppMsgBaseTyp
     state = NULL;
 
     switch(pxEventQueue->eSignal){
-    case CONTROLLER_ENTRY_SIG:
-        me->xStateVariables.eState = BMS_CHARGING_STATE;
+    case ENTRY_SIG:
+        me->xStateVariables.eState = CHARGING_STATE;
         //request bms live data
 //        vFSMTimerStart(me->pxTimer, pdMS_TO_TICKS(1000));   //check every 1s
         break;
-    case BMS_OFFLINE_SIG:
+    case OFFLINE_SIG:
         state = &vTinyBmsOfflineState;
         break;
-    case BMS_IDLE_SIG:
+    case IDLE_SIG:
         state = &vTinyBmsIdleState;
         break;
-    case BMS_FULLY_CHARGED_SIG:
+    case FULLY_CHARGED_SIG:
         state = &vTinyBmsFullyChargedState;
         break;
-    case BMS_DISCHARGING_SIG:
+    case DISCHARGING_SIG:
         state = &vTinyBmsDischargingState;
         break;
-    case BMS_REGENERATION_SIG:
+    case REGENERATION_SIG:
         state = &vTinyBmsRegenerationState;
         break;
-    case BMS_FAULT_SIG:
+    case FAULT_SIG:
         state = &vTinyBmsFaultState;
         break;
-    case BMS_GET_STATUS_SIG:
+    case GET_STATUS_SIG:
         xQueueSend(pxEventQueue->pxReturnQueue, &me->xStateVariables, 0);
         break;
-    case BMS_EXIT_SIG:
+    case EXIT_SIG:
 //        vFSMTimerStop(me->pxTimer);
     default:
         break;
@@ -189,33 +195,33 @@ void * vTinyBmsFullyChargedState(FSM_TinyBms_Definition_t * const me, xAppMsgBas
     state = NULL;
 
     switch(pxEventQueue->eSignal){
-    case CONTROLLER_ENTRY_SIG:
-        me->xStateVariables.eState = BMS_FULLY_CHARGED_STATE;
+    case ENTRY_SIG:
+        me->xStateVariables.eState = FULLY_CHARGED_STATE;
         //request bms live data
 //        vFSMTimerStart(me->pxTimer, pdMS_TO_TICKS(1000));   //check every 5s
         break;
-    case BMS_OFFLINE_SIG:
+    case OFFLINE_SIG:
         state = &vTinyBmsOfflineState;
         break;
-    case BMS_IDLE_SIG:
+    case IDLE_SIG:
         state = &vTinyBmsIdleState;
         break;
-    case BMS_CHARGING_SIG:
+    case CHARGING_SIG:
         state = &vTinyBmsChargingState;
         break;
-    case BMS_DISCHARGING_SIG:
+    case DISCHARGING_SIG:
         state = &vTinyBmsDischargingState;
         break;
-    case BMS_REGENERATION_SIG:
+    case REGENERATION_SIG:
         state = &vTinyBmsRegenerationState;
         break;
-    case BMS_FAULT_SIG:
+    case FAULT_SIG:
         state = &vTinyBmsFaultState;
         break;
-    case BMS_GET_STATUS_SIG:
+    case GET_STATUS_SIG:
         xQueueSend(pxEventQueue->pxReturnQueue, &me->xStateVariables, 0);
         break;
-    case BMS_EXIT_SIG:
+    case EXIT_SIG:
 //        vFSMTimerStop(me->pxTimer);
     default:
         break;
@@ -230,33 +236,33 @@ void * vTinyBmsDischargingState(FSM_TinyBms_Definition_t * const me, xAppMsgBase
     state = NULL;
 
     switch(pxEventQueue->eSignal){
-    case CONTROLLER_ENTRY_SIG:
-        me->xStateVariables.eState = BMS_DISCHARGING_STATE;
+    case ENTRY_SIG:
+        me->xStateVariables.eState = DISCHARGING_STATE;
         //request bms live data
 //        vFSMTimerStart(me->pxTimer, pdMS_TO_TICKS(100));   //check every 100ms
         break;
-    case BMS_OFFLINE_SIG:
+    case OFFLINE_SIG:
         state = &vTinyBmsOfflineState;
         break;
-    case BMS_IDLE_SIG:
+    case IDLE_SIG:
         state = &vTinyBmsIdleState;
         break;
-    case BMS_CHARGING_SIG:
+    case CHARGING_SIG:
         state = &vTinyBmsChargingState;
         break;
-    case BMS_FULLY_CHARGED_SIG:
+    case FULLY_CHARGED_SIG:
         state = &vTinyBmsFullyChargedState;
         break;
-    case BMS_REGENERATION_SIG:
+    case REGENERATION_SIG:
         state = &vTinyBmsRegenerationState;
         break;
-    case BMS_FAULT_SIG:
+    case FAULT_SIG:
         state = &vTinyBmsFaultState;
         break;
-    case BMS_GET_STATUS_SIG:
+    case GET_STATUS_SIG:
         xQueueSend(pxEventQueue->pxReturnQueue, &me->xStateVariables, 0);
         break;
-    case BMS_EXIT_SIG:
+    case EXIT_SIG:
 //        vFSMTimerStop(me->pxTimer);
     default:
         break;
@@ -269,33 +275,33 @@ void * vTinyBmsDischargingState(FSM_TinyBms_Definition_t * const me, xAppMsgBase
 void * vTinyBmsRegenerationState(FSM_TinyBms_Definition_t * const me, xAppMsgBaseType_t *pxEventQueue ){
     void *state;
     switch(pxEventQueue->eSignal){
-    case CONTROLLER_ENTRY_SIG:
-        me->xStateVariables.eState = BMS_REGENERATION_STATE;
+    case ENTRY_SIG:
+        me->xStateVariables.eState = REGENERATION_STATE;
         //request bms live data
 //        vFSMTimerStart(me->pxTimer, pdMS_TO_TICKS(1000));   //check every 100ms
         break;
-    case BMS_OFFLINE_SIG:
+    case OFFLINE_SIG:
         state = &vTinyBmsOfflineState;
         break;
-    case BMS_IDLE_SIG:
+    case IDLE_SIG:
         state = &vTinyBmsIdleState;
         break;
-    case BMS_CHARGING_SIG:
+    case CHARGING_SIG:
         state = &vTinyBmsChargingState;
         break;
-    case BMS_FULLY_CHARGED_SIG:
+    case FULLY_CHARGED_SIG:
         state = &vTinyBmsFullyChargedState;
         break;
-    case BMS_DISCHARGING_SIG:
+    case DISCHARGING_SIG:
         state = &vTinyBmsDischargingState;
         break;
-    case BMS_FAULT_SIG:
+    case FAULT_SIG:
         state = &vTinyBmsFaultState;
         break;
-    case BMS_GET_STATUS_SIG:
+    case GET_STATUS_SIG:
         xQueueSend(pxEventQueue->pxReturnQueue, &me->xStateVariables, 0);
         break;
-    case BMS_EXIT_SIG:
+    case EXIT_SIG:
 //        vFSMTimerStop(me->pxTimer);
     default:
         break;
@@ -308,32 +314,32 @@ void * vTinyBmsRegenerationState(FSM_TinyBms_Definition_t * const me, xAppMsgBas
 void * vTinyBmsFaultState(FSM_TinyBms_Definition_t * const me, xAppMsgBaseType_t *pxEventQueue ){
     void *state;
     switch(pxEventQueue->eSignal){
-    case CONTROLLER_ENTRY_SIG:
-        me->xStateVariables.eState = BMS_FAULT_STATE;
+    case ENTRY_SIG:
+        me->xStateVariables.eState = FAULT_STATE;
 //        vFSMTimerStart(me->pxTimer, pdMS_TO_TICKS(1000));   //check every 5s
         break;
-    case BMS_OFFLINE_SIG:
+    case OFFLINE_SIG:
         state = &vTinyBmsOfflineState;
         break;
-    case BMS_IDLE_SIG:
+    case IDLE_SIG:
         state = &vTinyBmsIdleState;
         break;
-    case BMS_CHARGING_SIG:
+    case CHARGING_SIG:
         state = &vTinyBmsChargingState;
         break;
-    case BMS_FULLY_CHARGED_SIG:
+    case FULLY_CHARGED_SIG:
         state = &vTinyBmsFullyChargedState;
         break;
-    case BMS_DISCHARGING_SIG:
+    case DISCHARGING_SIG:
         state = &vTinyBmsDischargingState;
         break;
-    case BMS_REGENERATION_SIG:
+    case REGENERATION_SIG:
         state = &vTinyBmsRegenerationState;
         break;
-    case BMS_GET_STATUS_SIG:
+    case GET_STATUS_SIG:
         xQueueSend(pxEventQueue->pxReturnQueue, &me->xStateVariables, 0);
         break;
-    case BMS_EXIT_SIG:
+    case EXIT_SIG:
 //        vFSMTimerStop(me->pxTimer);
     default:
         break;
@@ -342,119 +348,6 @@ void * vTinyBmsFaultState(FSM_TinyBms_Definition_t * const me, xAppMsgBaseType_t
     return state;
 }
 /*-----------------------------------------------------------*/
-
-//void * vTinyBmsIdleState(FSM_TinyBms_Definition_t * const me, xAppMsgBaseType_t *pxEventQueue ){
-//    void *state;
-//    switch(pxEventQueue->eSignal){
-//    case CONTROLLER_ENTRY_SIG:
-//        me->xStateVariables.eState = CONTROLLER_STOP_STATE;
-//        break;
-//    case CONTROLLER_RUN_SIG:
-//    case CONTROLLER_SHORT_PRESS_SIG:
-//        state = &vMainControllerStartState;
-//        break;
-//    case CONTROLLER_EMERGENCY_SIG:
-//        state = &vMainControllerEmergencyState;
-//        break;
-//    case CONTROLLER_GET_STATUS_SIG:
-//        xQueueSend(pxEventQueue->pxReturnQueue, &me->xStateVariables, 0);
-//        state = NULL;
-//        break;
-//    default:
-//        state = NULL;
-//        break;
-//    }
-//
-//    return state;
-//}
-//void * vTinyBmsStartState(FSM_TinyBms_Definition_t * const me, xAppMsgBaseType_t *pxEventQueue ){
-//    void *state;
-//    switch(pxEventQueue->eSignal){
-//    case CONTROLLER_ENTRY_SIG:
-//        me->xStateVariables.eState = CONTROLLER_RUNNING_STATE;
-//        gioSetBit(gioPORTB, 7, 1);
-//        state = NULL;
-//        break;
-//    case CONTROLLER_STOP_SIG:
-//    case CONTROLLER_SHORT_PRESS_SIG:
-//        state = &vMainControllerIdleState;
-//        break;
-//    case CONTROLLER_PAUSE_SIG:
-//        state = &vMainControllerPauseState;
-//        break;
-//    case CONTROLLER_EMERGENCY_SIG:
-//        state = &vMainControllerEmergencyState;
-//        break;
-//    case CONTROLLER_GET_STATUS_SIG:
-//        xQueueSend(pxEventQueue->pxReturnQueue, &me->xStateVariables, 0);
-//        state = NULL;
-//        break;
-//    case CONTROLLER_EXIT_SIG:
-//        gioSetBit(gioPORTB, 7, 0);
-//        state = NULL;
-//        break;
-//    default:
-//        state = NULL;
-//        break;
-//    }
-//
-//    return state;
-//}
-//void * vTinyBmsEmergencyState(FSM_TinyBms_Definition_t * const me, xAppMsgBaseType_t *pxEventQueue ){
-//    void *state;
-//    switch(pxEventQueue->eSignal){
-//    case CONTROLLER_ENTRY_SIG:
-//        me->xStateVariables.eState = CONTROLLER_EMERGENCY_STATE;
-//        break;
-//    case CONTROLLER_RUN_SIG:
-//    case CONTROLLER_SHORT_PRESS_SIG:
-//        state = &vMainControllerStartState;
-//        break;
-//    case CONTROLLER_STOP_SIG:
-//        state = &vMainControllerIdleState;
-//        break;
-//    case CONTROLLER_GET_STATUS_SIG:
-//        xQueueSend(pxEventQueue->pxReturnQueue, &me->xStateVariables, 0);
-//        state = NULL;
-//        break;
-//    default:
-//        state = NULL;
-//        break;
-//    }
-//
-//    return state;
-//}
-//void * vTinyBmsPauseState(FSM_TinyBms_Definition_t * const me, xAppMsgBaseType_t *pxEventQueue ){
-//    void *state;
-//    switch(pxEventQueue->eSignal){
-//    case CONTROLLER_ENTRY_SIG:
-//        me->xStateVariables.eState = CONTROLLER_PAUSED_STATE;
-//        vFSMTimerStart(me->pxTimer, pdMS_TO_TICKS(500));
-//        break;
-//    case CONTROLLER_RUN_SIG:
-//    case CONTROLLER_SHORT_PRESS_SIG:
-//        state = &vMainControllerStartState;
-//        break;
-//    case CONTROLLER_STOP_SIG:
-//        state = &vMainControllerIdleState;
-//        break;
-//    case CONTROLLER_EMERGENCY_SIG:
-//        state = &vMainControllerEmergencyState;
-//        break;
-//    case CONTROLLER_GET_STATUS_SIG:
-//        xQueueSend(pxEventQueue->pxReturnQueue, &me->xStateVariables, 0);
-//        state = NULL;
-//        break;
-//    case CONTROLLER_EXIT_SIG:
-//        vFSMTimerStop(me->pxTimer);
-//        gioSetBit(gioPORTB, 7, 0);
-//    default:
-//        state = NULL;
-//        break;
-//    }
-//
-//    return state;
-//}
 
 void vTinyBmsFSMTaskInit(FSM_TinyBms_Definition_t * const me){
     BaseType_t i;
@@ -473,7 +366,7 @@ void vTinyBmsFSMTaskInit(FSM_TinyBms_Definition_t * const me){
     me->xStateVariables.xBmsLiveData.uiDistanceLeftToEmptyBat=0;
     me->xStateVariables.xBmsLiveData.uiStateOfCharge=0;
     me->xStateVariables.xBmsLiveData.iTempInternal=0;
-    me->xStateVariables.xBmsLiveData.eOnlineStatus=BMS_NONE_STATE;
+    me->xStateVariables.xBmsLiveData.eOnlineStatus=0;
     me->xStateVariables.xBmsLiveData.uiBalancingDecisionBits=0;
     me->xStateVariables.xBmsLiveData.uiRealBalancingBits=0;
     me->xStateVariables.xBmsLiveData.uiNoDetectedCells=0;

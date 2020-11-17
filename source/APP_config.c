@@ -37,42 +37,59 @@
 //    { "ttc",  "application/x-font-ttf" }
 //};
 
-xThreadMapping_t xMainControllerMapping[] =
-{
-    { CONTROLLER_NONE_SIG,              CONTROLLER_NONE_STATE,          "unknown",      "unknown"   },
-    { CONTROLLER_RUN_SIG,               CONTROLLER_RUNNING_STATE,       "run",          "running"   },
-    { CONTROLLER_STOP_SIG,              CONTROLLER_STOP_STATE,          "stop",         "stopped"   },
-    { CONTROLLER_PAUSE_SIG,             CONTROLLER_PAUSED_STATE,        "pause",        "paused"    },
-    { CONTROLLER_EMERGENCY_SIG,         CONTROLLER_EMERGENCY_STATE,     "emergency",    "emergency" },
-    { CONTROLLER_GET_STATUS_SIG,        CONTROLLER_NONE_STATE,          "status",       ""          }
-};
+//xThreadMapping_t xMainControllerMapping[] =
+//{
+//    { CONTROLLER_NONE_SIG,              CONTROLLER_NONE_STATE,          "unknown",      "unknown"   },
+//    { CONTROLLER_RUN_SIG,               CONTROLLER_RUNNING_STATE,       "run",          "running"   },
+//    { CONTROLLER_STOP_SIG,              CONTROLLER_STOP_STATE,          "stop",         "stopped"   },
+//    { CONTROLLER_PAUSE_SIG,             CONTROLLER_PAUSED_STATE,        "pause",        "paused"    },
+//    { CONTROLLER_EMERGENCY_SIG,         CONTROLLER_EMERGENCY_STATE,     "emergency",    "emergency" },
+//    { CONTROLLER_GET_STATUS_SIG,        CONTROLLER_NONE_STATE,          "status",       ""          }
+//};
+//
+//xThreadMapping_t xTinyBmsMapping[] =
+//{
+//    { BMS_NONE_SIG,                     BMS_NONE_STATE,                 "unknown",          "unknown"       },
+//    { BMS_OFFLINE_SIG,                  BMS_OFFLINE_STATE,              "go-offline",       "offline"       },
+//    { BMS_CHARGING_SIG,                 BMS_CHARGING_STATE,             "charge",           "charging"      },
+//    { BMS_FULLY_CHARGED_SIG,            BMS_FULLY_CHARGED_STATE,        "finish-charge",    "charged"       },
+//    { BMS_DISCHARGING_SIG,              BMS_DISCHARGING_STATE,          "discharge",        "discharging"   },
+//    { BMS_REGENERATION_SIG,             BMS_REGENERATION_STATE,         "regenerate",       "regenerating"  },
+//    { BMS_IDLE_SIG,                     BMS_IDLE_STATE,                 "go-idle",          "idle"          },
+//    { BMS_FAULT_SIG,                    BMS_FAULT_STATE,                "go-fault",         "fault"         },
+//    { BMS_GET_STATUS_SIG,               BMS_NONE_STATE,                 "status",           ""              }
+//};
 
-xThreadMapping_t xTinyBmsMapping[] =
+xThreadMapping_t xThreadMapping[] =
 {
-    { BMS_NONE_SIG,                     BMS_NONE_STATE,                 "unknown",          "unknown"       },
-    { BMS_OFFLINE_SIG,                  BMS_OFFLINE_STATE,              "go-offline",       "offline"       },
-    { BMS_CHARGING_SIG,                 BMS_CHARGING_STATE,             "charge",           "charging"      },
-    { BMS_FULLY_CHARGED_SIG,            BMS_FULLY_CHARGED_STATE,        "finish-charge",    "charged"       },
-    { BMS_DISCHARGING_SIG,              BMS_DISCHARGING_STATE,          "discharge",        "discharging"   },
-    { BMS_REGENERATION_SIG,             BMS_REGENERATION_STATE,         "regenerate",       "regenerating"  },
-    { BMS_IDLE_SIG,                     BMS_IDLE_STATE,                 "go-idle",          "idle"          },
-    { BMS_FAULT_SIG,                    BMS_FAULT_STATE,                "go-fault",         "fault"         },
-    { BMS_GET_STATUS_SIG,               BMS_NONE_STATE,                 "status",           ""              }
+    { NONE_SIG,              NONE_STATE,             "unknown",          "unknown"       },
+    { GET_STATUS_SIG,        NONE_STATE,             "status",           ""              },
+    { RUN_SIG,               RUNNING_STATE,          "run",              "running"       },
+    { STOP_SIG,              STOP_STATE,             "stop",             "stopped"       },
+    { PAUSE_SIG,             PAUSED_STATE,           "pause",            "paused"        },
+    { EMERGENCY_SIG,         EMERGENCY_STATE,        "emergency",        "emergency"     },
+    { OFFLINE_SIG,           OFFLINE_STATE,          "go-offline",       "offline"       },
+    { CHARGING_SIG,          CHARGING_STATE,         "charge",           "charging"      },
+    { FULLY_CHARGED_SIG,     FULLY_CHARGED_STATE,    "finish-charge",    "charged"       },
+    { DISCHARGING_SIG,       DISCHARGING_STATE,      "discharge",        "discharging"   },
+    { REGENERATION_SIG,      REGENERATION_STATE,     "regenerate",       "regenerating"  },
+    { IDLE_SIG,              IDLE_STATE,             "go-idle",          "idle"          },
+    { FAULT_SIG,             FAULT_STATE,            "go-fault",         "fault"         },
 };
 
 #if !defined( ARRAY_SIZE )
     #define ARRAY_SIZE(x) ( BaseType_t ) (sizeof ( x ) / sizeof ( x )[ 0 ] )
 #endif
 
-ECtrlInputSignal uiThreadSignalFromCommand(xThreadMapping_t *xThread, char *pcCommandString)
+ESignal uiThreadSignalFromCommand(char *pcCommandString)
 {
-    ECtrlInputSignal eSignal = CONTROLLER_NONE_SIG;
+    ESignal eSignal = NONE_SIG;
     BaseType_t x;
 
-    for( x = 0; x < ARRAY_SIZE( xThread ); x++ )
+    for( x = 0; x < ARRAY_SIZE( xThreadMapping ); x++ )
     {
-        if (strcmp(xThread[x].cCommand, pcCommandString) == 0){
-            eSignal = (ECtrlInputSignal) xThread[x].eSignal;
+        if (strcmp(xThreadMapping[x].cCommand, pcCommandString) == 0){
+            eSignal = (ESignal) xThreadMapping[x].eSignal;
             break;
         }
     }
@@ -80,15 +97,15 @@ ECtrlInputSignal uiThreadSignalFromCommand(xThreadMapping_t *xThread, char *pcCo
 }
 /*-----------------------------------------------------------*/
 
-const char * pcStateNameFromThread(ECtrlInputSignal eState)
+const char * pcStateNameFromThread(ESignal eState)
 {
-    const char *pcStateName = xMainControllerMapping[0].cState;
+    const char *pcStateName = xThreadMapping[0].cState;
     BaseType_t x;
 
-    for( x = 0; x < ARRAY_SIZE( xMainControllerMapping ); x++ )
+    for( x = 0; x < ARRAY_SIZE( xThreadMapping ); x++ )
         {
-            if (xMainControllerMapping[x].eState == eState){
-                pcStateName = xMainControllerMapping[x].cState;
+            if (xThreadMapping[x].eState == eState){
+                pcStateName = xThreadMapping[x].cState;
                 break;
             }
         }

@@ -21,7 +21,7 @@ void vMainControllerFSMTask(void *pvParameters){
     FSM_MainController_Definition_t me;
     xAppMsgBaseType_t xMsg;
     void *(*activeState)(FSM_MainController_Definition_t * const me, xAppMsgBaseType_t *pxEventQueue ) = &vMainControllerIdleState;
-    me.xStateVariables.eState=CONTROLLER_STOP_STATE;
+    me.xStateVariables.eState=NONE_STATE;
 
 //    void *nextState = NULL;
     void *(*nextState)(FSM_MainController_Definition_t * const me, xAppMsgBaseType_t *pxEventQueue ) = NULL;
@@ -37,6 +37,10 @@ void vMainControllerFSMTask(void *pvParameters){
     me.xEventQueue = xQueueCtrlInputSignalHandle;
     me.pxTimer = &xTimerMainControllerHandle;
 
+    /* init first state */
+    xMsg.eSignal = ENTRY_SIG;
+    (*activeState)(&me, &xMsg);
+
     /* FSM execution */
     while(1)
         {
@@ -45,10 +49,10 @@ void vMainControllerFSMTask(void *pvParameters){
             {
                 nextState = (*activeState)(&me, &xMsg);     //TODO: remove warning
                 if (nextState != NULL){
-                    xMsg.eSignal = CONTROLLER_EXIT_SIG;
+                    xMsg.eSignal = EXIT_SIG;
                     (*activeState)(&me, &xMsg);
                     activeState = nextState;
-                    xMsg.eSignal = CONTROLLER_ENTRY_SIG;
+                    xMsg.eSignal = ENTRY_SIG;
                     (*activeState)(&me, &xMsg);
                 }
             }
@@ -56,21 +60,22 @@ void vMainControllerFSMTask(void *pvParameters){
         vTaskDelay(pdMS_TO_TICKS(100));
         }
 }
+/*-----------------------------------------------------------*/
 
 void * vMainControllerIdleState(FSM_MainController_Definition_t * const me, xAppMsgBaseType_t *pxEventQueue ){
     void *state;
     switch(pxEventQueue->eSignal){
-    case CONTROLLER_ENTRY_SIG:
-        me->xStateVariables.eState = CONTROLLER_STOP_STATE;
+    case ENTRY_SIG:
+        me->xStateVariables.eState = STOP_STATE;
         break;
-    case CONTROLLER_RUN_SIG:
-    case CONTROLLER_SHORT_PRESS_SIG:
+    case RUN_SIG:
+    case SHORT_PRESS_SIG:
         state = &vMainControllerStartState;
         break;
-    case CONTROLLER_EMERGENCY_SIG:
+    case EMERGENCY_SIG:
         state = &vMainControllerEmergencyState;
         break;
-    case CONTROLLER_GET_STATUS_SIG:
+    case GET_STATUS_SIG:
         xQueueSend(pxEventQueue->pxReturnQueue, &me->xStateVariables, 0);
         state = NULL;
         break;
@@ -81,29 +86,31 @@ void * vMainControllerIdleState(FSM_MainController_Definition_t * const me, xApp
 
     return state;
 }
+/*-----------------------------------------------------------*/
+
 void * vMainControllerStartState(FSM_MainController_Definition_t * const me, xAppMsgBaseType_t *pxEventQueue ){
     void *state;
     switch(pxEventQueue->eSignal){
-    case CONTROLLER_ENTRY_SIG:
-        me->xStateVariables.eState = CONTROLLER_RUNNING_STATE;
+    case ENTRY_SIG:
+        me->xStateVariables.eState = RUNNING_STATE;
         gioSetBit(gioPORTB, 7, 1);
         state = NULL;
         break;
-    case CONTROLLER_STOP_SIG:
-    case CONTROLLER_SHORT_PRESS_SIG:
+    case STOP_SIG:
+    case SHORT_PRESS_SIG:
         state = &vMainControllerIdleState;
         break;
-    case CONTROLLER_PAUSE_SIG:
+    case PAUSE_SIG:
         state = &vMainControllerPauseState;
         break;
-    case CONTROLLER_EMERGENCY_SIG:
+    case EMERGENCY_SIG:
         state = &vMainControllerEmergencyState;
         break;
-    case CONTROLLER_GET_STATUS_SIG:
+    case GET_STATUS_SIG:
         xQueueSend(pxEventQueue->pxReturnQueue, &me->xStateVariables, 0);
         state = NULL;
         break;
-    case CONTROLLER_EXIT_SIG:
+    case EXIT_SIG:
         gioSetBit(gioPORTB, 7, 0);
         state = NULL;
         break;
@@ -114,20 +121,22 @@ void * vMainControllerStartState(FSM_MainController_Definition_t * const me, xAp
 
     return state;
 }
+/*-----------------------------------------------------------*/
+
 void * vMainControllerEmergencyState(FSM_MainController_Definition_t * const me, xAppMsgBaseType_t *pxEventQueue ){
     void *state;
     switch(pxEventQueue->eSignal){
-    case CONTROLLER_ENTRY_SIG:
-        me->xStateVariables.eState = CONTROLLER_EMERGENCY_STATE;
+    case ENTRY_SIG:
+        me->xStateVariables.eState = EMERGENCY_STATE;
         break;
-    case CONTROLLER_RUN_SIG:
-    case CONTROLLER_SHORT_PRESS_SIG:
+    case RUN_SIG:
+    case SHORT_PRESS_SIG:
         state = &vMainControllerStartState;
         break;
-    case CONTROLLER_STOP_SIG:
+    case STOP_SIG:
         state = &vMainControllerIdleState;
         break;
-    case CONTROLLER_GET_STATUS_SIG:
+    case GET_STATUS_SIG:
         xQueueSend(pxEventQueue->pxReturnQueue, &me->xStateVariables, 0);
         state = NULL;
         break;
@@ -138,41 +147,44 @@ void * vMainControllerEmergencyState(FSM_MainController_Definition_t * const me,
 
     return state;
 }
+/*-----------------------------------------------------------*/
+
 void * vMainControllerPauseState(FSM_MainController_Definition_t * const me, xAppMsgBaseType_t *pxEventQueue ){
     void *state;
     switch(pxEventQueue->eSignal){
-    case CONTROLLER_ENTRY_SIG:
-        me->xStateVariables.eState = CONTROLLER_PAUSED_STATE;
+    case ENTRY_SIG:
+        me->xStateVariables.eState = PAUSED_STATE;
         vFSMTimerStart(me->pxTimer, pdMS_TO_TICKS(500));
         break;
-    case CONTROLLER_RUN_SIG:
-    case CONTROLLER_SHORT_PRESS_SIG:
+    case RUN_SIG:
+    case SHORT_PRESS_SIG:
         state = &vMainControllerStartState;
         break;
-    case CONTROLLER_STOP_SIG:
+    case STOP_SIG:
         state = &vMainControllerIdleState;
         break;
-    case CONTROLLER_EMERGENCY_SIG:
+    case EMERGENCY_SIG:
         state = &vMainControllerEmergencyState;
         break;
-    case CONTROLLER_GET_STATUS_SIG:
+    case GET_STATUS_SIG:
         xQueueSend(pxEventQueue->pxReturnQueue, &me->xStateVariables, 0);
         state = NULL;
         break;
-    case CONTROLLER_EXIT_SIG:
+    case EXIT_SIG:
         vFSMTimerStop(me->pxTimer);
         gioSetBit(gioPORTB, 7, 0);
     default:
         state = NULL;
         break;
     }
-
     return state;
 }
+/*-----------------------------------------------------------*/
 
 void vFSMTimerFunctionCallback(TimerHandle_t xTimer){
     gioToggleBit(gioPORTB, 7);
 }
+/*-----------------------------------------------------------*/
 
 void vFSMTimerStart(TimerHandle_t *xTimer, uint32_t uiPeriod){
     //create software timer
@@ -184,10 +196,11 @@ void vFSMTimerStart(TimerHandle_t *xTimer, uint32_t uiPeriod){
         xTimerStart((*xTimer), portMAX_DELAY);
     }
 }
+/*-----------------------------------------------------------*/
 
 void vFSMTimerStop(TimerHandle_t *xTimer){
     if((*xTimer) != NULL && xTimerIsTimerActive(xTimer) == pdTRUE)
     xTimerStop((*xTimer), portMAX_DELAY);
 }
-
+/*-----------------------------------------------------------*/
 

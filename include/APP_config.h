@@ -16,30 +16,68 @@
 #define appRestAPI_BUFFER_SIZE ( 2048 )
 #define appCOMMAND_LENGTH (32)
 
-/************* MAIN CONTROLLER *************/
-/* Controller input signals */
+/* Application signals */
 typedef enum {
-    CONTROLLER_NONE_SIG,            // not used, first
-    CONTROLLER_ENTRY_SIG,
-    CONTROLLER_EXIT_SIG,
-    CONTROLLER_RUN_SIG,
-    CONTROLLER_STOP_SIG,
-    CONTROLLER_PAUSE_SIG,
-    CONTROLLER_EMERGENCY_SIG,
-    CONTROLLER_SHORT_PRESS_SIG,     // last main controller
-    CONTROLLER_GET_STATUS_SIG,      //generic to all tasks
-    CONTROLLER_LAST_SIG             // not used, last
-} ECtrlInputSignal;
+    NONE_SIG,                       // not used, first
+    ENTRY_SIG,
+    EXIT_SIG,
+    GET_STATUS_SIG,                 //generic to all tasks
+    RUN_SIG,
+    STOP_SIG,
+    PAUSE_SIG,
+    EMERGENCY_SIG,
+    SHORT_PRESS_SIG,     // last main controller
+    OFFLINE_SIG,
+    CHARGING_SIG,
+    FULLY_CHARGED_SIG,
+    DISCHARGING_SIG,
+    REGENERATION_SIG,
+    IDLE_SIG,
+    FAULT_SIG,
+    BMS_LAST_SIG                    // not used, last
+} ESignal;
 
-/* Controller states */
+/* Application states */
 typedef enum {
-    CONTROLLER_NONE_STATE,          // not used, first
-    CONTROLLER_RUNNING_STATE,
-    CONTROLLER_STOP_STATE,
-    CONTROLLER_PAUSED_STATE,
-    CONTROLLER_EMERGENCY_STATE,
-    CONTROLLER_LAST_STATE,          // not used, last
-} EControllerState;
+    NONE_STATE,          // not used, first
+    RUNNING_STATE,
+    STOP_STATE,
+    PAUSED_STATE,
+    EMERGENCY_STATE,
+    OFFLINE_STATE,
+    CHARGING_STATE,
+    FULLY_CHARGED_STATE,
+    DISCHARGING_STATE,
+    REGENERATION_STATE,
+    IDLE_STATE,
+    FAULT_STATE,
+    LAST_STATE            // not used, last
+} EState;
+
+/************* MAIN CONTROLLER *************/
+///* Controller input signals */
+//typedef enum {
+//    CONTROLLER_NONE_SIG,            // not used, first
+//    CONTROLLER_ENTRY_SIG,
+//    CONTROLLER_EXIT_SIG,
+//    CONTROLLER_RUN_SIG,
+//    CONTROLLER_STOP_SIG,
+//    CONTROLLER_PAUSE_SIG,
+//    CONTROLLER_EMERGENCY_SIG,
+//    CONTROLLER_SHORT_PRESS_SIG,     // last main controller
+//    CONTROLLER_GET_STATUS_SIG,      //generic to all tasks
+//    CONTROLLER_LAST_SIG             // not used, last
+//} ECtrlInputSignal;
+
+///* Controller states */
+//typedef enum {
+//    CONTROLLER_NONE_STATE,          // not used, first
+//    CONTROLLER_RUNNING_STATE,
+//    CONTROLLER_STOP_STATE,
+//    CONTROLLER_PAUSED_STATE,
+//    CONTROLLER_EMERGENCY_STATE,
+//    CONTROLLER_LAST_STATE,          // not used, last
+//} EControllerState;
 
 /* Controller thread settings struct */
 typedef struct {
@@ -58,7 +96,7 @@ typedef struct {
 
 /* Controller thread struct */
 typedef struct {
-    uint8_t eState;
+    EState eState;
     char cModuleName[20];
     xCtsv_t xSettings;
 } xControllerStateVariables_t;
@@ -66,34 +104,34 @@ typedef struct {
 
 /****************** BMS ******************/
 #define NUMBER_OF_CELLS         16
-/* BMS input signals */
-typedef enum {
-    BMS_NONE_SIG,            // not used, first
-    BMS_ENTRY_SIG,
-    BMS_EXIT_SIG,
-    BMS_OFFLINE_SIG,
-    BMS_CHARGING_SIG,
-    BMS_FULLY_CHARGED_SIG,
-    BMS_DISCHARGING_SIG,
-    BMS_REGENERATION_SIG,
-    BMS_IDLE_SIG,
-    BMS_FAULT_SIG,
-    BMS_GET_STATUS_SIG,      //generic to all tasks
-    BMS_LAST_SIG             // not used, last
-} EBmsInputSignal;
+///* BMS input signals */
+//typedef enum {
+//    BMS_NONE_SIG,            // not used, first
+//    BMS_ENTRY_SIG,
+//    BMS_EXIT_SIG,
+//    BMS_OFFLINE_SIG,
+//    BMS_CHARGING_SIG,
+//    BMS_FULLY_CHARGED_SIG,
+//    BMS_DISCHARGING_SIG,
+//    BMS_REGENERATION_SIG,
+//    BMS_IDLE_SIG,
+//    BMS_FAULT_SIG,
+//    BMS_GET_STATUS_SIG,      //generic to all tasks
+//    BMS_LAST_SIG             // not used, last
+//} EBmsInputSignal;
 
-/* BMS states */
-typedef enum {
-    BMS_NONE_STATE,          // not used, first
-    BMS_OFFLINE_STATE,
-    BMS_CHARGING_STATE,
-    BMS_FULLY_CHARGED_STATE,
-    BMS_DISCHARGING_STATE,
-    BMS_REGENERATION_STATE,
-    BMS_IDLE_STATE,
-    BMS_FAULT_STATE,
-    BMS_LAST_STATE            // not used, last
-} EBmsState;
+///* BMS states */
+//typedef enum {
+//    BMS_NONE_STATE,          // not used, first
+//    BMS_OFFLINE_STATE,
+//    BMS_CHARGING_STATE,
+//    BMS_FULLY_CHARGED_STATE,
+//    BMS_DISCHARGING_STATE,
+//    BMS_REGENERATION_STATE,
+//    BMS_IDLE_STATE,
+//    BMS_FAULT_STATE,
+//    BMS_LAST_STATE            // not used, last
+//} EBmsState;
 
 /* Bms thread live data struct */
 typedef struct {
@@ -112,7 +150,7 @@ typedef struct {
     uint32_t uiStateOfCharge;                       // reg: 46/7; res: 0.000001%
     int16_t iTempInternal;                          // reg: 48;   res: 0.1C
     /****************************** RESERVED *******************************/
-    EBmsState eOnlineStatus;                        // reg: 50;   res: 0x91-Charging, 0x92-Fully Charged, 0x93-Discharging, 0x96-Regenertion, 0x97-Idle, 0x9B-Fault
+    uint16_t eOnlineStatus;                         // reg: 50;   res: 0x91-Charging, 0x92-Fully Charged, 0x93-Discharging, 0x96-Regenertion, 0x97-Idle, 0x9B-Fault
     /****************************** RESERVED *******************************/
     uint16_t uiBalancingDecisionBits;               // reg: 51;   res: First Cell - LSB Bit of LSB Byte: 1 - need balancing, 0 - cell no need balance
     uint16_t uiRealBalancingBits;                   // reg: 52;   res: First Cell - LSB Bit of LSB Byte: 1 - need balancing, 0 - cell no need balance
@@ -144,7 +182,7 @@ typedef struct {
 
 /* Bms thread struct */
 typedef struct {
-    uint8_t eState;
+    EState eState;
     char cModuleName[20];
     xBmsLvdt_t xBmsLiveData;
     xBmsSettings_t xBmsSettings;
@@ -152,17 +190,18 @@ typedef struct {
 /****************** BMS END ******************/;
 
 typedef struct {
-    uint8_t eSignal;
-    uint8_t eState;
+    ESignal eSignal;
+    EState eState;
     const char *cCommand;
     const char *cState;
 } xThreadMapping_t;
 
-extern xThreadMapping_t xMainControllerMapping[];
-extern xThreadMapping_t xTinyBmsMapping[];
+//extern xThreadMapping_t xMainControllerMapping[];
+//extern xThreadMapping_t xTinyBmsMapping[];
+extern xThreadMapping_t xThreadMapping[];
 
 /* Move to APP_thread_processing */
-uint8_t uiThreadSignalFromCommand(xThreadMapping_t *xThread, char *pcCommandString);
-const char * pcStateNameFromThread(uint8_t eState);
+uint8_t uiThreadSignalFromCommand(char *pcCommandString);
+const char * pcStateNameFromThread(ESignal eState);
 
 #endif /* INCLUDE_APP_CONFIG_H_ */

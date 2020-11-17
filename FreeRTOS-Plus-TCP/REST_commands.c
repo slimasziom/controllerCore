@@ -369,7 +369,7 @@ BaseType_t xMainControllerREST( char *pcWriteBuffer, size_t xWriteBufferLen, con
 {
     BaseType_t lParameterStringLength, xReturn;
     xControllerStateVariables_t xStateVariables;
-    xAppMsgBaseType_t xMsg = {xQueueRestAPIResponseHandle, CONTROLLER_GET_STATUS_SIG};
+    xAppMsgBaseType_t xMsg = {xQueueRestAPIResponseHandle, GET_STATUS_SIG};
     char * pcParameter;
 
     /* Obtain the signal string. */
@@ -387,17 +387,17 @@ BaseType_t xMainControllerREST( char *pcWriteBuffer, size_t xWriteBufferLen, con
     ( void ) xWriteBufferLen;
     ( void ) pcCommandString;
 
-    xMsg.eSignal = (ECtrlInputSignal) uiThreadSignalFromCommand(xMainControllerMapping, pcParameter);
+    xMsg.eSignal = (ESignal) uiThreadSignalFromCommand(pcParameter);
 
     switch(xMsg.eSignal){
-    case CONTROLLER_RUN_SIG:
-    case CONTROLLER_STOP_SIG:
-    case CONTROLLER_PAUSE_SIG:
-    case CONTROLLER_EMERGENCY_SIG:
+    case RUN_SIG:
+    case STOP_SIG:
+    case PAUSE_SIG:
+    case EMERGENCY_SIG:
         xQueueSend(xQueueCtrlInputSignalHandle, &xMsg, NULL);
         snprintf( pcWriteBuffer, xWriteBufferLen, "{\"success\": \"OK\", \"result\": {\"message\": \"executed\"}}" );
         break;
-    case CONTROLLER_GET_STATUS_SIG:
+    case GET_STATUS_SIG:
         if(xQueueSend(xQueueCtrlInputSignalHandle, &xMsg, NULL) == pdTRUE){
             if(xQueueReceive(xQueueRestAPIResponseHandle, &xStateVariables, 1000) == pdTRUE){
                 xMainControllerRESTStatusToJson(pcWriteBuffer, xWriteBufferLen, &xStateVariables);
@@ -444,8 +444,8 @@ static void xTinyBmsRESTStatusToJson( char *pcWriteBuffer, size_t xWriteBufferLe
                           "\"12\": %d, "
                           "\"13\": %d, "
                           "\"14\": %d, "
-                          "\"15\": %d, "
-                      "} "
+                          "\"15\": %d"
+                      "}, "
                   "\"Lifetime-Counter\": %d, "
                   "\"Time-Left\": %d, "
                   "\"Battery-Pack-Voltage\": %f, "
@@ -461,8 +461,8 @@ static void xTinyBmsRESTStatusToJson( char *pcWriteBuffer, size_t xWriteBufferLe
                   "\"Balancing-Decision-Bits\": %d, "
                   "\"Real-Balancing-Bits\": %d, "
                   "\"No-Detected-Cells\": %d, "
-                  "\"Speed\": %f, "
-              "}"
+                  "\"Speed\": %f"
+              "},"
               "\"Settings\": "
               "{"
                   "\"Fully-Charged-Voltage\": %d, "
@@ -479,7 +479,7 @@ static void xTinyBmsRESTStatusToJson( char *pcWriteBuffer, size_t xWriteBufferLe
                   "\"Discharge-Over-Current-Cutoff\": %d, "
                   "\"Charge-Over-Current-Cutoff\": %d, "
                   "\"OverHeat-Cutoff\": %d, "
-                  "\"Low-Temp-Charger-Cutoff\": %d, "
+                  "\"Low-Temp-Charger-Cutoff\": %d"
               "}"
           "}"
       "}",
@@ -541,7 +541,7 @@ static void xTinyBmsRESTStatusToJson( char *pcWriteBuffer, size_t xWriteBufferLe
 BaseType_t xTinyBmsREST(char *pcWriteBuffer, size_t xWriteBufferLen, const char *pcCommandString){
     BaseType_t lParameterStringLength, xReturn;
     xBmsStateVariables_t xStateVariables;
-    xAppMsgBaseType_t xMsg = {xQueueRestAPIResponseHandle, BMS_GET_STATUS_SIG};
+    xAppMsgBaseType_t xMsg = {xQueueRestAPIResponseHandle, GET_STATUS_SIG};
     char * pcParameter;
 
     /* Obtain the signal string. */
@@ -559,20 +559,20 @@ BaseType_t xTinyBmsREST(char *pcWriteBuffer, size_t xWriteBufferLen, const char 
     ( void ) xWriteBufferLen;
     ( void ) pcCommandString;
 
-    xMsg.eSignal = (EBmsInputSignal) uiThreadSignalFromCommand(xTinyBmsMapping, pcParameter);
+    xMsg.eSignal = (ESignal) uiThreadSignalFromCommand(pcParameter);
 
     switch(xMsg.eSignal){
-    case BMS_OFFLINE_SIG:
-    case BMS_CHARGING_SIG:
-    case BMS_FULLY_CHARGED_SIG:
-    case BMS_DISCHARGING_SIG:
-    case BMS_REGENERATION_SIG:
-    case BMS_IDLE_SIG:
-    case BMS_FAULT_SIG:
+    case OFFLINE_SIG:
+    case CHARGING_SIG:
+    case FULLY_CHARGED_SIG:
+    case DISCHARGING_SIG:
+    case REGENERATION_SIG:
+    case IDLE_SIG:
+    case FAULT_SIG:
         xQueueSend(xQueueBmsInputSignalHandle, &xMsg, NULL);
         snprintf( pcWriteBuffer, xWriteBufferLen, "{\"success\": \"OK\", \"result\": {\"message\": \"executed\"}}" );
         break;
-    case BMS_GET_STATUS_SIG:
+    case GET_STATUS_SIG:
         if(xQueueSend(xQueueBmsInputSignalHandle, &xMsg, NULL) == pdTRUE){
             if(xQueueReceive(xQueueRestAPIResponseHandle, &xStateVariables, 1000) == pdTRUE){
                 xTinyBmsRESTStatusToJson(pcWriteBuffer, xWriteBufferLen, &xStateVariables);
