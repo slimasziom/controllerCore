@@ -28,12 +28,17 @@ typedef enum {
     EMERGENCY_SIG,
     SHORT_PRESS_SIG,     // last main controller
     OFFLINE_SIG,
+    GO_ONLINE_SIG,
+    READ_SIG,
+    WRITE_SIG,
     CHARGING_SIG,
     FULLY_CHARGED_SIG,
     DISCHARGING_SIG,
     REGENERATION_SIG,
     IDLE_SIG,
     FAULT_SIG,
+    RESPONSE_SIG,
+    TIMEOUT_SIG,
     BMS_LAST_SIG                    // not used, last
 } ESignal;
 
@@ -45,6 +50,9 @@ typedef enum {
     PAUSED_STATE,
     EMERGENCY_STATE,
     OFFLINE_STATE,
+    GOING_ONLINE_STATE,
+    READING_STATE,
+    WRITING_STATE,
     CHARGING_STATE,
     FULLY_CHARGED_STATE,
     DISCHARGING_STATE,
@@ -141,8 +149,8 @@ typedef struct {
     uint32_t uiTimeLeft;                            // reg: 34/5; res: 1s
     float_t fBatteryPackVoltage;                    // reg: 36/7; res: 1V
     float_t fBatteryPackCurrent;                    // reg: 38/9; res: 1A
-    uint16_t uiBatteryMinCellVoltage;               // reg: 40/1; res: 1mV
-    uint16_t uiBatteryMaxCellVoltage;               // reg: 38/9; res: 1mV
+    uint16_t uiBatteryMinCellVoltage;               // reg: 40;   res: 1mV
+    uint16_t uiBatteryMaxCellVoltage;               // reg: 41;   res: 1mV
     int16_t iExtSensorTemp1;                        // reg: 42;   res: 0.1C
     int16_t iExtSensorTemp2;                        // reg: 43;   res: 0.1C
     uint16_t uiDistanceLeftToEmptyBat;              // reg: 44;   res: 1km

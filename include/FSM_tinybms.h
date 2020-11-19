@@ -11,6 +11,7 @@
 #include "math.h"
 #include "stdio.h"
 #include "stdlib.h"
+#include "HL_can.h"
 
 /* HALCoGen generated headers has moved to sys_main.h*/
 #include "sys_main.h"
@@ -36,6 +37,8 @@ typedef struct
     QueueHandle_t xEventQueue;
     TimerHandle_t *pxTimer;
     xBmsStateVariables_t xStateVariables;
+    canBASE_t *pCanNode;
+    uint32_t uiCanID;
 } FSM_TinyBms_Definition_t;
 
 #endif /* FSM_MAINCONTROLLER_H_ */

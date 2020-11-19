@@ -13,10 +13,18 @@
 #include "os_queue.h"
 #include "APP_config.h"
 
+#define CAN_DATA_MAX_SIZE   8
+
 typedef struct {
     QueueHandle_t *pxReturnQueue;
     ESignal eSignal;
 } xAppMsgBaseType_t;
+
+typedef struct {
+    xAppMsgBaseType_t xBase;
+    uint8_t uiData[CAN_DATA_MAX_SIZE];
+    uint8_t uiDataLength;
+} xAppMsgCANType_t;
 
 /* Queue handlers */
 extern xQueueHandle xQueueCtrlInputSignalHandle;
