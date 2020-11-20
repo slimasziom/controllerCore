@@ -69,7 +69,7 @@ xThreadMapping_t xThreadMapping[] =
     { PAUSE_SIG,             PAUSED_STATE,           "pause",            "paused"        },
     { EMERGENCY_SIG,         EMERGENCY_STATE,        "emergency",        "emergency"     },
     { OFFLINE_SIG,           OFFLINE_STATE,          "go-offline",       "offline"       },
-    { GO_ONLINE_SIG,         GOING_ONLINE_STATE,     "go-online",        "online"        },
+    { GO_ONLINE_SIG,         GOING_ONLINE_STATE,     "go-online",        "going-online"  },
     { READ_SIG,              READING_STATE,          "read",             "reading"       },
     { WRITE_SIG,             WRITING_STATE,          "write",            "writing"       },
     { CHARGING_SIG,          CHARGING_STATE,         "charge",           "charging"      },
@@ -78,6 +78,8 @@ xThreadMapping_t xThreadMapping[] =
     { REGENERATION_SIG,      REGENERATION_STATE,     "regenerate",       "regenerating"  },
     { IDLE_SIG,              IDLE_STATE,             "go-idle",          "idle"          },
     { FAULT_SIG,             FAULT_STATE,            "go-fault",         "fault"         },
+    { TIMEOUT_SIG,           FAULT_STATE,            "timeout",          ""              },
+
 };
 
 #if !defined( ARRAY_SIZE )

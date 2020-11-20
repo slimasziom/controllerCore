@@ -563,12 +563,10 @@ BaseType_t xTinyBmsREST(char *pcWriteBuffer, size_t xWriteBufferLen, const char 
 
     switch(xMsg.eSignal){
     case OFFLINE_SIG:
-    case CHARGING_SIG:
-    case FULLY_CHARGED_SIG:
-    case DISCHARGING_SIG:
-    case REGENERATION_SIG:
+    case GO_ONLINE_SIG:
     case IDLE_SIG:
     case FAULT_SIG:
+    case TIMEOUT_SIG:
         xQueueSend(xQueueBmsInputSignalHandle, &xMsg, NULL);
         snprintf( pcWriteBuffer, xWriteBufferLen, "{\"success\": \"OK\", \"result\": {\"message\": \"executed\"}}" );
         break;

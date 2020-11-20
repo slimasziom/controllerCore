@@ -42,11 +42,13 @@ void vTinyBmsFSMTaskInit(FSM_TinyBms_Definition_t * const me);
 void vTinyBmsFSMTask(void *pvParameters){
     FSM_TinyBms_Definition_t me;
     xAppMsgBaseType_t xMsg;
+    xAppMsgCANType_t xCANMsg;
     void *(*activeState)(FSM_TinyBms_Definition_t * const me, xAppMsgBaseType_t *pxEventQueue ) = &vTinyBmsOfflineState;
 //    void *nextState = NULL;
     void *(*nextState)(FSM_TinyBms_Definition_t * const me, xAppMsgBaseType_t *pxEventQueue ) = NULL;
     me.xEventQueue = xQueueBmsInputSignalHandle;
     me.pxTimer = &xTimerTinyBmsHandle;
+    me.pCanNode = canREG1;
 
     /* Initialization */
     me.xStateVariables.eState=NONE_STATE;
@@ -73,6 +75,20 @@ void vTinyBmsFSMTask(void *pvParameters){
                     (*activeState)(&me, &xMsg);
                 }
             }
+
+            if (xQueueReceive(xQueueBmsCANResponseHandle, &xCANMsg, 0) == pdTRUE)
+            {
+                nextState = (*activeState)(&me, &xCANMsg);     //TODO: remove warning
+                if (nextState != NULL){
+                    xMsg.eSignal = EXIT_SIG;
+                    (*activeState)(&me, &xMsg);
+                    activeState = nextState;
+                    xMsg.eSignal = ENTRY_SIG;
+                    (*activeState)(&me, &xMsg);
+                }
+            }
+
+
         /* 10Hz refresh rate */
         vTaskDelay(pdMS_TO_TICKS(100));
         }
@@ -118,6 +134,9 @@ void * vTinyBmsGoOnlineState(FSM_TinyBms_Definition_t * const me, xAppMsgBaseTyp
         //send request for bms state: 2.1.10 in 'TinyBMS_Communication_Protocols.pdf'
         vSendCANFrame(me, sizeof(puiDataBytes), puiDataBytes);
         //start timer
+        break;
+    case GO_ONLINE_SIG:
+        vSendCANFrame(me, sizeof(puiDataBytes), puiDataBytes);
         break;
     case OFFLINE_SIG:
         state = &vTinyBmsOfflineState;
@@ -420,7 +439,7 @@ void vTinyBmsFSMTaskInit(FSM_TinyBms_Definition_t * const me){
 ///*-----------------------------------------------------------*/
 
 void vSendCANFrame(FSM_TinyBms_Definition_t * const me, uint8_t uiDataLen, uint8_t *uiData){
-//    BSP_canSend(me->pCanNode, me->uiCanID, uiDataLen, uiData);
+    BSP_bmsCanSend(me->pCanNode, me->uiCanID, uiDataLen, uiData);
 }
 /*-----------------------------------------------------------*/
 

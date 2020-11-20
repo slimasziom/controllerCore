@@ -36,4 +36,6 @@ extern xQueueHandle xQueueCLICtrlResponseHandle;
 extern xQueueHandle xQueueRestAPIBmsResponseHandle;
 extern xQueueHandle xQueueCLIBmsResponseHandle;
 
+extern xQueueHandle xQueueBmsCANResponseHandle;
+
 #endif /* INCLUDE_APP_QUEUES_H_ */

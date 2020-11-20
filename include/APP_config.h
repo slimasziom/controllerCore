@@ -13,6 +13,8 @@
 #include "stdint.h"
 #include "math.h"
 
+#include "HL_can.h"
+
 #define appRestAPI_BUFFER_SIZE ( 2048 )
 #define appCOMMAND_LENGTH (32)
 
@@ -207,6 +209,8 @@ typedef struct {
 //extern xThreadMapping_t xMainControllerMapping[];
 //extern xThreadMapping_t xTinyBmsMapping[];
 extern xThreadMapping_t xThreadMapping[];
+
+extern void BSP_bmsCanSend(canBASE_t *node, uint32_t uiID, uint8_t uiDataLen, uint8_t *uiData);
 
 /* Move to APP_thread_processing */
 uint8_t uiThreadSignalFromCommand(char *pcCommandString);

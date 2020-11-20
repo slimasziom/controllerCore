@@ -19,3 +19,5 @@ xQueueHandle xQueueRestAPIBmsResponseHandle;
 
 xQueueHandle xQueueCLIBmsResponseHandle;
 
+xQueueHandle xQueueBmsCANResponseHandle;
+
