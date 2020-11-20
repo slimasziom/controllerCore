@@ -7,7 +7,7 @@
  */
 
 /* 
-* Copyright (C) 2009-2015 Texas Instruments Incorporated - www.ti.com  
+* Copyright (C) 2009-2016 Texas Instruments Incorporated - www.ti.com  
 * 
 * 
 *  Redistribution and use in source and binary forms, with or without 
@@ -83,7 +83,7 @@
  **/
 /* SourceId : ETH_SourceId_059 */
 /* DesignId : ETH_DesignId_059*/
-/* Requirements : HL_ETH_SR41, HL_ETH_SR45 */
+/* Requirements : HL_CONQ_EMAC_SR62 */
 boolean MDIOPhyRegRead(uint32 baseAddr, uint32 phyAddr,
                             uint32 regNum, volatile uint16 * dataPtr)
 {
@@ -103,9 +103,7 @@ boolean MDIOPhyRegRead(uint32 baseAddr, uint32 phyAddr,
     /*SAFETYMCUSW 28 D MR:NA <APPROVED> "Hardware status bit read check" */
     while((HWREG(baseAddr + MDIO_USERACCESS0) & MDIO_USERACCESS0_GO) == MDIO_USERACCESS0_GO)
     { 
-    	/* Limiting CPU usage. */
-    	vTaskDelay(1);
-    } /* Wait */
+	} /* Wait */
 
     /* Store the data if the read is acknowledged */
     if(((HWREG(baseAddr + MDIO_USERACCESS0)) & MDIO_USERACCESS0_ACK) == MDIO_USERACCESS0_ACK)
@@ -132,7 +130,7 @@ boolean MDIOPhyRegRead(uint32 baseAddr, uint32 phyAddr,
  **/
 /* SourceId : ETH_SourceId_058 */
 /* DesignId : ETH_DesignId_058*/
-/* Requirements : HL_ETH_SR41 */
+/* Requirements : HL_CONQ_EMAC_SR63 */
 void MDIOPhyRegWrite(uint32 baseAddr, uint32 phyAddr,
                      uint32 regNum, uint16 RegVal)
 {
@@ -166,7 +164,7 @@ void MDIOPhyRegWrite(uint32 baseAddr, uint32 phyAddr,
  **/
 /* SourceId : ETH_SourceId_062 */
 /* DesignId : ETH_DesignId_062*/
-/* Requirements : HL_ETH_SR42 */
+/* Requirements : HL_CONQ_EMAC_SR64 */
 uint32 MDIOPhyAliveStatusGet(uint32 baseAddr)
 {
     return (HWREG(baseAddr + MDIO_ALIVE));
@@ -184,7 +182,7 @@ uint32 MDIOPhyAliveStatusGet(uint32 baseAddr)
  **/
 /* SourceId : ETH_SourceId_061 */
 /* DesignId : ETH_DesignId_061*/
-/* Requirements : HL_ETH_SR42 */
+/* Requirements : HL_CONQ_EMAC_SR67 */
 uint32 MDIOPhyLinkStatusGet(uint32 baseAddr)
 {
     return (HWREG(baseAddr + MDIO_LINK));
@@ -202,7 +200,7 @@ uint32 MDIOPhyLinkStatusGet(uint32 baseAddr)
  **/
 /* SourceId : ETH_SourceId_060 */
 /* DesignId : ETH_DesignId_060*/
-/* Requirements : HL_ETH_SR39 */
+/* Requirements : HL_CONQ_EMAC_SR59 */
 void MDIOInit(uint32 baseAddr, uint32 mdioInputFreq,
               uint32 mdioOutputFreq)
 {
@@ -223,7 +221,7 @@ void MDIOInit(uint32 baseAddr, uint32 mdioInputFreq,
  **/
 /* SourceId : ETH_SourceId_056 */
 /* DesignId : ETH_DesignId_056*/
-/* Requirements : HL_ETH_SR40 */
+/* Requirements : HL_CONQ_EMAC_SR60 */
 void MDIOEnable(uint32 baseAddr) {
 	HWREG(baseAddr + MDIO_CONTROL) = HWREG(baseAddr + MDIO_CONTROL)
 			| MDIO_CONTROL_ENABLE;
@@ -239,7 +237,7 @@ void MDIOEnable(uint32 baseAddr) {
  **/
 /* SourceId : ETH_SourceId_057 */
 /* DesignId : ETH_DesignId_057*/
-/* Requirements : HL_ETH_SR40 */
+/* Requirements : HL_CONQ_EMAC_SR61 */
 void MDIODisable(uint32 baseAddr) {
 	HWREG(baseAddr + MDIO_CONTROL) = HWREG(baseAddr + MDIO_CONTROL)
 			& (~MDIO_CONTROL_ENABLE);

@@ -1,12 +1,12 @@
 /** @file HL_sys_vim.c
 *   @brief VIM Driver Implementation File
-*   @date 03.Apr.2015
-*   @version 04.04.00
+*   @date 07-July-2017
+*   @version 04.07.00
 *
 */
 
 /* 
-* Copyright (C) 2009-2015 Texas Instruments Incorporated - www.ti.com  
+* Copyright (C) 2009-2016 Texas Instruments Incorporated - www.ti.com  
 * 
 * 
 *  Redistribution and use in source and binary forms, with or without 
@@ -85,7 +85,7 @@ static const t_isrFuncPTR s_vim_init[128U] =
     &lin1HighLevelInterrupt,       /* Channel 13  */
     &phantomInterrupt,          /* Channel 14  */
     &phantomInterrupt,          /* Channel 15  */
-    &phantomInterrupt,          /* Channel 16  */
+    &can1HighLevelInterrupt,       /* Channel 16  */
     &phantomInterrupt,          /* Channel 17  */
     &phantomInterrupt,          /* Channel 18  */
     &phantomInterrupt,          /* Channel 19  */
@@ -199,6 +199,9 @@ static const t_isrFuncPTR s_vim_init[128U] =
 };
 void vimECCErrorHandler(void);
 
+/* SourceId : VIM_SourceId_001 */
+/* DesignId : VIM_DesignId_001 */
+/* Requirements : HL_CONQ_VIM_SR2 */
 /** @fn void vimInit(void)
 *   @brief Initializes VIM module
 *
@@ -377,7 +380,7 @@ void vimInit(void)
                         | (uint32)((uint32)1U << 13U)
                         | (uint32)((uint32)0U << 14U)
                         | (uint32)((uint32)0U << 15U)
-                        | (uint32)((uint32)0U << 16U)
+                        | (uint32)((uint32)1U << 16U)
                         | (uint32)((uint32)0U << 17U)
                         | (uint32)((uint32)0U << 18U)
                         | (uint32)((uint32)0U << 19U)
@@ -501,6 +504,9 @@ void vimInit(void)
 /* USER CODE END */
 }
 
+/* SourceId : VIM_SourceId_002 */
+/* DesignId : VIM_DesignId_002 */
+/* Requirements : HL_CONQ_VIM_SR5 */
 /** @fn void vimChannelMap(uint32 request, uint32 channel, t_isrFuncPTR handler)
 *   @brief Map selected interrupt request to the selected channel
 *
@@ -534,6 +540,9 @@ void vimChannelMap(uint32 request, uint32 channel, t_isrFuncPTR handler)
 /* USER CODE END */
 }
 
+/* SourceId : VIM_SourceId_003 */
+/* DesignId : VIM_DesignId_003 */
+/* Requirements : HL_CONQ_VIM_SR3 */
 /** @fn void vimEnableInterrupt(uint32 channel, systemInterrupt_t inttype)
 *   @brief Enable interrupt for the the selected channel
 *
@@ -606,6 +615,9 @@ void vimEnableInterrupt(uint32 channel, systemInterrupt_t inttype)
 /* USER CODE END */
 }
 
+/* SourceId : VIM_SourceId_004 */
+/* DesignId : VIM_DesignId_004 */
+/* Requirements : HL_CONQ_VIM_SR5 */
 /** @fn void vimDisableInterrupt(uint32 channel)
 *   @brief Disable interrupt for the the selected channel
 *
@@ -646,6 +658,9 @@ void vimDisableInterrupt(uint32 channel)
 /* USER CODE BEGIN (9) */
 /* USER CODE END */
 
+/* SourceId : VIM_SourceId_005 */
+/* DesignId : VIM_DesignId_005 */
+/* Requirements : HL_CONQ_VIM_SR7 */
 /** @fn void vimGetConfigValue(vim_config_reg_t *config_reg, config_value_type_t type)
 *   @brief Get the initial or current values of the configuration registers
 *
@@ -753,7 +768,7 @@ void vimGetConfigValue(vim_config_reg_t *config_reg, config_value_type_t type)
 
 /* SourceId : VIM_SourceId_006 */
 /* DesignId : VIM_DesignId_006 */
-/* Requirements : HL_SR105 */
+/* Requirements : HL_CONQ_VIM_SR6 */
 void vimECCErrorHandler(void)
 {
     uint32 vec;
@@ -765,10 +780,10 @@ void vimECCErrorHandler(void)
     uint32 error_addr = vimREG->UERRADDR;
 
     /* Identify the channel number */
-    uint32 error_channel = ((error_addr & 0x3FFU) >> 2U) - 1U;
+    uint32 error_channel = ((error_addr & 0x3FFU) >> 2U);
 
     /* Correct the corrupted location */
-    vimRAM->ISR[error_channel + 1U] = s_vim_init[error_channel + 1U];
+    vimRAM->ISR[error_channel] = s_vim_init[error_channel];
 
     /* Clear Parity Error Flag */
     vimREG->ECCSTAT = 1U;

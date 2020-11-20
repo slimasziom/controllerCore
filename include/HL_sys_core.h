@@ -1,7 +1,7 @@
 /** @file HL_sys_core.h
 *   @brief System Core Header File
-*   @date 03.Apr.2015
-*   @version 04.04.00
+*   @date 07-July-2017
+*   @version 04.07.00
 *   
 *   This file contains:
 *   - Core Interface Functions
@@ -10,7 +10,7 @@
 */
 
 /* 
-* Copyright (C) 2009-2015 Texas Instruments Incorporated - www.ti.com  
+* Copyright (C) 2009-2016 Texas Instruments Incorporated - www.ti.com  
 * 
 * 
 *  Redistribution and use in source and binary forms, with or without 
@@ -56,6 +56,60 @@ extern "C" {
 /* USER CODE BEGIN (0) */
 /* USER CODE END */
 
+/** @def USER_STACK_LENGTH
+*   @brief USER Mode Stack length (in bytes)
+*
+*   Alias for USER Mode Stack length (in bytes)
+*
+*	@note: Use this macro for USER Mode Stack length (in bytes)
+*/
+#define USER_STACK_LENGTH   0x00002000U
+
+/** @def SVC_STACK_LENGTH
+*   @brief SVC Mode Stack length (in bytes)
+*
+*   Alias for SVC Mode Stack length (in bytes)
+*
+*	@note: Use this macro for SVC Mode Stack length (in bytes)
+*/
+#define SVC_STACK_LENGTH    0x00002000U
+
+/** @def FIQ_STACK_LENGTH
+*   @brief FIQ Mode Stack length (in bytes)
+*
+*   Alias for FIQ Mode Stack length (in bytes)
+*
+*	@note: Use this macro for FIQ Mode Stack length (in bytes)
+*/
+#define FIQ_STACK_LENGTH    0x00000800U
+
+/** @def IRQ_STACK_LENGTH
+*   @brief IRQ Mode Stack length (in bytes)
+*
+*   Alias for IRQ Mode Stack length (in bytes)
+*
+*	@note: Use this macro for IRQ Mode Stack length (in bytes)
+*/
+#define IRQ_STACK_LENGTH    0x00000200U
+
+/** @def ABORT_STACK_LENGTH
+*   @brief ABORT Mode Stack length (in bytes)
+*
+*   Alias for ABORT Mode Stack length (in bytes)
+*
+*	@note: Use this macro for ABORT Mode Stack length (in bytes)
+*/
+#define ABORT_STACK_LENGTH  0x00000200U
+
+/** @def UNDEF_STACK_LENGTH
+*   @brief UNDEF Mode Stack length (in bytes)
+*
+*   Alias for UNDEF Mode Stack length (in bytes)
+*
+*	@note: Use this macro for UNDEF Mode Stack length (in bytes)
+*/
+#define UNDEF_STACK_LENGTH  0x00000200U
+
 /* System Core Interface Functions */
 
 /** @fn void _coreInitRegisters_(void)
@@ -72,6 +126,11 @@ void _coreInitStackPointer_(void);
 *   @brief Get CPSR Value
 */
 uint32 _getCPSRValue_(void);
+
+/** @fn void _checkMemInitOn_(void)
+*   @brief Wait until Mem Init is complete if initiated already.
+*/
+void _checkMemInitOn_(void);
 
 /** @fn void _gotoCPUIdle_(void)
 *   @brief Take CPU to Idle state
@@ -276,16 +335,6 @@ void _dCacheInvalidate_(void);
 *   @brief Invalidate ICache.
 */
 void _iCacheInvalidate_(void);
-
-/** @fn void _dcacheCleanRange_(unsigned int startAddress, unsigned int endAddress);
-*   @brief clean data cache address range
-*/
-void _dcacheCleanRange_(unsigned int startAddress, unsigned int endAddress);
-
-/** @fn void _dcacheInvalidateRange_(unsigned int startAddress, unsigned int endAddress);
-*   @brief invalidate data cache address range
-*/
-void _dcacheInvalidateRange_(unsigned int startAddress, unsigned int endAddress);
 
 
 /* USER CODE BEGIN (1) */

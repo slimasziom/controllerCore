@@ -7,7 +7,7 @@
     <tools>ti</tools>
   </DEVICE>
   <VERSION>
-    <version>04.06.00</version>
+    <version>04.04.00</version>
   </VERSION>
   <HET1>
     <FILENAME>
@@ -352,8 +352,7 @@
         <NAME>HL_can.h</NAME>
       </HDRCAN>
       <SRCCAN>
-        <NAME>HL_can.c</NAME>
-      </SRCCAN>
+        </SRCCAN>
       <HDRADC_R>
         <NAME>HL_reg_adc.h</NAME>
       </HDRADC_R>
@@ -370,7 +369,7 @@
         <NAME/>
       </HET1ASMSRC>
       <STDHDRHET>
-        <NAME>std_nhet.h</NAME>
+        <NAME>HL_std_nhet.h</NAME>
       </STDHDRHET>
       <HDRHET_R>
         <NAME>HL_reg_het.h</NAME>
@@ -539,15 +538,6 @@
       <SRC14FEE/>
       <SRC15FEE/>
       <SRC16FEE/>
-      <SRC2PHY>
-        <NAME>HL_phy_tlk111.c</NAME>
-      </SRC2PHY>
-      <HDR2PHY>
-        <NAME>HL_phy_tlk111.h</NAME>
-      </HDR2PHY>
-      <HDR7EMAC>
-        <NAME>HL_emac_phyConfig.h</NAME>
-      </HDR7EMAC>
     </FILENAMES>
   </SYSTEM>
   <OS>
@@ -726,7 +716,7 @@
         <PATH>include\HL_can.h</PATH>
       </HDRCAN>
       <SRCCAN>
-        <PATH>source\HL_can.c</PATH>
+        <PATH></PATH>
       </SRCCAN>
     </FILENAMES>
   </CAN>
@@ -746,7 +736,7 @@
   <HET>
     <FILENAMES>
       <STDHDRHET>
-        <PATH>include\std_nhet.h</PATH>
+        <PATH>include\HL_std_nhet.h</PATH>
       </STDHDRHET>
       <HDRHET_R>
         <PATH>include\HL_reg_het.h</PATH>
@@ -810,15 +800,6 @@
       <SRCPHY>
         <PATH>source\HL_phy_dp83640.c</PATH>
       </SRCPHY>
-      <SRC2PHY>
-        <PATH>source\HL_phy_tlk111.c</PATH>
-      </SRC2PHY>
-      <HDR2PHY>
-        <PATH>include\HL_phy_tlk111.h</PATH>
-      </HDR2PHY>
-      <HDR7EMAC>
-        <PATH>include\HL_emac_phyConfig.h</PATH>
-      </HDR7EMAC>
     </FILENAMES>
   </EMAC>
   <DCC>

@@ -1,7 +1,7 @@
 /** @file HL_nmpu.c
 *   @brief NMPU Driver Source File
-*   @date 03.Apr.2015
-*   @version 04.04.00
+*   @date 07-July-2017
+*   @version 04.07.00
 *
 *   This file contains:
 *   - API Functions
@@ -11,7 +11,7 @@
 */
 
 /* 
-* Copyright (C) 2009-2015 Texas Instruments Incorporated - www.ti.com  
+* Copyright (C) 2009-2016 Texas Instruments Incorporated - www.ti.com  
 * 
 * 
 *  Redistribution and use in source and binary forms, with or without 
@@ -59,6 +59,9 @@
 *
 *   This function enables memory protection
 */
+/* SourceId : NMPU_SourceId_001 */
+/* DesignId : NMPU_DesignId_001 */
+/* Requirements : HL_CONQ_NMPU_SR1 */
 void nmpuEnable(nmpuBASE_t * nmpu)
 {
 /* USER CODE BEGIN (0) */
@@ -82,6 +85,9 @@ void nmpuEnable(nmpuBASE_t * nmpu)
 *
 *   This function disables memory protection
 */
+/* SourceId : NMPU_SourceId_002 */
+/* DesignId : NMPU_DesignId_002 */
+/* Requirements : HL_CONQ_NMPU_SR2 */
 void nmpuDisable(nmpuBASE_t * nmpu)
 {
 /* USER CODE BEGIN (2) */
@@ -105,6 +111,9 @@ void nmpuDisable(nmpuBASE_t * nmpu)
 *
 *   This function enables error pulse output to ESM
 */
+/* SourceId : NMPU_SourceId_003 */
+/* DesignId : NMPU_DesignId_003 */
+/* Requirements : HL_CONQ_NMPU_SR3 */
 void nmpuEnableErrorGen(nmpuBASE_t * nmpu)
 {
 /* USER CODE BEGIN (4) */
@@ -128,6 +137,9 @@ void nmpuEnableErrorGen(nmpuBASE_t * nmpu)
 *
 *   This function disables error pulse output to ESM
 */
+/* SourceId : NMPU_SourceId_004 */
+/* DesignId : NMPU_DesignId_004 */
+/* Requirements : HL_CONQ_NMPU_SR4 */
 void nmpuDisableErrorGen(nmpuBASE_t * nmpu)
 {
 /* USER CODE BEGIN (6) */
@@ -157,6 +169,9 @@ void nmpuDisableErrorGen(nmpuBASE_t * nmpu)
 *
 *   This function enables an NMPU region. This function will not enable the NMPU module. Application must call the routine nmpuEnable to so the same.
 */
+/* SourceId : NMPU_SourceId_005 */
+/* DesignId : NMPU_DesignId_005 */
+/* Requirements : HL_CONQ_NMPU_SR5 */
 boolean nmpuEnableRegion(nmpuBASE_t * nmpu, nmpuReg_t region, nmpuRegionAttributes_t config)
 {
     boolean status = TRUE;
@@ -208,6 +223,9 @@ boolean nmpuEnableRegion(nmpuBASE_t * nmpu, nmpuReg_t region, nmpuRegionAttribut
 *
 *   This function disables an NMPU region.
 */
+/* SourceId : NMPU_SourceId_006 */
+/* DesignId : NMPU_DesignId_006 */
+/* Requirements : HL_CONQ_NMPU_SR6 */
 boolean nmpuDisableRegion(nmpuBASE_t * nmpu, nmpuReg_t region)
 {
     boolean status;
@@ -251,6 +269,9 @@ boolean nmpuDisableRegion(nmpuBASE_t * nmpu, nmpuReg_t region)
 *
 *   This function returns the status of NMPU error
 */
+/* SourceId : NMPU_SourceId_007 */
+/* DesignId : NMPU_DesignId_007 */
+/* Requirements : HL_CONQ_NMPU_SR7 */
 nmpuErr_t nmpuGetErrorStatus(nmpuBASE_t * nmpu)
 {
     nmpuErr_t status;
@@ -305,6 +326,9 @@ nmpuErr_t nmpuGetErrorStatus(nmpuBASE_t * nmpu)
 *
 *   This function returns the region for which an access permission error was detected
 */
+/* SourceId : NMPU_SourceId_008 */
+/* DesignId : NMPU_DesignId_008 */
+/* Requirements : HL_CONQ_NMPU_SR9 */
 nmpuReg_t nmpuGetErrorRegion(nmpuBASE_t * nmpu)
 {
 /* USER CODE BEGIN (14) */
@@ -327,6 +351,9 @@ nmpuReg_t nmpuGetErrorRegion(nmpuBASE_t * nmpu)
 *
 *   This function returns the address for MPU compare fail
 */
+/* SourceId : NMPU_SourceId_009 */
+/* DesignId : NMPU_DesignId_009 */
+/* Requirements : HL_CONQ_NMPU_SR8 */
 uint32 nmpuGetErrorAddress(nmpuBASE_t * nmpu)
 {
 /* USER CODE BEGIN (16) */
@@ -348,6 +375,9 @@ uint32 nmpuGetErrorAddress(nmpuBASE_t * nmpu)
 *
 *   This function clears the error status flags
 */
+/* SourceId : NMPU_SourceId_010 */
+/* DesignId : NMPU_DesignId_010 */
+/* Requirements : HL_CONQ_NMPU_SR10 */
 void nmpuClearErrorStatus(nmpuBASE_t * nmpu)
 {
 /* USER CODE BEGIN (18) */

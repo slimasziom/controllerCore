@@ -18,7 +18,7 @@
  *********************************************************************************************************************/
 
 /* 
-* Copyright (C) 2009-2015 Texas Instruments Incorporated - www.ti.com  
+* Copyright (C) 2009-2016 Texas Instruments Incorporated - www.ti.com  
 * 
 * 
 *  Redistribution and use in source and binary forms, with or without 
@@ -106,7 +106,7 @@
 #define _L2FMC
 #endif
 #include "F021.h"
-#include "Std_Types.h"
+#include "HL_hal_stdtypes.h"
 #include "Device_types.h"
 
 #endif /* DEVICE_TMS570LC43x_H */

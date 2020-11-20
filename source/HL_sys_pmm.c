@@ -1,11 +1,11 @@
 /** @file HL_sys_pmm.c
 *   @brief PCR Driver Implementation File
-*   @date 03.Apr.2015
-*   @version 04.04.00
+*   @date 07-July-2017
+*   @version 04.07.00
 *
 */
 /* 
-* Copyright (C) 2009-2015 Texas Instruments Incorporated - www.ti.com  
+* Copyright (C) 2009-2016 Texas Instruments Incorporated - www.ti.com  
 * 
 * 
 *  Redistribution and use in source and binary forms, with or without 
@@ -57,6 +57,9 @@
 *   This function turns on the selected Logic Power Domain
 *
 */
+/* SourceId : PMM_SourceId_001 */
+/* DesignId : PMM_DesignId_001 */
+/* Requirements : HL_CONQ_PMM_SR3 */
 boolean pmmTurnONLogicPowerDomain(pmm_LogicPD_t logicPD)
 {
 	boolean status = TRUE;
@@ -124,6 +127,9 @@ boolean pmmTurnONLogicPowerDomain(pmm_LogicPD_t logicPD)
 *   This function turns off the selected Logic Power Domain
 *
 */
+/* SourceId : PMM_SourceId_002 */
+/* DesignId : PMM_DesignId_002 */
+/* Requirements : HL_CONQ_PMM_SR4 */
 boolean pmmTurnOFFLogicPowerDomain(pmm_LogicPD_t logicPD)
 {
 	boolean status = TRUE;
@@ -191,6 +197,9 @@ boolean pmmTurnOFFLogicPowerDomain(pmm_LogicPD_t logicPD)
 *   This function checks whether the selected power domain is active or not.
 *
 */
+/* SourceId : PMM_SourceId_003 */
+/* DesignId : PMM_DesignId_003 */
+/* Requirements : HL_CONQ_PMM_SR5 */
 boolean pmmIsLogicPowerDomainActive(pmm_LogicPD_t logicPD)
 {
     boolean status;

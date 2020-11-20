@@ -1,7 +1,7 @@
 /** @file HL_can.h
 *   @brief CAN Driver Header File
-*   @date 03.Apr.2015
-*   @version 04.04.00
+*   @date 07-July-2017
+*   @version 04.07.00
 *   
 *   This file contains:
 *   - Definitions
@@ -12,7 +12,7 @@
 */
 
 /* 
-* Copyright (C) 2009-2015 Texas Instruments Incorporated - www.ti.com  
+* Copyright (C) 2009-2016 Texas Instruments Incorporated - www.ti.com  
 * 
 * 
 *  Redistribution and use in source and binary forms, with or without 
@@ -629,6 +629,98 @@ typedef struct can_config_reg
 } can_config_reg_t;
 
 
+/* Configuration registers initial value for CAN1*/
+#define CAN1_CTL_CONFIGVALUE      ((uint32)0x00000000U \
+                                 | (uint32)0x00000000U \
+                                 | (uint32)((uint32)0x00000005U  << 10U) | 0x00020002U)
+#define CAN1_ES_CONFIGVALUE         0x00000007U 
+#define CAN1_BTR_CONFIGVALUE      ((uint32)((uint32)0U << 16U) \
+                                 | (uint32)((uint32)(4U - 1U) << 12U) \
+                                 | (uint32)((uint32)((6U + 4U) - 1U) << 8U) \
+                                 | (uint32)((uint32)(4U - 1U) << 6U) | (uint32)9U)
+#define CAN1_TEST_CONFIGVALUE       0x00000080U 
+#define CAN1_ABOTR_CONFIGVALUE    ((uint32)(0U))
+#define CAN1_INTMUX0_CONFIGVALUE  ((uint32)0x00000000U \
+                                 | (uint32)0x00000000U \
+                                 | (uint32)0x00000000U \
+                                 | (uint32)0x00000000U \
+                                 | (uint32)0x00000000U \
+                                 | (uint32)0x00000000U \
+                                 | (uint32)0x00000000U \
+                                 | (uint32)0x00000000U \
+                                 | (uint32)0x00000000U \
+                                 | (uint32)0x00000000U \
+                                 | (uint32)0x00000000U \
+                                 | (uint32)0x00000000U \
+                                 | (uint32)0x00000000U \
+                                 | (uint32)0x00000000U \
+                                 | (uint32)0x00000000U \
+                                 | (uint32)0x00000000U \
+                                 | (uint32)0x00000000U \
+                                 | (uint32)0x00000000U \
+                                 | (uint32)0x00000000U \
+                                 | (uint32)0x00000000U \
+                                 | (uint32)0x00000000U \
+                                 | (uint32)0x00000000U \
+                                 | (uint32)0x00000000U \
+                                 | (uint32)0x00000000U \
+                                 | (uint32)0x00000000U \
+                                 | (uint32)0x00000000U \
+                                 | (uint32)0x00000000U \
+                                 | (uint32)0x00000000U \
+                                 | (uint32)0x00000000U \
+                                 | (uint32)0x00000000U \
+                                 | (uint32)0x00000000U \
+                                 | (uint32)0x00000000U)
+
+#define CAN1_INTMUX1_CONFIGVALUE  ((uint32)0x00000000U \
+                                 | (uint32)0x00000000U \
+                                 | (uint32)0x00000000U \
+                                 | (uint32)0x00000000U \
+                                 | (uint32)0x00000000U \
+                                 | (uint32)0x00000000U \
+                                 | (uint32)0x00000000U \
+                                 | (uint32)0x00000000U \
+                                 | (uint32)0x00000000U \
+                                 | (uint32)0x00000000U \
+                                 | (uint32)0x00000000U \
+                                 | (uint32)0x00000000U \
+                                 | (uint32)0x00000000U \
+                                 | (uint32)0x00000000U \
+                                 | (uint32)0x00000000U \
+                                 | (uint32)0x00000000U \
+                                 | (uint32)0x00000000U \
+                                 | (uint32)0x00000000U \
+                                 | (uint32)0x00000000U \
+                                 | (uint32)0x00000000U \
+                                 | (uint32)0x00000000U \
+                                 | (uint32)0x00000000U \
+                                 | (uint32)0x00000000U \
+                                 | (uint32)0x00000000U \
+                                 | (uint32)0x00000000U \
+                                 | (uint32)0x00000000U \
+                                 | (uint32)0x00000000U \
+                                 | (uint32)0x00000000U \
+                                 | (uint32)0x00000000U \
+                                 | (uint32)0x00000000U \
+                                 | (uint32)0x00000000U \
+                                 | (uint32)0x00000000U)
+
+#define CAN1_INTMUX2_CONFIGVALUE   0x00000000U
+#define CAN1_INTMUX3_CONFIGVALUE   0x00000000U
+#define CAN1_TIOC_CONFIGVALUE    ((uint32)((uint32)1U  << 18U ) \
+                                 |(uint32)((uint32)0U  << 17U ) \
+								 |(uint32)((uint32)0U  << 16U ) \
+                                 |(uint32)((uint32)1U  << 3U ) \
+                                 |(uint32)((uint32)0U  << 2U ) \
+                                 |(uint32)((uint32)0U << 1U ))
+#define CAN1_RIOC_CONFIGVALUE    ((uint32)((uint32)1U  << 18U ) \
+                                 |(uint32)((uint32)0U  << 17U ) \
+								 |(uint32)((uint32)0U  << 16U ) \
+                                 |(uint32)((uint32)1U  << 3U ) \
+                                 |(uint32)((uint32)0U  << 2U ) \
+                                 |(uint32)((uint32)0U << 1U ))
+
 
 
 
@@ -672,6 +764,7 @@ void   canIoSetDirection(canBASE_t *node,uint32 TxDir,uint32 RxDir);
 void   canIoSetPort(canBASE_t *node, uint32 TxValue, uint32 RxValue);
 uint32 canIoTxGetBit(canBASE_t *node);
 uint32 canIoRxGetBit(canBASE_t *node);
+void can1GetConfigValue(can_config_reg_t *config_reg, config_value_type_t type);
 /** @fn void canErrorNotification(canBASE_t *node, uint32 notification)
 *   @brief Error notification
 *   @param[in] node Pointer to CAN node:

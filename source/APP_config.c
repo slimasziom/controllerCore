@@ -100,7 +100,7 @@ ESignal uiThreadSignalFromCommand(char *pcCommandString)
 }
 /*-----------------------------------------------------------*/
 
-const char * pcStateNameFromThread(ESignal eState)
+const char * pcStateNameFromThread(EState eState)
 {
     const char *pcStateName = xThreadMapping[0].cState;
     BaseType_t x;

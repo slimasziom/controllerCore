@@ -88,6 +88,8 @@
  * See http://www.freertos.org/a00110.html.
  *----------------------------------------------------------*/
 
+/* USER CODE BEGIN (0) */
+/* USER CODE END */
 #define configUSE_PREEMPTION		  1
 #define configUSE_PORT_OPTIMISED_TASK_SELECTION	1
 #define configUSE_FPU							1
@@ -105,6 +107,17 @@
 #define configGENERATE_RUN_TIME_STATS 1
 #define configUSE_MALLOC_FAILED_HOOK  1
 
+/* USER CODE BEGIN (1) */
+/* USER CODE END */
+
+#define configSUPPORT_STATIC_ALLOCATION			0
+#define configSUPPORT_DYNAMIC_ALLOCATION		1
+
+//#define configNUM_THREAD_LOCAL_STORAGE_POINTERS 1
+#define configUSE_TICKLESS_IDLE					1
+
+/* USER CODE BEGIN (2) */
+/* USER CODE END */
 #define configCHECK_FOR_STACK_OVERFLOW 2
 
 /* Co-routine definitions. */
@@ -124,6 +137,13 @@
 #define configTIMER_QUEUE_LENGTH		10
 #define configTIMER_TASK_STACK_DEPTH	( configMINIMAL_STACK_SIZE * 2 )
 
+/* USER CODE BEGIN (3) */
+//#define configUSE_TIMERS                1
+//#define configTIMER_TASK_PRIORITY       ( 2 )
+//#define configTIMER_QUEUE_LENGTH        10
+//#define configTIMER_TASK_STACK_DEPTH    ( configMINIMAL_STACK_SIZE * 2 )
+/* USER CODE END */
+
 /* Set the following definitions to 1 to include the API function, or zero to exclude the API function. */
 #define INCLUDE_vTaskPrioritySet		    1
 #define INCLUDE_uxTaskPriorityGet		    1
@@ -135,36 +155,47 @@
 #define INCLUDE_vTaskDelay				    1
 #define INCLUDE_xTaskGetSchedulerState      1
 #define INCLUDE_uxTaskGetStackHighWaterMark 1
+#define INCLUDE_xTaskAbortDelay             1
+#define INCLUDE_eTaskGetState               1
+#define INCLUDE_xTaskGetHandle              1
+#define INCLUDE_xTaskGetIdleTaskHandle      1
+
+/* USER CODE BEGIN (4) */
+#define INCLUDE_xTimerPendFunctionCall     1
+/* USER CODE END */
 
 
 /* debug ASSERT */
 #define configASSERT( x ) if( ( x ) == pdFALSE ) { taskDISABLE_INTERRUPTS(); for( ;; ); }
 
-/* USER CODE BEGIN (0) */
-#define configUSE_PERCEPIO_TRACE 			0
+/* USER CODE BEGIN (5) */
+//#define configSUPPORT_STATIC_ALLOCATION         1
+//#define configSUPPORT_DYNAMIC_ALLOCATION        1
+
+#define configUSE_PERCEPIO_TRACE           0
 
 /* UART CLI paraméterek */
 #define configCOMMAND_INT_MAX_OUTPUT_SIZE 400
-#define configUART_COMMAND_CONSOLE_STACK_SIZE		( configMINIMAL_STACK_SIZE * 4 )
-#define configUART_COMMAND_CONSOLE_TASK_PRIORITY	( 6U )
+#define configUART_COMMAND_CONSOLE_STACK_SIZE      ( configMINIMAL_STACK_SIZE * 4 )
+#define configUART_COMMAND_CONSOLE_TASK_PRIORITY   ( 6U )
 
 /* UDP command server task parameters. */
-#define mainUDP_CLI_TASK_PRIORITY		(4 | portPRIVILEGE_BIT)
-#define mainUDP_CLI_PORT_NUMBER			( 5001UL )
-#define mainUDP_CLI_TASK_STACK_SIZE		( configMINIMAL_STACK_SIZE * 4 )
+#define mainUDP_CLI_TASK_PRIORITY      (4 | portPRIVILEGE_BIT)
+#define mainUDP_CLI_PORT_NUMBER            ( 5001UL )
+#define mainUDP_CLI_TASK_STACK_SIZE        ( configMINIMAL_STACK_SIZE * 4 )
 
 /* Thread Local Storage - Jelenleg csak a FreeRTOS-plus-FAT csomag használja */
 #define configNUM_THREAD_LOCAL_STORAGE_POINTERS 5
 
-#define INCLUDE_xSemaphoreGetMutexHolder	1
-#define INCLUDE_xTaskGetCurrentTaskHandle	1
+#define INCLUDE_xSemaphoreGetMutexHolder   1
+#define INCLUDE_xTaskGetCurrentTaskHandle  1
 
 /* The maximum priority an interrupt that uses an interrupt safe FreeRTOS API
 function can have.  Note that lower priority have numerically higher values.  */
-#define configMAX_LIBRARY_INTERRUPT_PRIORITY	( 5 )
+#define configMAX_LIBRARY_INTERRUPT_PRIORITY   ( 5 )
 
 /* The minimum possible interrupt priority. */
-#define configMIN_LIBRARY_INTERRUPT_PRIORITY	( 63 )
+#define configMIN_LIBRARY_INTERRUPT_PRIORITY   ( 63 )
 
 #include "FreeRTOS_runtimestats.h"
 

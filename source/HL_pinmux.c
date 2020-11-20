@@ -1,12 +1,12 @@
 /** @file HL_pinmux.c 
 *   @brief PINMUX Driver Implementation File
-*   @date 03.Apr.2015
-*   @version 04.04.00
+*   @date 07-July-2017
+*   @version 04.07.00
 *
 */
 
 /* 
-* Copyright (C) 2009-2015 Texas Instruments Incorporated - www.ti.com  
+* Copyright (C) 2009-2016 Texas Instruments Incorporated - www.ti.com  
 * 
 * 
 *  Redistribution and use in source and binary forms, with or without 
@@ -162,52 +162,52 @@
             (pinMuxReg->PINMUX[170] = (pinMuxReg->PINMUX[170] & PINMUX_ECAP6_FILTER_MASK) | (PINMUX_ECAP6_FILTER_##state))		
 
 #define PINMUX_GIOA0_DMA_ENABLE(state)      \
-            (pinMuxReg->PINMUX[170] = (pinMuxReg->PINMUX[170] & PINMUX_GIOA0_DMA_MASK) | (PINMUX_GIOA0_DMA_##state))		
+            (pinMuxReg->PINMUX[175] = (pinMuxReg->PINMUX[175] & PINMUX_GIOA0_DMA_MASK) | (PINMUX_GIOA0_DMA_##state))		
 					
 #define PINMUX_GIOA1_DMA_ENABLE(state)      \
-            (pinMuxReg->PINMUX[170] = (pinMuxReg->PINMUX[170] & PINMUX_GIOA1_DMA_MASK) | (PINMUX_GIOA1_DMA_##state))		
+            (pinMuxReg->PINMUX[175] = (pinMuxReg->PINMUX[175] & PINMUX_GIOA1_DMA_MASK) | (PINMUX_GIOA1_DMA_##state))		
 
 #define PINMUX_GIOA2_DMA_ENABLE(state)      \
-            (pinMuxReg->PINMUX[170] = (pinMuxReg->PINMUX[170] & PINMUX_GIOA2_DMA_MASK) | (PINMUX_GIOA2_DMA_##state))		
+            (pinMuxReg->PINMUX[175] = (pinMuxReg->PINMUX[175] & PINMUX_GIOA2_DMA_MASK) | (PINMUX_GIOA2_DMA_##state))		
 
 #define PINMUX_GIOA3_DMA_ENABLE(state)      \
-            (pinMuxReg->PINMUX[170] = (pinMuxReg->PINMUX[170] & PINMUX_GIOA3_DMA_MASK) | (PINMUX_GIOA3_DMA_##state))		
+            (pinMuxReg->PINMUX[175] = (pinMuxReg->PINMUX[175] & PINMUX_GIOA3_DMA_MASK) | (PINMUX_GIOA3_DMA_##state))		
 
 #define PINMUX_GIOA4_DMA_ENABLE(state)      \
-            (pinMuxReg->PINMUX[170] = (pinMuxReg->PINMUX[170] & PINMUX_GIOA4_DMA_MASK) | (PINMUX_GIOA4_DMA_##state))		
+            (pinMuxReg->PINMUX[176] = (pinMuxReg->PINMUX[176] & PINMUX_GIOA4_DMA_MASK) | (PINMUX_GIOA4_DMA_##state))		
 
 #define PINMUX_GIOA5_DMA_ENABLE(state)      \
-            (pinMuxReg->PINMUX[170] = (pinMuxReg->PINMUX[170] & PINMUX_GIOA5_DMA_MASK) | (PINMUX_GIOA5_DMA_##state))		
+            (pinMuxReg->PINMUX[176] = (pinMuxReg->PINMUX[176] & PINMUX_GIOA5_DMA_MASK) | (PINMUX_GIOA5_DMA_##state))		
 
 #define PINMUX_GIOA6_DMA_ENABLE(state)      \
-            (pinMuxReg->PINMUX[170] = (pinMuxReg->PINMUX[170] & PINMUX_GIOA6_DMA_MASK) | (PINMUX_GIOA6_DMA_##state))		
+            (pinMuxReg->PINMUX[176] = (pinMuxReg->PINMUX[176] & PINMUX_GIOA6_DMA_MASK) | (PINMUX_GIOA6_DMA_##state))		
 
 #define PINMUX_GIOA7_DMA_ENABLE(state)      \
-            (pinMuxReg->PINMUX[170] = (pinMuxReg->PINMUX[170] & PINMUX_GIOA7_DMA_MASK) | (PINMUX_GIOA7_DMA_##state))		
+            (pinMuxReg->PINMUX[176] = (pinMuxReg->PINMUX[176] & PINMUX_GIOA7_DMA_MASK) | (PINMUX_GIOA7_DMA_##state))		
 			
 #define PINMUX_GIOB0_DMA_ENABLE(state)      \
-            (pinMuxReg->PINMUX[170] = (pinMuxReg->PINMUX[170] & PINMUX_GIOB0_DMA_MASK) | (PINMUX_GIOB0_DMA_##state))		
+            (pinMuxReg->PINMUX[177] = (pinMuxReg->PINMUX[177] & PINMUX_GIOB0_DMA_MASK) | (PINMUX_GIOB0_DMA_##state))		
 					
 #define PINMUX_GIOB1_DMA_ENABLE(state)      \
-            (pinMuxReg->PINMUX[170] = (pinMuxReg->PINMUX[170] & PINMUX_GIOB1_DMA_MASK) | (PINMUX_GIOB1_DMA_##state))		
+            (pinMuxReg->PINMUX[177] = (pinMuxReg->PINMUX[177] & PINMUX_GIOB1_DMA_MASK) | (PINMUX_GIOB1_DMA_##state))		
 
 #define PINMUX_GIOB2_DMA_ENABLE(state)      \
-            (pinMuxReg->PINMUX[170] = (pinMuxReg->PINMUX[170] & PINMUX_GIOB2_DMA_MASK) | (PINMUX_GIOB2_DMA_##state))		
+            (pinMuxReg->PINMUX[177] = (pinMuxReg->PINMUX[177] & PINMUX_GIOB2_DMA_MASK) | (PINMUX_GIOB2_DMA_##state))		
 
 #define PINMUX_GIOB3_DMA_ENABLE(state)      \
-            (pinMuxReg->PINMUX[170] = (pinMuxReg->PINMUX[170] & PINMUX_GIOB3_DMA_MASK) | (PINMUX_GIOB3_DMA_##state))		
+            (pinMuxReg->PINMUX[177] = (pinMuxReg->PINMUX[177] & PINMUX_GIOB3_DMA_MASK) | (PINMUX_GIOB3_DMA_##state))		
 
 #define PINMUX_GIOB4_DMA_ENABLE(state)      \
-            (pinMuxReg->PINMUX[170] = (pinMuxReg->PINMUX[170] & PINMUX_GIOB4_DMA_MASK) | (PINMUX_GIOB4_DMA_##state))		
+            (pinMuxReg->PINMUX[178] = (pinMuxReg->PINMUX[178] & PINMUX_GIOB4_DMA_MASK) | (PINMUX_GIOB4_DMA_##state))		
 
 #define PINMUX_GIOB5_DMA_ENABLE(state)      \
-            (pinMuxReg->PINMUX[170] = (pinMuxReg->PINMUX[170] & PINMUX_GIOB5_DMA_MASK) | (PINMUX_GIOB5_DMA_##state))		
+            (pinMuxReg->PINMUX[178] = (pinMuxReg->PINMUX[178] & PINMUX_GIOB5_DMA_MASK) | (PINMUX_GIOB5_DMA_##state))		
 
 #define PINMUX_GIOB6_DMA_ENABLE(state)      \
-            (pinMuxReg->PINMUX[170] = (pinMuxReg->PINMUX[170] & PINMUX_GIOB6_DMA_MASK) | (PINMUX_GIOB6_DMA_##state))		
+            (pinMuxReg->PINMUX[178] = (pinMuxReg->PINMUX[178] & PINMUX_GIOB6_DMA_MASK) | (PINMUX_GIOB6_DMA_##state))		
 
 #define PINMUX_GIOB7_DMA_ENABLE(state)      \
-            (pinMuxReg->PINMUX[170] = (pinMuxReg->PINMUX[170] & PINMUX_GIOB7_DMA_MASK) | (PINMUX_GIOB7_DMA_##state))		
+            (pinMuxReg->PINMUX[178] = (pinMuxReg->PINMUX[178] & PINMUX_GIOB7_DMA_MASK) | (PINMUX_GIOB7_DMA_##state))		
 
 #define PINMUX_TEMP1_ENABLE(state)      \
             (pinMuxReg->PINMUX[173] = (pinMuxReg->PINMUX[173] & PINMUX_TEMP1_ENABLE_MASK) | (PINMUX_TEMP1_ENABLE_##state))		
@@ -252,8 +252,10 @@ void muxInit(void){
 	pinMuxReg->PINMUX[8] = PINMUX_BALL_D16_EMIF_BA_1;
 	
 	pinMuxReg->PINMUX[9] = PINMUX_BALL_R4_GIOB_3 | PINMUX_BALL_N17_EMIF_nCS_0 | PINMUX_BALL_L17_GIOB_4;
+//	pinMuxReg->PINMUX[9] = PINMUX_BALL_R4_ | PINMUX_BALL_N17_EMIF_nCS_0 | PINMUX_BALL_L17_;
 	
-	pinMuxReg->PINMUX[10] = PINMUX_BALL_K17_EMIF_nCS_3 | PINMUX_BALL_M17_EMIF_nCSl_4 | PINMUX_BALL_R3_GIOB_6 | PINMUX_BALL_P3_GIOB_7;
+	pinMuxReg->PINMUX[9] = PINMUX_BALL_R4_GIOB_3 | PINMUX_BALL_N17_EMIF_nCS_0 | PINMUX_BALL_L17_GIOB_4;
+//	pinMuxReg->PINMUX[10] = PINMUX_BALL_K17_EMIF_nCS_3 | PINMUX_BALL_M17_EMIF_nCS_4 | PINMUX_BALL_R3_ | PINMUX_BALL_P3_;
 	
 	pinMuxReg->PINMUX[11] = PINMUX_BALL_D17_EMIF_nWE | PINMUX_BALL_E9_ETMDATA_08 | PINMUX_BALL_E8_ETMDATA_09 | PINMUX_BALL_E7_ETMDATA_10;
 	
@@ -311,9 +313,9 @@ void muxInit(void){
 	
 	pinMuxReg->PINMUX[80] = (SIGNAL_AD2EVT_T10 | 0x02020200U);
 
-	pinMuxReg->PINMUX[81] = 0U;
+	pinMuxReg->PINMUX[81] = 0x02020202U;
 
-	pinMuxReg->PINMUX[82] = 0U;
+	pinMuxReg->PINMUX[82] = 0x02020202U;
 
 	pinMuxReg->PINMUX[83] = (SIGNAL_GIOA_0_A5 | 0x00020202U);
 

@@ -210,6 +210,6 @@ extern xThreadMapping_t xThreadMapping[];
 
 /* Move to APP_thread_processing */
 uint8_t uiThreadSignalFromCommand(char *pcCommandString);
-const char * pcStateNameFromThread(ESignal eState);
+const char * pcStateNameFromThread(EState eState);
 
 #endif /* INCLUDE_APP_CONFIG_H_ */

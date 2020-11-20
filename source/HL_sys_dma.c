@@ -1,7 +1,7 @@
 /** @file HL_sys_dma.c 
 *   @brief DMA Driver Source File
-*   @date 03.Apr.2015
-*   @version 04.04.00
+*   @date 07-July-2017
+*   @version 04.07.00
 *
 *   This file contains:
 *   - API Functions
@@ -11,7 +11,7 @@
 */
 
 /* 
-* Copyright (C) 2009-2015 Texas Instruments Incorporated - www.ti.com  
+* Copyright (C) 2009-2016 Texas Instruments Incorporated - www.ti.com  
 * 
 * 
 *  Redistribution and use in source and binary forms, with or without 
@@ -54,6 +54,9 @@
 *
 *   This function brings DMA out of reset
 */
+/* SourceId : DMA_SourceId_001 */
+/* DesignId : DMA_DesignId_001 */
+/* Requirements : HL_CONQ_DMA_SR1 */
 void dmaEnable(void)
 {
 /* USER CODE BEGIN (0) */
@@ -71,6 +74,9 @@ void dmaEnable(void)
 *
 *   This function disables DMA module
 */
+/* SourceId : DMA_SourceId_002 */
+/* DesignId : DMA_DesignId_002 */
+/* Requirements : HL_CONQ_DMA_SR2 */
 void dmaDisable(void)
 {
 /* USER CODE BEGIN (2) */
@@ -92,6 +98,9 @@ void dmaDisable(void)
 *
 *   This function sets control packet
 */
+/* SourceId : DMA_SourceId_003 */
+/* DesignId : DMA_DesignId_003 */
+/* Requirements : HL_CONQ_DMA_SR4 */
 void dmaSetCtrlPacket(dmaChannel_t channel, g_dmaCTRL g_dmaCTRLPKT)
 {
     uint8 i,j;
@@ -135,6 +144,9 @@ void dmaSetCtrlPacket(dmaChannel_t channel, g_dmaCTRL g_dmaCTRLPKT)
 *
 *   This function enables the DMA channel for hardware or software triggering
 */
+/* SourceId : DMA_SourceId_004 */
+/* DesignId : DMA_DesignId_004 */
+/* Requirements : HL_CONQ_DMA_SR5 */
 void dmaSetChEnable(dmaChannel_t channel, dmaTriggerType_t type)
 {
 /* USER CODE BEGIN (6) */
@@ -160,6 +172,9 @@ void dmaSetChEnable(dmaChannel_t channel, dmaTriggerType_t type)
 *
 *   This function assigns DMA request lines to channels
 */
+/* SourceId : DMA_SourceId_005 */
+/* DesignId : DMA_DesignId_005 */
+/* Requirements : HL_CONQ_DMA_SR3 */
 void dmaReqAssign(dmaChannel_t channel, dmaRequest_t reqline)
 {
     uint8 i,j;
@@ -189,6 +204,9 @@ void dmaReqAssign(dmaChannel_t channel, dmaRequest_t reqline)
 *
 *   This function assigns the selected priority to the selected channel
 */
+/* SourceId : DMA_SourceId_006 */
+/* DesignId : DMA_DesignId_006 */
+/* Requirements : HL_CONQ_DMA_SR6 */
 void dmaSetPriority(dmaChannel_t channel, dmaPriorityQueue_t priority)
 {
 /* USER CODE BEGIN (10) */
@@ -222,6 +240,9 @@ void dmaSetPriority(dmaChannel_t channel, dmaPriorityQueue_t priority)
 *
 *   This function enables the selected interrupt for the selected channel
 */
+/* SourceId : DMA_SourceId_007 */
+/* DesignId : DMA_DesignId_007 */
+/* Requirements : HL_CONQ_DMA_SR8 */
 void dmaEnableInterrupt(dmaChannel_t channel, dmaInterrupt_t inttype, dmaIntGroup_t group)
 {
 /* USER CODE BEGIN (12) */
@@ -262,6 +283,9 @@ void dmaEnableInterrupt(dmaChannel_t channel, dmaInterrupt_t inttype, dmaIntGrou
 *
 *   This function disables the selected interrupt for the selected channel
 */
+/* SourceId : DMA_SourceId_008 */
+/* DesignId : DMA_DesignId_008 */
+/* Requirements : HL_CONQ_DMA_SR9 */
 void dmaDisableInterrupt(dmaChannel_t channel, dmaInterrupt_t inttype)
 {
 /* USER CODE BEGIN (14) */
@@ -300,6 +324,9 @@ void dmaDisableInterrupt(dmaChannel_t channel, dmaInterrupt_t inttype)
 *
 *   This function configure start and end address of the selected region
 */
+/* SourceId : DMA_SourceId_009 */
+/* DesignId : DMA_DesignId_009 */
+/* Requirements : HL_CONQ_DMA_SR10 */
 void dmaDefineRegion(dmaMPURegion_t region, uint32 start_add, uint32 end_add)
 {
 /* USER CODE BEGIN (16) */
@@ -343,6 +370,9 @@ void dmaDefineRegion(dmaMPURegion_t region, uint32 start_add, uint32 end_add)
 *
 *   This function enables the selected region with selected access permission with or without interrupt enable
 */
+/* SourceId : DMA_SourceId_010 */
+/* DesignId : DMA_DesignId_010 */
+/* Requirements : HL_CONQ_DMA_SR11 */
 void dmaEnableRegion(dmaMPURegion_t region, dmaRegionAccess_t access, dmaMPUInt_t intenable)
 {
 	uint8 bitpos = 0U;
@@ -389,6 +419,9 @@ void dmaEnableRegion(dmaMPURegion_t region, dmaRegionAccess_t access, dmaMPUInt_
 *
 *   This function disables the selected region(no address checking done).
 */
+/* SourceId : DMA_SourceId_011 */
+/* DesignId : DMA_DesignId_011 */
+/* Requirements : HL_CONQ_DMA_SR12 */
 void dmaDisableRegion(dmaMPURegion_t region)
 {
 	uint8 bitpos = 0U;
@@ -416,6 +449,9 @@ void dmaDisableRegion(dmaMPURegion_t region)
 *
 *   This function enables ECC check
 */
+/* SourceId : DMA_SourceId_012 */
+/* DesignId : DMA_DesignId_012 */
+/* Requirements : HL_CONQ_DMA_SR13 */
 void dmaEnableECC(void)
 {
 /* USER CODE BEGIN (22) */
@@ -432,6 +468,9 @@ void dmaEnableECC(void)
 *
 *   This function disables ECC check
 */
+/* SourceId : DMA_SourceId_013 */
+/* DesignId : DMA_DesignId_013 */
+/* Requirements : HL_CONQ_DMA_SR14 */
 void dmaDisableECC(void)
 {
 /* USER CODE BEGIN (24) */
@@ -449,6 +488,9 @@ void dmaDisableECC(void)
 *
 *   This function returns the request line number mapped to the selected channel
 */
+/* SourceId : DMA_SourceId_014 */
+/* DesignId : DMA_DesignId_014 */
+/* Requirements : HL_CONQ_DMA_SR3 */
 uint32 dmaGetReq(dmaChannel_t channel)
 {
     uint8 i,j;
@@ -473,6 +515,9 @@ uint32 dmaGetReq(dmaChannel_t channel)
 *
 *   This function returns TRUE if the channel is currently being processed using one of the FIFOs.
 */
+/* SourceId : DMA_SourceId_015 */
+/* DesignId : DMA_DesignId_016 */
+/* Requirements : HL_CONQ_DMA_SR21 */
 boolean dmaIsChannelActive(dmaChannel_t channel)
 {
 	boolean status;
@@ -501,6 +546,9 @@ boolean dmaIsChannelActive(dmaChannel_t channel)
 *
 *   This function returns TRUE if DMA's external bus is busy in data transfers
 */
+/* SourceId : DMA_SourceId_016 */
+/* DesignId : DMA_DesignId_015 */
+/* Requirements : HL_CONQ_DMA_SR20 */
 boolean dmaIsBusy(void)
 {
 	boolean status;
@@ -523,6 +571,9 @@ boolean dmaIsBusy(void)
 	return status;
 }
 
+/* SourceId : DMA_SourceId_017 */
+/* DesignId : DMA_DesignId_017 */
+/* Requirements : HL_CONQ_DMA_SR22 */
 boolean dmaGetInterruptStatus(dmaChannel_t channel, dmaInterrupt_t inttype)
 {
 	boolean status;

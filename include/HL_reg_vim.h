@@ -1,7 +1,7 @@
 /** @file HL_reg_vim.h
 *   @brief VIM Register Layer Header File
-*   @date 03.Apr.2015
-*   @version 04.04.00
+*   @date 07-July-2017
+*   @version 04.07.00
 *   
 *   This file contains:
 *   - Definitions
@@ -11,7 +11,7 @@
 */
 
 /* 
-* Copyright (C) 2009-2015 Texas Instruments Incorporated - www.ti.com  
+* Copyright (C) 2009-2016 Texas Instruments Incorporated - www.ti.com  
 * 
 * 
 *  Redistribution and use in source and binary forms, with or without 
@@ -104,7 +104,7 @@ typedef volatile struct vimBase
     uint32      FIQVECREG;        /* 0x0174        */
     uint32      CAPEVT;           /* 0x0178        */	
     uint32      rsvd4;            /* 0x017C        */
-    uint32      CHANCTRL[24U];    /* 0x0180-0x027C */
+    uint32      CHANCTRL[32U];    /* 0x0180-0x02FC */
 } vimBASE_t;
 
 #define vimREG ((vimBASE_t *)0xFFFFFD00U)

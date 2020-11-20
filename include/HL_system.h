@@ -1,7 +1,7 @@
 /** @file HL_system.h
 *   @brief System Driver Header File
-*   @date 03.Apr.2015
-*   @version 04.04.00
+*   @date 07-July-2017
+*   @version 04.07.00
 *   
 *   This file contains:
 *   - Definitions
@@ -11,7 +11,7 @@
 */
 
 /* 
-* Copyright (C) 2009-2015 Texas Instruments Incorporated - www.ti.com  
+* Copyright (C) 2009-2016 Texas Instruments Incorporated - www.ti.com  
 * 
 * 
 *  Redistribution and use in source and binary forms, with or without 
@@ -111,7 +111,6 @@ typedef enum
     WATCHDOG2_RESET     = 0x1000U,  /**< Alias for Watch Dog 2 Reset  */
     DEBUG_RESET         = 0x0800U,  /**< Alias for Debug Reset        */
     INTERCONNECT_RESET  = 0x0080U,  /**< Alias for Interconnect Reset */
-    CPU1_RESET          = 0x0040U,  /**< Alias for CPU 1 Reset        */
     CPU0_RESET          = 0x0020U,  /**< Alias for CPU 0 Reset        */
     SW_RESET            = 0x0010U,  /**< Alias for Software Reset     */
     EXT_RESET           = 0x0008U,  /**< Alias for External Reset     */
@@ -363,7 +362,7 @@ typedef struct system_config_reg
                                     | (uint32)((uint32)0x1FU << 24U) \
                                     | (uint32)0x00000000U \
                                     | (uint32)((uint32)(8U - 1U)<< 16U)\
-                                    | (uint32)((uint32)(150U - 1U)<< 8U) )
+                                    | (uint32)(0x9500U))
                                     
 #define SYS_PLLCTL1_CONFIGVALUE_2   (((SYS_PLLCTL1_CONFIGVALUE_1) & 0xE0FFFFFFU) | (uint32)((uint32)(1U - 1U) << 24U))
                                     
@@ -404,7 +403,7 @@ typedef struct system_config_reg
 #define SYS2_PLLCTL3_CONFIGVALUE_1  ( (uint32)((uint32)(1U - 1U) << 29U)\
                                     | (uint32)((uint32)0x1FU << 24U) \
                                     | (uint32)((uint32)(8U - 1U)<< 16U) \
-                                    | (uint32)((uint32)(150U - 1U) << 8U) )
+                                    | (uint32)(0x9500U))
                                     
 #define SYS2_PLLCTL3_CONFIGVALUE_2  (((SYS2_PLLCTL3_CONFIGVALUE_1) & 0xE0FFFFFFU) | (uint32)((uint32)(1U - 1U) << 24U))
 #define SYS2_STCCLKDIV_CONFIGVALUE  0U
@@ -476,6 +475,7 @@ void mapClocks(void);
 void systemInit(void);
 void systemPowerDown(uint32 mode);
 resetSource_t getResetSource(void);
+
 
 
 /* USER CODE BEGIN (4) */

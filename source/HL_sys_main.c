@@ -1,14 +1,14 @@
 /** @file HL_sys_main.c 
 *   @brief Application main file
-*   @date 03.Apr.2015
-*   @version 04.04.00
+*   @date 07-July-2017
+*   @version 04.07.00
 *
 *   This file contains an empty main function,
 *   which can be used for the application.
 */
 
 /* 
-* Copyright (C) 2009-2015 Texas Instruments Incorporated - www.ti.com  
+* Copyright (C) 2009-2016 Texas Instruments Incorporated - www.ti.com  
 * 
 * 
 *  Redistribution and use in source and binary forms, with or without 
@@ -66,11 +66,14 @@
 uint8	emacAddress[6U] = 	{0x00U, 0x08U, 0xEEU, 0x03U, 0xA6U, 0x6CU};
 uint32 	emacPhyAddress	=	1U;
 
-void main(void)
+int main(void)
 {
 /* USER CODE BEGIN (3) */
 /* USER CODE END */
+
+    return 0;
 }
+
 
 /* USER CODE BEGIN (4) */
 /* USER CODE END */

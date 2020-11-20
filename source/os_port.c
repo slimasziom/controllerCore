@@ -1,60 +1,64 @@
 /*
-    FreeRTOS V8.1.2 - Copyright (C) 2014 Real Time Engineers Ltd.
+    FreeRTOS V9.0.0 - Copyright (C) 2016 Real Time Engineers Ltd.
     All rights reserved
 
     VISIT http://www.FreeRTOS.org TO ENSURE YOU ARE USING THE LATEST VERSION.
-
-    ***************************************************************************
-     *                                                                       *
-     *    FreeRTOS provides completely free yet professionally developed,    *
-     *    robust, strictly quality controlled, supported, and cross          *
-     *    platform software that has become a de facto standard.             *
-     *                                                                       *
-     *    Help yourself get started quickly and support the FreeRTOS         *
-     *    project by purchasing a FreeRTOS tutorial book, reference          *
-     *    manual, or both from: http://www.FreeRTOS.org/Documentation        *
-     *                                                                       *
-     *    Thank you!                                                         *
-     *                                                                       *
-    ***************************************************************************
 
     This file is part of the FreeRTOS distribution.
 
     FreeRTOS is free software; you can redistribute it and/or modify it under
     the terms of the GNU General Public License (version 2) as published by the
-    Free Software Foundation >>!AND MODIFIED BY!<< the FreeRTOS exception.
+    Free Software Foundation >>>> AND MODIFIED BY <<<< the FreeRTOS exception.
 
+    ***************************************************************************
     >>!   NOTE: The modification to the GPL is included to allow you to     !<<
     >>!   distribute a combined work that includes FreeRTOS without being   !<<
     >>!   obliged to provide the source code for proprietary components     !<<
     >>!   outside of the FreeRTOS kernel.                                   !<<
+    ***************************************************************************
 
     FreeRTOS is distributed in the hope that it will be useful, but WITHOUT ANY
     WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
-    FOR A PARTICULAR PURPOSE.  Full license text is available from the following
+    FOR A PARTICULAR PURPOSE.  Full license text is available on the following
     link: http://www.freertos.org/a00114.html
 
-    1 tab == 4 spaces!
-
     ***************************************************************************
      *                                                                       *
-     *    Having a problem?  Start by reading the FAQ "My application does   *
-     *    not run, what could be wrong?"                                     *
+     *    FreeRTOS provides completely free yet professionally developed,    *
+     *    robust, strictly quality controlled, supported, and cross          *
+     *    platform software that is more than just the market leader, it     *
+     *    is the industry's de facto standard.                               *
      *                                                                       *
-     *    http://www.FreeRTOS.org/FAQHelp.html                               *
+     *    Help yourself get started quickly while simultaneously helping     *
+     *    to support the FreeRTOS project by purchasing a FreeRTOS           *
+     *    tutorial book, reference manual, or both:                          *
+     *    http://www.FreeRTOS.org/Documentation                              *
      *                                                                       *
     ***************************************************************************
 
-    http://www.FreeRTOS.org - Documentation, books, training, latest versions,
-    license and Real Time Engineers Ltd. contact details.
+    http://www.FreeRTOS.org/FAQHelp.html - Having a problem?  Start by reading
+    the FAQ page "My application does not run, what could be wrong?".  Have you
+    defined configASSERT()?
+
+    http://www.FreeRTOS.org/support - In return for receiving this top quality
+    embedded software for free we request you assist our global community by
+    participating in the support forum.
+
+    http://www.FreeRTOS.org/training - Investing in training allows your team to
+    be as productive as possible as early as possible.  Now you can receive
+    FreeRTOS training directly from Richard Barry, CEO of Real Time Engineers
+    Ltd, and the world's leading authority on the world's leading RTOS.
 
     http://www.FreeRTOS.org/plus - A selection of FreeRTOS ecosystem products,
     including FreeRTOS+Trace - an indispensable productivity tool, a DOS
     compatible FAT file system, and our tiny thread aware UDP/IP stack.
 
-    http://www.OpenRTOS.com - Real Time Engineers ltd license FreeRTOS to High
-    Integrity Systems to sell under the OpenRTOS brand.  Low cost OpenRTOS
-    licenses offer ticketed support, indemnification and middleware.
+    http://www.FreeRTOS.org/labs - Where new FreeRTOS products go to incubate.
+    Come and try FreeRTOS+TCP, our new open source TCP/IP stack for FreeRTOS.
+
+    http://www.OpenRTOS.com - Real Time Engineers ltd. license FreeRTOS to High
+    Integrity Systems ltd. to sell under the OpenRTOS brand.  Low cost OpenRTOS
+    licenses offer ticketed support, indemnification and commercial middleware.
 
     http://www.SafeRTOS.com - High Integrity Systems also provide a safety
     engineered and independently SIL3 certified version for use in safety and
@@ -62,6 +66,8 @@
 
     1 tab == 4 spaces!
 */
+/* USER CODE BEGIN (0) */
+/* USER CODE END */
 
 #define MPU_WRAPPERS_INCLUDED_FROM_API_FILE
 
@@ -70,8 +76,12 @@
 #include "os_task.h"
 #include "HL_sys_core.h"
 
+/* USER CODE BEGIN (1) */
+/* USER CODE END */
 
 #undef MPU_WRAPPERS_INCLUDED_FROM_API_FILE
+/* USER CODE BEGIN (2) */
+/* USER CODE END */
 
 /*-----------------------------------------------------------*/
 
@@ -101,6 +111,8 @@
 R0 (in which the parameters are passed. */
 #define portSPACE_BETWEEN_TOS_AND_PARAMETERS	( 12 )
 
+/* USER CODE BEGIN (3) */
+/* USER CODE END */
 
 /*-----------------------------------------------------------*/
 
@@ -112,19 +124,22 @@ extern void prvMpuEnable( void );
 extern void prvMpuDisable( void );
 extern void prvMpuSetRegion( unsigned region, unsigned base, unsigned size, unsigned access );
 
-
+/* USER CODE BEGIN (4) */
+/* USER CODE END */
 /*-----------------------------------------------------------*/
 
 /* Count of the critical section nesting depth. */
-PRIVILEGED_DATA unsigned portLONG ulCriticalNesting = 9999;
+uint32_t ulCriticalNesting = 9999;
 
 /*-----------------------------------------------------------*/
 
 /* Saved as part of the task context.  Set to pdFALSE if the task does not
 require an FPU context. */
-PRIVILEGED_DATA uint32_t ulTaskHasFPUContext = 0;
+uint32_t ulTaskHasFPUContext = 0;
 
 /*-----------------------------------------------------------*/
+/* USER CODE BEGIN (5) */
+/* USER CODE END */
 
 /*-----------------------------------------------------------*/
 
@@ -244,13 +259,18 @@ static unsigned long prvGetMPURegionSizeSetting( unsigned long ulActualSizeInByt
 
 /*----------------------------------------------------------------------------*/
 
-void vPortStoreTaskMPUSettings( xMPU_SETTINGS *xMPUSettings, const struct xMEMORY_REGION * const xRegions, portSTACK_TYPE *pxBottomOfStack, unsigned short usStackDepth )
+/* Note: By default, all the RAM regions are configured to be cached (write-back, write-through) for better performance.
+   This configuration is not suited in case multiple bus masters access the RAM, for example, DMA or EMAC master.
+   Please use the USERCODE section below to change the default MPU settings */
+void vPortStoreTaskMPUSettings( xMPU_SETTINGS *xMPUSettings, const struct xMEMORY_REGION * const xRegions, StackType_t *pxBottomOfStack, uint32_t usStackDepth )
 {
 	long lIndex;
 	unsigned long ul;
 
 	if( xRegions == NULL )
 	{
+/* USER CODE BEGIN (6) */
+/* USER CODE END */
 		/* No MPU regions are specified so allow access to all of the RAM. */
 		xMPUSettings->xRegion[0].ulRegionBaseAddress = 0x08000000;
 		xMPUSettings->xRegion[0].ulRegionSize        = portMPU_SIZE_512KB | portMPU_REGION_ENABLE;
@@ -262,6 +282,8 @@ void vPortStoreTaskMPUSettings( xMPU_SETTINGS *xMPUSettings, const struct xMEMOR
 		xMPUSettings->xRegion[1].ulRegionSize        = portMPU_SIZE_4KB | portMPU_REGION_ENABLE;
 		xMPUSettings->xRegion[1].ulRegionAttribute   = portMPU_PRIV_RW_USER_NA_NOEXEC | portMPU_NORMAL_OIWBWA_NONSHARED;
 
+/* USER CODE BEGIN (7) */
+/* USER CODE END */
 		/* Invalidate all other regions. */
 		for( ul = 2; ul <= portNUM_CONFIGURABLE_REGIONS; ul++ )
 		{
@@ -269,9 +291,13 @@ void vPortStoreTaskMPUSettings( xMPU_SETTINGS *xMPUSettings, const struct xMEMOR
 			xMPUSettings->xRegion[ ul ].ulRegionSize        = 0UL;
 			xMPUSettings->xRegion[ ul ].ulRegionAttribute   = 0UL;
 		}
+/* USER CODE BEGIN (8) */
+/* USER CODE END */
 	}
 	else
 	{
+/* USER CODE BEGIN (9) */
+/* USER CODE END */
 		/* This function is called automatically when the task is created - in
 		which case the stack region parameters will be valid.  At all other
 		times the stack parameters will not be valid and it is assumed that the
@@ -284,8 +310,12 @@ void vPortStoreTaskMPUSettings( xMPU_SETTINGS *xMPUSettings, const struct xMEMOR
 			xMPUSettings->xRegion[0].ulRegionAttribute   = portMPU_REGION_READ_WRITE | portMPU_NORMAL_OIWBWA_NONSHARED;
 
 		}
-		lIndex = 0;
 
+/* USER CODE BEGIN (10) */
+/* USER CODE END */
+		
+		lIndex = 0;
+		
 		for( ul = 1; ul <= portNUM_CONFIGURABLE_REGIONS; ul++ )
 		{
 			if( ( xRegions[ lIndex ] ).ulLengthInBytes > 0UL )
@@ -306,7 +336,11 @@ void vPortStoreTaskMPUSettings( xMPU_SETTINGS *xMPUSettings, const struct xMEMOR
 			}
 			lIndex++;
 		}
+/* USER CODE BEGIN (11) */
+/* USER CODE END */
 	}
+/* USER CODE BEGIN (12) */
+/* USER CODE END */
 }
 
 /*-----------------------------------------------------------*/
@@ -320,7 +354,7 @@ static void prvSetupTimerInterrupt(void)
 	portRTI_TBCTRL_REG = 0x00000000U;
 
 	/* COMPSEL0 will use the RTIFRC0 counter. */
-	portRTI_COMPCTRL_REG = 0x00000100U;
+	portRTI_COMPCTRL_REG = 0x00000000U;
 
 	/* Initialise the counter and the prescale counter registers. */
 	portRTI_CNT0_UC0_REG  =  0x00000000U;

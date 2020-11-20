@@ -46,10 +46,48 @@
  * 01.17.00		  15Oct2014    Vishwanath Reddy     SDOCM00113379    RAM Optimization changes.
  * 01.17.01		  30Oct2014    Vishwanath Reddy     SDOCM00113536    Support for TMS570LS07xx,TMS570LS09xx,
  *                                                                   TMS570LS05xx, RM44Lx. 
+ * 01.17.02		  26Dec2014    Vishwanath Reddy     SDOCM00114102    FLEE Errata Fix.
+ *                                                  SDOCM00114104    Change ALL 1's OK check condition.
+ *                                                                   Updated version info. Added new macros.
+ *                                                  SDOCM00114423	 Add new enum TI_Fee_DeviceType.
+ *                                                                   Add new variable TI_Fee_MaxSectors and 
+ *                                                                   prototype TI_FeeInternal_PopulateStructures. 
+ * 01.18.00		  12Oct2015    Vishwanath Reddy     SDOCM00119455    Update version history.
+ *                                                                   Update ti_fee_util.c file for the
+ *                                                                   bugfix "If morethan one data set is config-
+ *                                                                   ured, then a valid block may get invalidated if
+ *                                                                   multiple valid blocks are present in FEE memory. 
+ * 01.18.01		  17Nov2015    Vishwanath Reddy     SDOCM00120161    Update version history.
+ *                                                                   In TI_FeeInternal_FeeManager, do not change the 
+ *                                                                   state to IDLE,after completing the copy operation. 
+ * 01.18.02		  05Feb2016    Vishwanath Reddy     SDOCM00121158    Update version history.
+ *                                                                   Add a call of TI_FeeInternal_PollFlashStatus()
+ *                                                                   before reading data from FEE bank in
+ *                                                                   TI_FeeInternal_UpdateBlockOffsetArray(),
+ *                                                                   TI_Fee_WriteAsync(),TI_Fee_WriteSync(),
+ *                                                                   TI_Fee_ReadSync(), TI_Fee_Read()
+ * 01.18.03       30June2016   Vishwanath Reddy     SDOCM00122388    Update patch version TI_FEE_SW_PATCH_VERSION.
+ *                                                                   TI_FEE_FLASH_CRC_ENABLE is renamed to 
+ *                                                                   TI_FEE_FLASH_CHECKSUM_ENABLE.  
+ *                                                  SDOCM00122429    In ti_fee_types.h, add error when endianess 
+ *                                                                   is not defined.
+ * 01.19.00       08Augu2016   Vishwanath Reddy     SDOCM00122592    Update patch version TI_FEE_MINOR_VERSION.
+ *                                                                   Code for using partially ersed sector is now 
+ *                                                                   removed. 
+ *                                                                   Bugfix for FEE reading from unimplemented memory
+ *                                                                   space.
+ * 01.19.01       12Augu2016   Vishwanath Reddy     SDOCM00122543    Update patch version TI_FEE_MINOR_VERSION.
+ *                                                                   Synchronous write API modified to avoid copy of 
+ *                                                                   already copied block.
+ * 01.19.02       25Janu2017   Vishwanath Reddy     SDOCM00122832    Update patch version TI_FEE_MINOR_VERSION.
+ *                                                                   Format API modified to erase all configured VS. 
+ *                                                  SDOCM00122833    In API TI_Fee_ErrorRecovery, added polling for
+ *                                                                   flash status before calling TI_Fee_Init.
+ * 01.19.03       15May2017    Prathap Srinivasan   SDOCM00122917    Added TI_Fee_bIsMainFunctionCalled Global Variable. 
  *********************************************************************************************************************/
 
 /*
-* Copyright (C) 2009-2015 Texas Instruments Incorporated - www.ti.com  
+* Copyright (C) 2009-2016 Texas Instruments Incorporated - www.ti.com  
 * 
 * 
 *  Redistribution and use in source and binary forms, with or without 
@@ -88,7 +126,7 @@
 /**********************************************************************************************************************
  * INCLUDES
  *********************************************************************************************************************/
-#include "Std_Types.h"
+#include "HL_hal_stdtypes.h"
 #include "fee_interface.h"
 #include "ti_fee_types.h"
 #include "ti_fee_cfg.h"
@@ -100,8 +138,8 @@
 #define TI_FEE_MINOR_VERSION    0U
 #define TI_FEE_PATCH_VERSION    2U
 #define TI_FEE_SW_MAJOR_VERSION 1U
-#define TI_FEE_SW_MINOR_VERSION 17U
-#define TI_FEE_SW_PATCH_VERSION 2U
+#define TI_FEE_SW_MINOR_VERSION 19U
+#define TI_FEE_SW_PATCH_VERSION 3U
 
 #define TI_FEE_VIRTUAL_SECTOR_VERSION 1U
 
@@ -360,7 +398,7 @@ extern uint8 TI_Fee_MaxSectors;
 #endif
 extern TI_Fee_GlobalVarsType TI_Fee_GlobalVariables[TI_FEE_NUMBER_OF_EEPS];
 extern TI_Fee_StatusWordType_UN TI_Fee_oStatusWord[TI_FEE_NUMBER_OF_EEPS];
-#if(TI_FEE_FLASH_CRC_ENABLE == STD_ON)
+#if(TI_FEE_FLASH_CHECKSUM_ENABLE == STD_ON)
 extern uint32 TI_Fee_u32FletcherChecksum;
 #endif
 extern uint32 TI_Fee_u32BlockEraseCount;
@@ -380,6 +418,7 @@ extern TI_Fee_StatusWordType_UN TI_Fee_oStatusWord_Global;
 #endif
 extern boolean TI_Fee_FapiInitCalled; 
 extern boolean TI_Fee_bEraseSuspended;
+extern boolean TI_Fee_bIsMainFunctionCalled;
 
 
 /**********************************************************************************************************************
@@ -450,7 +489,7 @@ void TI_FeeInternal_WriteInitialize(TI_Fee_AddressType oFlashNextAddress, uint8*
 void TI_FeeInternal_CheckForError(uint8 u8EEPIndex);
 void TI_FeeInternal_EnableRequiredFlashSector(uint32 u32VirtualSectorStartAddress);
 uint16 TI_FeeInternal_GetArrayIndex(uint16 BlockNumber, uint16 DataSetNumber, uint8 u8EEPIndex, boolean bCallContext);
-#if(TI_FEE_FLASH_CRC_ENABLE == STD_ON)
+#if(TI_FEE_FLASH_CHECKSUM_ENABLE == STD_ON)
 uint32 TI_FeeInternal_Fletcher16( uint8 const *pu8data, uint16 u16Length);
 #endif
 #if (TI_FEE_GENERATE_DEVICEANDVIRTUALSECTORSTRUC == STD_ON)

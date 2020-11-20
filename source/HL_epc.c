@@ -1,12 +1,12 @@
 /** @file HL_epc.c
 *   @brief EPC Driver Implementation File
-*   @date 03.Apr.2015
-*   @version 04.04.00
+*   @date 07-July-2017
+*   @version 04.07.00
 *   This file contains APIs for the Error Profiling Controller Module.
 */
 
 /* 
-* Copyright (C) 2009-2015 Texas Instruments Incorporated - www.ti.com  
+* Copyright (C) 2009-2016 Texas Instruments Incorporated - www.ti.com  
 * 
 * 
 *  Redistribution and use in source and binary forms, with or without 
@@ -57,6 +57,9 @@
 *   Enable ECC error generation for ECC errors detected on DMA Port A master by the
 *   CPU Interconnect Subsystem
 */
+/* SourceId : EPC_SourceId_001 */
+/* DesignId : EPC_DesignId_001 */
+/* Requirements : HL_CONQ_EPC_SR1 */
 void epcEnableIP1ErrorGen(void)
 {
 /* USER CODE BEGIN (2) */
@@ -74,6 +77,9 @@ void epcEnableIP1ErrorGen(void)
 *   Disable ECC error generation for ECC errors detected on DMA Port A master by the
 *   CPU Interconnect Subsystem
 */
+/* SourceId : EPC_SourceId_002 */
+/* DesignId : EPC_DesignId_002 */
+/* Requirements : HL_CONQ_EPC_SR2 */
 void epcDisableIP1ErrorGen(void)
 {
 /* USER CODE BEGIN (4) */
@@ -91,6 +97,9 @@ void epcDisableIP1ErrorGen(void)
 *   Enable ECC error generation for ECC errors detected on PS_SCR_M master by the
 *   CPU Interconnect Subsystem
 */
+/* SourceId : EPC_SourceId_003 */
+/* DesignId : EPC_DesignId_003 */
+/* Requirements : HL_CONQ_EPC_SR3 */
 void epcEnableIP2ErrorGen(void)
 {
 /* USER CODE BEGIN (6) */
@@ -108,6 +117,9 @@ void epcEnableIP2ErrorGen(void)
 *   Disable ECC error generation for ECC errors detected on PS_SCR_M master by the
 *   CPU Interconnect Subsystem
 */
+/* SourceId : EPC_SourceId_004 */
+/* DesignId : EPC_DesignId_004 */
+/* Requirements : HL_CONQ_EPC_SR4 */
 void epcDisableIP2ErrorGen(void)
 {
 /* USER CODE BEGIN (8) */
@@ -126,6 +138,9 @@ void epcDisableIP2ErrorGen(void)
 *   generate the serr_event if there is a correctable ECC fault address arrives from one of
 *   the EPC-IP interface and the CAM has an empty entry.
 */
+/* SourceId : EPC_SourceId_005 */
+/* DesignId : EPC_DesignId_005 */
+/* Requirements : HL_CONQ_EPC_SR5 */
 void epcEnableSERREvent(void)
 {
 /* USER CODE BEGIN (10) */
@@ -143,6 +158,9 @@ void epcEnableSERREvent(void)
 *   These bits (when enabled) cause EPC to
 *   disable the serr_event generation.
 */
+/* SourceId : EPC_SourceId_006 */
+/* DesignId : EPC_DesignId_006 */
+/* Requirements : HL_CONQ_EPC_SR6 */
 void epcDisableSERREvent(void)
 {
 /* USER CODE BEGIN (12) */
@@ -160,6 +178,9 @@ void epcDisableSERREvent(void)
 *   If this bit is set and CAM is full, CAM Full Interrupt
 *   is generated.
 */
+/* SourceId : EPC_SourceId_007 */
+/* DesignId : EPC_DesignId_007 */
+/* Requirements : HL_CONQ_EPC_SR7 */
 void epcEnableInterrupt(void)
 {
 /* USER CODE BEGIN (14) */
@@ -176,6 +197,9 @@ void epcEnableInterrupt(void)
 *
 *   Disables interrupt generation in case CAM is full.
 */
+/* SourceId : EPC_SourceId_008 */
+/* DesignId : EPC_DesignId_008 */
+/* Requirements : HL_CONQ_EPC_SR8 */
 void epcDisableInterrupt(void)
 {
 /* USER CODE BEGIN (16) */
@@ -192,6 +216,9 @@ void epcDisableInterrupt(void)
 *
 *   CAM entries are cleared and available for future CAM usage.
 */
+/* SourceId : EPC_SourceId_009 */
+/* DesignId : EPC_DesignId_009 */
+/* Requirements : HL_CONQ_EPC_SR9 */
 void epcCAMInit(void)
 {
     uint8 i;
@@ -212,6 +239,9 @@ void epcCAMInit(void)
 *
 *   This function executes a diagnostic test on EPC and returns the result
 */
+/* SourceId : EPC_SourceId_010 */
+/* DesignId : EPC_DesignId_010 */
+/* Requirements : HL_CONQ_EPC_SR14 */
 boolean epcDiagnosticTest(void)
 {
     uint32 epccntrl_bk, camCont_bk, camIndex_bk;
@@ -265,6 +295,9 @@ boolean epcDiagnosticTest(void)
 *
 *   Allows you to write a new CAM entry, after checking if there are any available entries.
 */
+/* SourceId : EPC_SourceId_011 */
+/* DesignId : EPC_DesignId_011 */
+/* Requirements : HL_CONQ_EPC_SR10 */
 boolean epcAddCAMEEntry(uint32 address)
 {
     uint8 i = 0U;
@@ -302,6 +335,9 @@ boolean epcAddCAMEEntry(uint32 address)
 *
 *   Checks if the CAM Entry is available and ready for future usage.
 */
+/* SourceId : EPC_SourceId_012 */
+/* DesignId : EPC_DesignId_012 */
+/* Requirements : HL_CONQ_EPC_SR11 */
 boolean epcCheckCAMEntry(uint32 index)
 {
     uint32 i,j;
@@ -327,4 +363,9 @@ boolean epcCheckCAMEntry(uint32 index)
 /* USER CODE END */
     return status;
 }
+
+
+/* USER CODE BEGIN (28) */
+/* USER CODE END */
+
 

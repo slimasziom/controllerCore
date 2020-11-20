@@ -1,14 +1,14 @@
 /** @file HL_errata.c
 *   @brief Errata workaround Source File
-*   @date 03.Apr.2015
-*   @version 04.04.00
+*   @date 07-July-2017
+*   @version 04.07.00
 *
 *   This file contains:
 *   - Errata workaround API's
 */
 
 /* 
-* Copyright (C) 2009-2015 Texas Instruments Incorporated - www.ti.com  
+* Copyright (C) 2009-2016 Texas Instruments Incorporated - www.ti.com  
 * 
 * 
 *  Redistribution and use in source and binary forms, with or without 
@@ -70,6 +70,10 @@ void errataFailNotification(uint32 flag)
 *   This function is designed to initialize the ROMs using the PBIST controller.
 *   The CPU will configure the PBIST controller to test the PBIST ROM and STC ROM.
 *   This function should be called at startup after system init before using the ROMs.
+*
+*   @note : This Function uses register's which are not exposed to users through
+*   TRM , to run custom algorithm. User can use this function as Black box. 
+*
 */
 void errata_PBIST_4(void)
 {

@@ -230,8 +230,8 @@ free) the network buffers are themselves blocked waiting for a network buffer.
 ipconfigMAX_SEND_BLOCK_TIME_TICKS is specified in RTOS ticks.  A time in
 milliseconds can be converted to a time in ticks by dividing the time in
 milliseconds by portTICK_PERIOD_MS. */
-//#define ipconfigUDP_MAX_SEND_BLOCK_TIME_TICKS ( 5000 / portTICK_PERIOD_MS )
-#define ipconfigUDP_MAX_SEND_BLOCK_TIME_TICKS ( 5000000 / portTICK_PERIOD_US )
+#define ipconfigUDP_MAX_SEND_BLOCK_TIME_TICKS ( 5000 / portTICK_PERIOD_MS )
+//#define ipconfigUDP_MAX_SEND_BLOCK_TIME_TICKS ( 5000000 / portTICK_PERIOD_US )
 
 /* If ipconfigUSE_DHCP is 1 then FreeRTOS+TCP will attempt to retrieve an IP
 address, netmask, DNS server address and gateway address from a DHCP server.  If
@@ -251,8 +251,8 @@ ipconfigMAXIMUM_DISCOVER_TX_PERIOD.  The IP stack will revert to using the
 static IP address passed as a parameter to FreeRTOS_IPInit() if the
 re-transmission time interval reaches ipconfigMAXIMUM_DISCOVER_TX_PERIOD without
 a DHCP reply being received. */
-//#define ipconfigMAXIMUM_DISCOVER_TX_PERIOD		( 120000 / portTICK_PERIOD_MS )
-#define ipconfigMAXIMUM_DISCOVER_TX_PERIOD		( 120000000 / portTICK_PERIOD_US )
+#define ipconfigMAXIMUM_DISCOVER_TX_PERIOD		( 120000 / portTICK_PERIOD_MS )
+//#define ipconfigMAXIMUM_DISCOVER_TX_PERIOD		( 120000000 / portTICK_PERIOD_US )
 
 
 /* The ARP cache is a table that maps IP addresses to MAC addresses.  The IP
@@ -303,7 +303,8 @@ to a pre-determinable value. */
 
 
 /* Maximum hány tick idõt várjon a network buffer felszabadulására */
-#define ipconfigTCP_MAX_RECV_BLOCK_TIME_TICKS ( 5000000 / portTICK_PERIOD_US )
+#define ipconfigTCP_MAX_RECV_BLOCK_TIME_TICKS ( 5000 / portTICK_PERIOD_MS )
+//#define ipconfigTCP_MAX_RECV_BLOCK_TIME_TICKS ( 5000000 / portTICK_PERIOD_US )
 
 /* A FreeRTOS queue is used to send events from application tasks to the IP
 stack.  ipconfigEVENT_QUEUE_LENGTH sets the maximum number of events that can

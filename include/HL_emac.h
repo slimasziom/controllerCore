@@ -7,7 +7,7 @@
  */
 
 /* 
-* Copyright (C) 2009-2015 Texas Instruments Incorporated - www.ti.com  
+* Copyright (C) 2009-2016 Texas Instruments Incorporated - www.ti.com  
 * 
 * 
 *  Redistribution and use in source and binary forms, with or without 
@@ -52,7 +52,7 @@
 #include "HL_hw_emac.h"
 #include "HL_hw_emac_ctrl.h"
 #include "HL_mdio.h"
-#include "HL_phy_dp83640.h"
+#include "HL_emac_phyConfig.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -61,6 +61,13 @@ extern "C" {
 /* USER CODE BEGIN (1) */
 #include "FreeRTOS.h"
 #include "os_semphr.h"
+
+#define EMAC_CONTROL_RESET             (0x01U)
+#define EMAC_SOFT_RESET                (0x01U)
+#define EMAC_MAX_HEADER_DESC           (8U)
+#define EMAC_UNICAST_DISABLE           (0xFFU)
+
+
 /* USER CODE END */
 
 /*****************************************************************************/
@@ -139,10 +146,7 @@ extern "C" {
 #define MIN_PKT_LEN               60U
 #define MIN_PACKET_SIZE          (46U)
 
-#define EMAC_CONTROL_RESET             (0x01U)
-#define EMAC_SOFT_RESET                (0x01U)
-#define EMAC_MAX_HEADER_DESC           (8U)
-#define EMAC_UNICAST_DISABLE           (0xFFU)
+
 
 
 #define EMAC_BUF_DESC_OWNER       0x20000000U

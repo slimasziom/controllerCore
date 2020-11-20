@@ -3,7 +3,7 @@
  */
 
 /* 
-* Copyright (C) 2009-2015 Texas Instruments Incorporated - www.ti.com  
+* Copyright (C) 2009-2016 Texas Instruments Incorporated - www.ti.com  
 * 
 * 
 *  Redistribution and use in source and binary forms, with or without 
@@ -66,6 +66,7 @@ typedef enum phyTimeStamp
 #define PHY_ID2                           (3u)
 #define PHY_AUTONEG_ADV                   (4u)
 #define PHY_LINK_PARTNER_ABLTY            (5u)
+#define PHY_LINK_PARTNER_SPD              (16u)
 #define PHY_TXTS						  (28u)
 #define PHY_RXTS						  (29u)
 
@@ -120,6 +121,7 @@ extern boolean Dp83640LinkStatusGet(uint32 mdioBaseAddr, uint32 phyAddr,volatile
 extern uint64 Dp83640GetTimeStamp(uint32 mdioBaseAddr, uint32 phyAddr, phyTimeStamp_t type);
 extern void Dp83640EnableLoopback(uint32 mdioBaseAddr, uint32 phyAddr);
 extern void Dp83640DisableLoopback(uint32 mdioBaseAddr, uint32 phyAddr);
+extern boolean Dp83640PartnerSpdGet(uint32 mdioBaseAddr, uint32 phyAddr, uint16 *ptnerAblty);
 
 /* USER CODE BEGIN (2) */
 #undef DP83640_PHY_ID

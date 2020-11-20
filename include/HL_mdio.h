@@ -7,7 +7,7 @@
  */
 
 /* 
-* Copyright (C) 2009-2015 Texas Instruments Incorporated - www.ti.com  
+* Copyright (C) 2009-2016 Texas Instruments Incorporated - www.ti.com  
 * 
 * 
 *  Redistribution and use in source and binary forms, with or without 
@@ -48,6 +48,7 @@
 /* USER CODE END */
 
 #include "HL_sys_common.h"
+#include "HL_system.h"
 #include "HL_hw_mdio.h"
 
 #ifdef __cplusplus
@@ -58,7 +59,7 @@ extern "C" {
 /* USER CODE END */
 
 /* MDIO input and output frequencies in Hz */
-#define MDIO_FREQ_INPUT           32000000U
+#define MDIO_FREQ_INPUT           ((uint32)(VCLK3_FREQ * 1000000.00F))
 #define MDIO_FREQ_OUTPUT          1000000U
 /*****************************************************************************/
 

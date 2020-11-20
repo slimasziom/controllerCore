@@ -1,7 +1,7 @@
 /** @file HL_reg_flash.h
 *   @brief Flash Register Layer Header File
-*   @date 03.Apr.2015
-*   @version 04.04.00
+*   @date 07-July-2017
+*   @version 04.07.00
 *   
 *   This file contains:
 *   - Definitions
@@ -11,7 +11,7 @@
 */
 
 /* 
-* Copyright (C) 2009-2015 Texas Instruments Incorporated - www.ti.com  
+* Copyright (C) 2009-2016 Texas Instruments Incorporated - www.ti.com  
 * 
 * 
 *  Redistribution and use in source and binary forms, with or without 
@@ -111,14 +111,14 @@ typedef volatile struct flashWBase
     uint32 rsvd13;          /* 0x00CC */	
     uint32 RCR_VALUE0;      /* 0x00D0 */
     uint32 RCR_VALUE1;      /* 0x00D4 */	
-    uint32 rsvd14[109U];    /* 0x00D8 - 0x00284 */	
+    uint32 rsvd14[108U];    /* 0x00D8 - 0x00284 */	
     uint32 FSM_WR_ENA;      /* 0x0288 */
-    uint32 rsvd15[12U];     /* 0x028C - 0x002B4 */
+    uint32 rsvd15[11U];     /* 0x028C - 0x002B4 */
     uint32 EEPROM_CONFIG;   /* 0x02B8 */
     uint32 rsvd16;          /* 0x02BC */	
     uint32 FSM_SECTOR1;     /* 0x02C0 */
     uint32 FSM_SECTOR2;     /* 0x02C4 */	
-    uint32 rsvd17[79U];     /* 0x02A8 */
+    uint32 rsvd17[78U];     /* 0x02A8 */
     uint32 FCFG_BANK;       /* 0x02B8 */
 
 } flashWBASE_t;

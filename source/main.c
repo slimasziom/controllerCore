@@ -65,12 +65,21 @@
 #include "FSM_maincontroller.h"
 #include "FSM_tinybms.h"
 
+#include "HL_can.h"
+
 uint8 emacAddress[6U] =	{0x00U, 0x08U, 0xEEU, 0x03U, 0xA6U, 0x6CU};
 uint32 emacPhyAddress =	1U;
 static const uint8_t ucIPAddress[4] = {configIP_ADDR0, configIP_ADDR1, configIP_ADDR2, configIP_ADDR3};
 static const uint8_t ucNetMask[4] = {configNET_MASK0, configNET_MASK1, configNET_MASK2, configNET_MASK3};
 static const uint8_t ucGatewayAddress[4] = {configGATEWAY_ADDR0, configGATEWAY_ADDR1, configGATEWAY_ADDR2, configGATEWAY_ADDR3};
 static const uint8_t ucDNSServerAddress[4] = {configDNS_SERVER_ADDR0, configDNS_SERVER_ADDR1, configDNS_SERVER_ADDR2, configDNS_SERVER_ADDR3};
+
+/* CAN */
+#define DCAN_SIZE           8
+static const uint32 s_canByteOrder[8U] = {3U, 2U, 1U, 0U, 7U, 6U, 5U, 4U};
+#define DCAN_TX_MESSAGE_BOX     canMESSAGE_BOX1
+uint8_t tx_data[DCAN_SIZE] = {'H', 'E', 'R', 'C', 'U', 'L', 'E', 'S'};
+uint8_t rx_data[DCAN_SIZE] = {0};
 
 /* Task handlers */
 xTaskHandle xTask1Handle, xTask2Handle, xServerWorkTaskHandle, xMainControllerTaskHandle;
@@ -120,6 +129,7 @@ void main(void)
 	gioSetDirection(hetPORT2, 0x00000000);
 	sciInit();
 	adcInit();
+	canInit();
 	adcMidPointCalibration(adcREG1);
 
 	_enable_IRQ();
@@ -265,6 +275,32 @@ void gioNotification(gioPORT_t *port, uint32 bit)
     /* xQueueCtrlInputSignalHandle signal */
     ESignal eMsg = SHORT_PRESS_SIG;
     xQueueSendToFrontFromISR(xQueueCtrlInputSignalHandle, &eMsg, NULL);
+}
+
+/* can interrupt notification (Not used but must be provided) */
+void canMessageNotification(canBASE_t *node, uint32_t messageBox){
+    uint32 success = 0;
+    if(canIsRxMessageArrived(canREG1,canMESSAGE_BOX2))
+    {
+//        success = canGetData(canREG1,canMESSAGE_BOX2, rx_data);
+//        BSP_log_default(success);
+////        BSP_log_default(rx_data[2]*256 + rx_data[3]);
+////        BSP_log_default(rx_data[4]*256 + rx_data[5]);
+////        BSP_log_default(rx_data[6]*256 + rx_data[7]);
+//
+//        /* Make events and send them to stats : */
+//        BSP_log_default(123);
+////        MeasurementEvt *pe = Q_NEW(MeasurementEvt, CAN_DATA_SIG);
+////        BSP_log_default(456);
+////        pe->voltage_in = (int32_t)(rx_data[0]*256 + rx_data[1]);
+////        pe->voltage_out = (int32_t)(rx_data[2]*256 + rx_data[3]);
+////        pe->current_in = (int32_t)(rx_data[4]*256 + rx_data[5]);
+////        pe->current_out = (int32_t)(rx_data[6]*256 + rx_data[7]);
+////        BSP_log_default(789);
+////        QACTIVE_POST(AO_DC_DC, &pe->super, 0U);
+//        BSP_log_default(101);
+
+    }
 }
 
 /** ***************************************************************************************************

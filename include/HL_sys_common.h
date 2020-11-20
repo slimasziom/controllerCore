@@ -1,7 +1,7 @@
 /** @file HL_sys_common.h
 *   @brief Common Header File
-*   @date 03.Apr.2015
-*   @version 04.04.00
+*   @date 07-July-2017
+*   @version 04.07.00
 *   
 *   This file contains:
 *   - General Definitions
@@ -10,7 +10,7 @@
 */
 
 /* 
-* Copyright (C) 2009-2015 Texas Instruments Incorporated - www.ti.com  
+* Copyright (C) 2009-2016 Texas Instruments Incorporated - www.ti.com  
 * 
 * 
 *  Redistribution and use in source and binary forms, with or without 
@@ -93,19 +93,13 @@ typedef enum config_value_type
 	CurrentValue
 }config_value_type_t;
 
-/** @def HL_CPU0
-*   @brief CPU0 Identifier
-*
-*   CPU0 Identifier
-*/
-#define HL_CPU0   0U
 
-/** @def HL_CPU1
-*   @brief CPU1 Identifier
-*
-*   CPU1 Identifier
-*/
-#define HL_CPU1   1U
+#ifndef __little_endian__
+#define __little_endian__  0
+#endif
+#ifndef __LITTLE_ENDIAN__
+#define __LITTLE_ENDIAN__  0
+#endif
 
 /* USER CODE BEGIN (1) */
 /* USER CODE END */

@@ -1,12 +1,12 @@
 /** @file HL_emif.h
 *   @brief emif Driver Definition File
-*   @date 03.Apr.2015
-*   @version 04.04.00
+*   @date 07-July-2017
+*   @version 04.07.00
 *   
 */
 
 /* 
-* Copyright (C) 2009-2015 Texas Instruments Incorporated - www.ti.com  
+* Copyright (C) 2009-2016 Texas Instruments Incorporated - www.ti.com  
 * 
 * 
 *  Redistribution and use in source and binary forms, with or without 
@@ -107,7 +107,7 @@ enum emif_wait_polarity
 };
 
 
-#define PTR ((uint32 *)(0x80000000U))
+#define PTR ((volatile uint32 *)(0x80000000U))
 
 
 /* Configuration registers */
@@ -149,6 +149,7 @@ typedef struct emif_config_reg
 /* EMIF Interface Functions */
 
 void emif_SDRAMInit(void);
+void emif_SDRAM_StartupInit(void);
 void emif_ASYNC1Init(void);
 void emif_ASYNC2Init(void);
 void emif_ASYNC3Init(void);

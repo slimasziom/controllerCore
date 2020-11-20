@@ -1,7 +1,7 @@
 /** @file HL_esm.h
 *   @brief Error Signaling Module Driver Header File
-*   @date 03.Apr.2015
-*   @version 04.04.00
+*   @date 07-July-2017
+*   @version 04.07.00
 *
 *   This file contains:
 *   - Definitions
@@ -11,7 +11,7 @@
 */
 
 /* 
-* Copyright (C) 2009-2015 Texas Instruments Incorporated - www.ti.com  
+* Copyright (C) 2009-2016 Texas Instruments Incorporated - www.ti.com  
 * 
 * 
 *  Redistribution and use in source and binary forms, with or without 
@@ -1227,8 +1227,9 @@ void esmGetConfigValue(esm_config_reg_t *config_reg, config_value_type_t type);
 *   @brief Interrupt callback
 *   @param[in] channel - Group 1 channel
 *
-* This is a callback that is provided by the application and is called upon
-* an interrupt. The parameter passed to the callback is group 1 channel caused the interrupt.
+*   This is a callback that is provided by the application and is called upon
+*   an interrupt. The parameter passed to the callback is group 1 channel caused the interrupt.
+*   @note Callback parameter channel is not a masked value. Do not use the macros esmCHANNELx for comparison.
 */
 void esmGroup1Notification(esmBASE_t *esm, uint32 channel);
 
@@ -1236,17 +1237,19 @@ void esmGroup1Notification(esmBASE_t *esm, uint32 channel);
 *   @brief Interrupt callback
 *   @param[in] channel - Group 2 channel
 *
-* This is a callback that is provided by the application and is called upon
-* an interrupt. The parameter passed to the callback is group 2 channel caused the interrupt.
+*   This is a callback that is provided by the application and is called upon
+*   an interrupt. The parameter passed to the callback is group 2 channel caused the interrupt.
+*   @note Callback parameter channel is not a masked value. Do not use the macros esmCHANNELx for comparison.
 */
 void esmGroup2Notification(esmBASE_t *esm, uint32 channel);
 
 /** @fn void esmGroup3Notification(esmBASE_t *esmREG, uint32 channel)
 *   @brief Notification function for Group 3 Error
-*   @param[in] channel - Group 3 channel
+*   @param[in] channel - Group 3 channel errors
 *
-* This is a callback that is provided by the application
-* The parameter passed to the callback is group 3 channel error.
+*   This is a callback that is provided by the application
+*   The parameter passed to the callback contains the group 3 channel errors (masked values).
+*   @note Use the macros esmCHANNELx for comparison.
 */
 void esmGroup3Notification(esmBASE_t *esm, uint32 channel);
 

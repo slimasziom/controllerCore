@@ -1,35 +1,35 @@
 ;-------------------------------------------------------------------------------
 ; HL_sys_core.asm
 ;
-; Copyright (C) 2009-2015 Texas Instruments Incorporated - www.ti.com  
-; 
-; 
-;  Redistribution and use in source and binary forms, with or without 
-;  modification, are permitted provided that the following conditions 
+; Copyright (C) 2009-2016 Texas Instruments Incorporated - www.ti.com
+;
+;
+;  Redistribution and use in source and binary forms, with or without
+;  modification, are permitted provided that the following conditions
 ;  are met:
 ;
-;    Redistributions of source code must retain the above copyright 
+;    Redistributions of source code must retain the above copyright
 ;    notice, this list of conditions and the following disclaimer.
 ;
 ;    Redistributions in binary form must reproduce the above copyright
-;    notice, this list of conditions and the following disclaimer in the 
-;    documentation and/or other materials provided with the   
+;    notice, this list of conditions and the following disclaimer in the
+;    documentation and/or other materials provided with the
 ;    distribution.
 ;
 ;    Neither the name of Texas Instruments Incorporated nor the names of
 ;    its contributors may be used to endorse or promote products derived
 ;    from this software without specific prior written permission.
 ;
-;  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 
-;  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT 
+;  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+;  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
 ;  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
-;  A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT 
-;  OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, 
-;  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT 
+;  A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+;  OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+;  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
 ;  LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
 ;  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
-;  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT 
-;  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE 
+;  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+;  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 ;  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ;
 ;
@@ -40,10 +40,13 @@
 
 ;-------------------------------------------------------------------------------
 ; Initialize CPU Registers
+; SourceId : CORE_SourceId_001
+; DesignId : CORE_DesignId_001
+; Requirements: HL_CONQ_CORE_SR2
 
     .def     _coreInitRegisters_
     .asmfunc
-    
+
 
 _coreInitRegisters_
 
@@ -63,7 +66,7 @@ _coreInitRegisters_
         mov r12, #0x0000
         mov r13, #0x0000
         mrs r1, cpsr
-        msr spsr_cxsf, r1 
+        msr spsr_cxsf, r1
         ; Switch to FIQ mode (M = 10001)
         cps #17
         mov lr, r0
@@ -73,27 +76,27 @@ _coreInitRegisters_
         mov r11, #0x0000
         mov r12, #0x0000
         mrs r1, cpsr
-        msr spsr_cxsf, r1 
+        msr spsr_cxsf, r1
         ; Switch to IRQ mode (M = 10010)
         cps #18
         mov lr, r0
         mrs r1,cpsr
-        msr spsr_cxsf, r1         
+        msr spsr_cxsf, r1
         ; Switch to Abort mode (M = 10111)
         cps #23
         mov lr, r0
         mrs r1,cpsr
-        msr spsr_cxsf, r1         
+        msr spsr_cxsf, r1
         ; Switch to Undefined Instruction Mode (M = 11011)
         cps #27
         mov lr, r0
         mrs r1,cpsr
-        msr spsr_cxsf, r1         
+        msr spsr_cxsf, r1
         ; Switch to System Mode ( Shares User Mode registers ) (M = 11111)
         cps #31
         mov lr, r0
         mrs r1,cpsr
-        msr spsr_cxsf, r1         
+        msr spsr_cxsf, r1
 
 
         mrc   p15,     #0x00,      r2,       c1, c0, #0x02
@@ -133,6 +136,9 @@ next4
 
 ;-------------------------------------------------------------------------------
 ; Initialize Stack Pointers
+; SourceId : CORE_SourceId_002
+; DesignId : CORE_DesignId_002
+; Requirements: HL_CONQ_CORE_SR3
 
     .def     _coreInitStackPointer_
     .asmfunc
@@ -164,6 +170,9 @@ undefSp .word 0x08000000+0x00002000+0x00002000+0x00000800+0x00000200+0x00000200+
 
 ;-------------------------------------------------------------------------------
 ; Get CPSR Value
+; SourceId : CORE_SourceId_003
+; DesignId : CORE_DesignId_003
+; Requirements: HL_CONQ_CORE_SR13
 
     .def     _getCPSRValue_
     .asmfunc
@@ -174,9 +183,12 @@ _getCPSRValue_
         bx    lr
 
     .endasmfunc
-    
+
 ;-------------------------------------------------------------------------------
 ; Take CPU to IDLE state
+; SourceId : CORE_SourceId_004
+; DesignId : CORE_DesignId_004
+; Requirements: HL_CONQ_CORE_SR12
 
     .def     _gotoCPUIdle_
     .asmfunc
@@ -189,12 +201,15 @@ _gotoCPUIdle_
         nop
         nop
         bx    lr
-        
+
     .endasmfunc
-    
+
 
 ;-------------------------------------------------------------------------------
 ; Enable VFP Unit
+; SourceId : CORE_SourceId_005
+; DesignId : CORE_DesignId_006
+; Requirements: HL_CONQ_CORE_SR4
 
     .def     _coreEnableVfp_
     .asmfunc
@@ -212,17 +227,18 @@ _coreEnableVfp_
 
 ;-------------------------------------------------------------------------------
 ; Enable Event Bus Export
+; SourceId : CORE_SourceId_006
+; DesignId : CORE_DesignId_007
+; Requirements: HL_CONQ_CORE_SR6
 
     .def     _coreEnableEventBusExport_
     .asmfunc
 
 _coreEnableEventBusExport_
 
-        stmfd sp!, {r0}
         mrc   p15, #0x00, r0,         c9, c12, #0x00
         orr   r0,  r0,    #0x10
         mcr   p15, #0x00, r0,         c9, c12, #0x00
-        ldmfd sp!, {r0}
         bx    lr
 
     .endasmfunc
@@ -230,34 +246,37 @@ _coreEnableEventBusExport_
 
 ;-------------------------------------------------------------------------------
 ; Disable Event Bus Export
+; SourceId : CORE_SourceId_007
+; DesignId : CORE_DesignId_008
+; Requirements: HL_CONQ_CORE_SR7
+
 
     .def     _coreDisableEventBusExport_
     .asmfunc
 
 _coreDisableEventBusExport_
 
-        stmfd sp!, {r0}
         mrc   p15, #0x00, r0,         c9, c12, #0x00
         bic   r0,  r0,    #0x10
         mcr   p15, #0x00, r0,         c9, c12, #0x00
-        ldmfd sp!, {r0}        
         bx    lr
 
     .endasmfunc
 
 ;-------------------------------------------------------------------------------
 ; Enable Offset via Vic controller
+; SourceId : CORE_SourceId_012
+; DesignId : CORE_DesignId_005
+; Requirements: HL_CONQ_CORE_SR5
 
     .def     _coreEnableIrqVicOffset_
     .asmfunc
 
 _coreEnableIrqVicOffset_
 
-        stmfd sp!, {r0}
         mrc   p15, #0, r0,         c1, c0,  #0
         orr   r0,  r0,    #0x01000000
         mcr   p15, #0, r0,         c1, c0,  #0
-        ldmfd sp!, {r0}        
         bx    lr
 
     .endasmfunc
@@ -265,6 +284,9 @@ _coreEnableIrqVicOffset_
 
 ;-------------------------------------------------------------------------------
 ; Get data fault status register
+; SourceId : CORE_SourceId_013
+; DesignId : CORE_DesignId_009
+; Requirements: HL_CONQ_CORE_SR14
 
     .def     _coreGetDataFault_
     .asmfunc
@@ -279,16 +301,17 @@ _coreGetDataFault_
 
 ;-------------------------------------------------------------------------------
 ; Clear data fault status register
+; SourceId : CORE_SourceId_014
+; DesignId : CORE_DesignId_010
+; Requirements: HL_CONQ_CORE_SR20
 
     .def     _coreClearDataFault_
     .asmfunc
 
 _coreClearDataFault_
 
-        stmfd sp!, {r0}
         mov   r0,  #0
         mcr   p15, #0, r0, c5, c0,  #0
-        ldmfd sp!, {r0}        
         bx    lr
 
     .endasmfunc
@@ -296,6 +319,9 @@ _coreClearDataFault_
 
 ;-------------------------------------------------------------------------------
 ; Get instruction fault status register
+; SourceId : CORE_SourceId_015
+; DesignId : CORE_DesignId_011
+; Requirements: HL_CONQ_CORE_SR15
 
     .def     _coreGetInstructionFault_
     .asmfunc
@@ -310,16 +336,17 @@ _coreGetInstructionFault_
 
 ;-------------------------------------------------------------------------------
 ; Clear instruction fault status register
+; SourceId : CORE_SourceId_016
+; DesignId : CORE_DesignId_012
+; Requirements: HL_CONQ_CORE_SR21
 
     .def     _coreClearInstructionFault_
     .asmfunc
 
 _coreClearInstructionFault_
 
-        stmfd sp!, {r0}
         mov   r0,  #0
         mcr   p15, #0, r0, c5, c0, #1
-        ldmfd sp!, {r0}        
         bx    lr
 
     .endasmfunc
@@ -327,6 +354,9 @@ _coreClearInstructionFault_
 
 ;-------------------------------------------------------------------------------
 ; Get data fault address register
+; SourceId : CORE_SourceId_017
+; DesignId : CORE_DesignId_013
+; Requirements: HL_CONQ_CORE_SR18
 
     .def     _coreGetDataFaultAddress_
     .asmfunc
@@ -341,16 +371,17 @@ _coreGetDataFaultAddress_
 
 ;-------------------------------------------------------------------------------
 ; Clear data fault address register
+; SourceId : CORE_SourceId_018
+; DesignId : CORE_DesignId_014
+; Requirements: HL_CONQ_CORE_SR24
 
     .def     _coreClearDataFaultAddress_
     .asmfunc
 
 _coreClearDataFaultAddress_
 
-        stmfd sp!, {r0}
         mov   r0,  #0
         mcr   p15, #0, r0, c6, c0,  #0
-        ldmfd sp!, {r0}        
         bx    lr
 
     .endasmfunc
@@ -358,6 +389,9 @@ _coreClearDataFaultAddress_
 
 ;-------------------------------------------------------------------------------
 ; Get instruction fault address register
+; SourceId : CORE_SourceId_019
+; DesignId : CORE_DesignId_015
+; Requirements: HL_CONQ_CORE_SR19
 
     .def     _coreGetInstructionFaultAddress_
     .asmfunc
@@ -372,16 +406,17 @@ _coreGetInstructionFaultAddress_
 
 ;-------------------------------------------------------------------------------
 ; Clear instruction fault address register
+; SourceId : CORE_SourceId_020
+; DesignId : CORE_DesignId_016
+; Requirements: HL_CONQ_CORE_SR25
 
     .def     _coreClearInstructionFaultAddress_
     .asmfunc
 
 _coreClearInstructionFaultAddress_
 
-        stmfd sp!, {r0}
         mov   r0,  #0
         mcr   p15, #0, r0, c6, c0, #2
-        ldmfd sp!, {r0}        
         bx    lr
 
     .endasmfunc
@@ -389,6 +424,9 @@ _coreClearInstructionFaultAddress_
 
 ;-------------------------------------------------------------------------------
 ; Get auxiliary data fault status register
+; SourceId : CORE_SourceId_021
+; DesignId : CORE_DesignId_017
+; Requirements: HL_CONQ_CORE_SR16
 
     .def     _coreGetAuxiliaryDataFault_
     .asmfunc
@@ -403,16 +441,17 @@ _coreGetAuxiliaryDataFault_
 
 ;-------------------------------------------------------------------------------
 ; Clear auxiliary data fault status register
+; SourceId : CORE_SourceId_022
+; DesignId : CORE_DesignId_018
+; Requirements: HL_CONQ_CORE_SR22
 
     .def     _coreClearAuxiliaryDataFault_
     .asmfunc
 
 _coreClearAuxiliaryDataFault_
 
-        stmfd sp!, {r0}
         mov   r0,  #0
         mcr   p15, #0, r0, c5, c1, #0
-        ldmfd sp!, {r0}        
         bx    lr
 
     .endasmfunc
@@ -420,6 +459,9 @@ _coreClearAuxiliaryDataFault_
 
 ;-------------------------------------------------------------------------------
 ; Get auxiliary instruction fault status register
+; SourceId : CORE_SourceId_023
+; DesignId : CORE_DesignId_019
+; Requirements: HL_CONQ_CORE_SR17
 
     .def     _coreGetAuxiliaryInstructionFault_
     .asmfunc
@@ -433,35 +475,42 @@ _coreGetAuxiliaryInstructionFault_
 
 ;-------------------------------------------------------------------------------
 ; Clear auxiliary instruction fault status register
+; SourceId : CORE_SourceId_024
+; DesignId : CORE_DesignId_020
+; Requirements: HL_CONQ_CORE_SR23
 
     .def     _coreClearAuxiliaryInstructionFault_
     .asmfunc
 
 _coreClearAuxiliaryInstructionFault_
 
-        stmfd sp!, {r0}
         mov   r0,  #0
         mrc   p15, #0, r0, c5, c1, #1
-        ldmfd sp!, {r0}        
         bx    lr
 
     .endasmfunc
 
 ;-------------------------------------------------------------------------------
 ; Disable IRQ interrupt
+; SourceId : CORE_SourceId_025
+; DesignId : CORE_DesignId_021
+; Requirements: HL_CONQ_CORE_SR11
 
-        .def _disable_IRQ_interrupt_    
+        .def _disable_IRQ_interrupt_
         .asmfunc
-        
+
 _disable_IRQ_interrupt_
 
         cpsid i
         bx    lr
-        
+
         .endasmfunc
-        
+
 ;-------------------------------------------------------------------------------
 ; Enable interrupts - CPU IRQ
+; SourceId : CORE_SourceId_026
+; DesignId : CORE_DesignId_022
+; Requirements: HL_CONQ_CORE_SR8
 
        .def _enable_IRQ_interrupt_
        .asmfunc
@@ -470,10 +519,13 @@ _enable_IRQ_interrupt_
 
         cpsie i
         bx    lr
-        
+
         .endasmfunc
 ;-------------------------------------------------------------------------------
 ; Enable interrupts - CPU IRQ & FIQ
+; SourceId : CORE_SourceId_027
+; DesignId : CORE_DesignId_024
+; Requirements: HL_CONQ_CORE_SR10
 
        .def _enable_interrupt_
        .asmfunc
@@ -482,9 +534,9 @@ _enable_interrupt_
 
         cpsie if
         bx    lr
-        
+
         .endasmfunc
-        
+
 ;-------------------------------------------------------------------------------
 ; Clear ESM CCM errorss
 
@@ -493,7 +545,7 @@ _enable_interrupt_
 
 _esmCcmErrorsClear_
 
-        stmfd sp!, {r0-r2}        
+        stmfd sp!, {r0-r2}
         ldr   r0, ESMSR1_REG    ; load the ESMSR1 status register address
         ldr   r2, ESMSR1_ERR_CLR
         str   r2, [r0]         ; clear the ESMSR1 register
@@ -516,7 +568,7 @@ _esmCcmErrorsClear_
         ldr   r0, CCMR4_STAT_REG    ; load the CCMR4 status register address
         ldr   r2, CCMR4_ERR_CLR
         str   r2, [r0]         ; clear the CCMR4 status register
-        ldmfd sp!, {r0-r2}        
+        ldmfd sp!, {r0-r2}
         bx    lr
 
 ESMSR1_REG        .word 0xFFFFF518
@@ -533,33 +585,33 @@ ESMSSR2_ERR_CLR   .word 0x00000004
 VIM_INT_CLR       .word 0x00000001
 VIM_INTREQ        .word 0xFFFFFE20
 
-        .endasmfunc    
+        .endasmfunc
 
 ;-------------------------------------------------------------------------------
 ;Initialize RAM memory
 
        .def _memInit_
        .asmfunc
-	   
+
 _memInit_
-	   	ldr   r12, MINITGCR		;Load MINITGCR register address
-	   	mov   r4, #0xA			
-	   	str   r4, [r12]			;Enable global memory hardware initialization
-		
-	   	ldr   r11,  MSIENA		;Load MSIENA register address
-	   	mov   r4, #0x1			;Bit position 0 of MSIENA corresponds to SRAM
-	   	str   r4, [r11]			;Enable auto hardware initalisation for SRAM
-mloop							;Loop till memory hardware initialization comletes
-	 	ldr   r5, MSTCGSTAT
-	  	ldr   r4, [r5]
-		tst   r4, #0x100
-	   	beq   mloop
-		
-		mov   r4, #5
-		str   r4, [r12]			;Disable global memory hardware initialization
-		bx lr
-		.endasmfunc
-		
+        ldr   r12, MINITGCR     ;Load MINITGCR register address
+        mov   r4, #0xA
+        str   r4, [r12]         ;Enable global memory hardware initialization
+
+        ldr   r11,  MSIENA      ;Load MSIENA register address
+        mov   r4, #0x1          ;Bit position 0 of MSIENA corresponds to SRAM
+        str   r4, [r11]         ;Enable auto hardware initalisation for SRAM
+mloop                           ;Loop till memory hardware initialization comletes
+        ldr   r5, MSTCGSTAT
+        ldr   r4, [r5]
+        tst   r4, #0x100
+        beq   mloop
+
+        mov   r4, #5
+        str   r4, [r12]         ;Disable global memory hardware initialization
+        bx lr
+        .endasmfunc
+
 ;-------------------------------------------------------------------------------
 ; Check Initialize RAM memory
 
@@ -567,130 +619,101 @@ mloop							;Loop till memory hardware initialization comletes
        .asmfunc
 
 _checkMemInitOn_
-	   	ldr   r12, MINITGCR		;Load MINITGCR register address
-mloop5 	ldr   r4, [r12]
-	  	teq   r4, #0xA
-		beq   mloop5
-		bx lr
-		.endasmfunc
-		
-MINITGCR	.word 0xFFFFFF5C
-MSIENA		.word 0xFFFFFF60
-MSTCGSTAT	.word 0xFFFFFF68
+        ldr   r12, MINITGCR     ;Load MINITGCR register address
+mloop5  ldr   r4, [r12]
+        teq   r4, #0xA
+        beq   mloop5
+        bx lr
+        .endasmfunc
+
+MINITGCR    .word 0xFFFFFF5C
+MSIENA      .word 0xFFFFFF60
+MSTCGSTAT   .word 0xFFFFFF68
 
 ;-------------------------------------------------------------------------------
 ; Enable caches
 
-		.def  _cacheEnable_
+        .def  _cacheEnable_
         .asmfunc
 
 _cacheEnable_
 
-        stmfd sp!, {r0-r1} 
+        stmfd sp!, {r0-r1}
         mov r0,#0
-		
-		MRC   p15, #0, R1, c1, c0, #0 	; Read System Control Register configuration data
-		ORR   R1, R1, #0x1 <<12 		; instruction cache enable
-		ORR   R1, R1, #0x1 <<2 		    ; data cache enable
-		DSB
-		MCR   p15, #0, r0, c15, c5, #0 	; Invalidate entire data cache
-		MCR   p15, #0, r0, c7, c5, #0 	; Invalidate entire instruction cache
-		MCR   p15, #0, R1, c1, c0, #0 	; enabled cache RAMs
-		ISB
-		
-		ldmfd sp!, {r0-r1}   
-		 
-		bx	  lr
+
+        MRC p15, #0, r1, c1, c0, #1      ; Read auxiliary control register
+        BIC r1, r1, #0x1 << 5           ; bit is default set to disable ECC. Clearing bit 5
+        MCR p15, #0, r1, c1, c0, #1      ; enable ECC, generate abort on ECC errors, enable
+                                        ; hardware recovery
+
+        MRC   p15, #0, R1, c1, c0, #0   ; Read System Control Register configuration data
+        ORR   R1, R1, #0x1 <<12         ; instruction cache enable
+        ORR   R1, R1, #0x1 <<2          ; data cache enable
+        DSB
+        MCR   p15, #0, r0, c15, c5, #0  ; Invalidate entire data cache
+        DSB                             ; delay is required, manually added
+        MCR   p15, #0, r0, c7, c5, #0   ; Invalidate entire instruction cache
+        DSB                             ; delay is required, manually added
+        MCR   p15, #0, R1, c1, c0, #0   ; enabled cache RAMs
+        ISB
+
+        ldmfd sp!, {r0-r1}
+
+        bx    lr
         .endasmfunc
 
 ;-------------------------------------------------------------------------------
 ; Disable caches
 
-		.def  _cacheDisable_
+        .def  _cacheDisable_
         .asmfunc
 
 _cacheDisable_
 
-		stmfd sp!, {r1} 
+        stmfd sp!, {r1}
 
-		MRC   p15, #0, R1, c1, c0, #0 	; Read System Control Register configuration data
-		BIC   R1, R1, #0x1 <<12 		; instruction cache disable
-		BIC   R1, R1, #0x1 <<2 		    ; data cache disable
-		DSB
-		MCR   p15, #0, R1, c1, c0, #0 	; disabled cache RAMs
-		ISB
-		
-		ldmfd sp!, {r1}   
-		
-		bx	  lr
+        MRC   p15, #0, R1, c1, c0, #0   ; Read System Control Register configuration data
+        BIC   R1, R1, #0x1 <<12         ; instruction cache disable
+        BIC   R1, R1, #0x1 <<2          ; data cache disable
+        DSB
+        MCR   p15, #0, R1, c1, c0, #0   ; disabled cache RAMs
+        ISB
+
+        ldmfd sp!, {r1}
+
+        bx    lr
         .endasmfunc
 
 ;-------------------------------------------------------------------------------
 ; Invalidate Data Cache
 
-		.def  _dCacheInvalidate_
-	    .asmfunc
+        .def  _dCacheInvalidate_
+        .asmfunc
 
 _dCacheInvalidate_
-        stmfd sp!, {r0} 
-		MOV   R0,#0
-		DSB
-		MCR   P15, #0, R0, C15, C5, #0
-		DSB
-		ldmfd sp!, {r0}   
-		bx	  lr
+        MOV   R0,#0
+        DSB
+        MCR   P15, #0, R0, C15, C5, #0
+        DSB
+        bx    lr
         .endasmfunc
 
 ;-------------------------------------------------------------------------------
 ; Invalidate Instruction Cache
 
-		.def  _iCacheInvalidate_
+        .def  _iCacheInvalidate_
         .asmfunc
 
 _iCacheInvalidate_
-        stmfd sp!, {r0}
-		MOV   R0,#0
-		DSB
-		MCR   p15, #0, r0, c7, c5, #0
-		DSB
-		ldmfd sp!, {r0}  
-		bx	  lr
+        MOV   R0,#0
+        DSB
+        MCR   p15, #0, r0, c7, c5, #0
+        DSB
+        bx    lr
         .endasmfunc
 
-;-------------------------------------------------------------------------------
-; dcacheCleanRange
-; void _dcache_clean_range_(unsigned int startAddress, unsigned int endAddress);
-		.def  _dcacheCleanRange_
-        .asmfunc
-_dcacheCleanRange_
-		BIC   R0, R0, #7					; data cache line size -1
-loop:	MCR	  P15, #0, R0, C7, C10, #1		; clean D entry
-		ADD	  R0, R0, #8					; data cache line size
-		CMP	  R0, R1
-		BLO	  loop
-		MCR	  P15, #0, R0, C7, C10, #4		; data Synchronization Barrier
-		BX    LR
-        .endasmfunc
 
-;-------------------------------------------------------------------------------
-; dcacheInvalidateRange
-; void _dcacheInvalidateRange_(unsigned int startAddress, unsigned int endAddress);
-		.def  _dcacheInvalidateRange_
-        .asmfunc
-_dcacheInvalidateRange_
-		TST	  R0, #7						; data cache line size -1
-		MCR	  P15, #0, R0, C7, C10, #1		; clean D entry
-		TST	  R1, #7						; data cache line size -1
-		MCR	  P15, #0, R1, C7, c10, #1		; clean D entry
-		BIC	  R0, R0, #8					; data cache line size -1
-loop2:	MCR   P15, #0, R0, C7, C6, #1		; invalidate D entry
-		ADD	  R0, R0, #8					; data cache line size
-		CMP	  R0, R1
-		BLO   loop2
-		MCR	  P15, #0, R0, C7, C10, #4		; data Synchronization Barrier
-		BX    LR
-        .endasmfunc
-		
+
 ;-------------------------------------------------------------------------------
 ; C++ construct table pointers
 

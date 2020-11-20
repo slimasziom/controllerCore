@@ -1,7 +1,7 @@
 /** @file HL_reg_ccmr5.h
 *   @brief CCMR5 Register Layer Header File
-*   @date 03.Apr.2015
-*   @version 04.04.00
+*   @date 07-July-2017
+*   @version 04.07.00
 *   
 *   This file contains:
 *   - Definitions
@@ -11,7 +11,7 @@
 */
 
 /* 
-* Copyright (C) 2009-2015 Texas Instruments Incorporated - www.ti.com  
+* Copyright (C) 2009-2016 Texas Instruments Incorporated - www.ti.com  
 * 
 * 
 *  Redistribution and use in source and binary forms, with or without 
@@ -78,7 +78,7 @@ typedef volatile struct ccmr5Base
     uint32 CCMPDSTAT0;  /* 0x24 Power Domain Status Register 0 */
 } ccmr5BASE_t;
 
-#define ccmr5REG   ((ccmr5BASE_t *)0xFFFFF600)
+#define ccmr5REG   ((ccmr5BASE_t *)0xFFFFF600U)
 /* USER CODE BEGIN (1) */
 /* USER CODE END */
 

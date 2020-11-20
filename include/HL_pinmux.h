@@ -1,12 +1,12 @@
 /** @file HL_pinmux.h 
 *   @brief PINMUX Driver Implementation File
-*   @date 03.Apr.2015
-*   @version 04.04.00
+*   @date 07-July-2017
+*   @version 04.07.00
 *
 */
 
 /* 
-* Copyright (C) 2009-2015 Texas Instruments Incorporated - www.ti.com  
+* Copyright (C) 2009-2016 Texas Instruments Incorporated - www.ti.com  
 * 
 * 
 *  Redistribution and use in source and binary forms, with or without 
@@ -515,28 +515,28 @@ extern "C" {
 #define PINMUX_BALL_K3_ECLK2                                  ((uint32)((uint32)0x4U <<  PINMUX_BALL_K3_SHIFT))
 
 #define PINMUX_BALL_R4_EMIF_nCAS                                  ((uint32)((uint32)0x1U <<  PINMUX_BALL_R4_SHIFT))
-#define PINMUX_BALL_R4_GIOB_3                                  ((uint32)((uint32)0x2U <<  PINMUX_BALL_R4_SHIFT))
+#define PINMUX_BALL_R4_GIOB_3                                  ((uint32)((uint32)0x4U <<  PINMUX_BALL_R4_SHIFT))
 
 #define PINMUX_BALL_N17_EMIF_nCS_0                                  ((uint32)((uint32)0x1U <<  PINMUX_BALL_N17_SHIFT))
 #define PINMUX_BALL_N17_RTP_DATA_15                                  ((uint32)((uint32)0x2U <<  PINMUX_BALL_N17_SHIFT))
 #define PINMUX_BALL_N17_N2HET2_07                                  ((uint32)((uint32)0x4U <<  PINMUX_BALL_N17_SHIFT))
 
 #define PINMUX_BALL_L17_EMIF_nCS_2                                  ((uint32)((uint32)0x1U <<  PINMUX_BALL_L17_SHIFT))
-#define PINMUX_BALL_L17_GIOB_4                                  ((uint32)((uint32)0x2U <<  PINMUX_BALL_L17_SHIFT))
+#define PINMUX_BALL_L17_GIOB_4                                  ((uint32)((uint32)0x4U <<  PINMUX_BALL_L17_SHIFT))
 
 #define PINMUX_BALL_K17_EMIF_nCS_3                                  ((uint32)((uint32)0x1U <<  PINMUX_BALL_K17_SHIFT))
 #define PINMUX_BALL_K17_RTP_DATA_14                                  ((uint32)((uint32)0x2U <<  PINMUX_BALL_K17_SHIFT))
 #define PINMUX_BALL_K17_N2HET2_09                                  ((uint32)((uint32)0x4U <<  PINMUX_BALL_K17_SHIFT))
 
-#define PINMUX_BALL_M17_EMIF_nCSl_4                                  ((uint32)((uint32)0x1U <<  PINMUX_BALL_M17_SHIFT))
+#define PINMUX_BALL_M17_EMIF_nCS_4                                  ((uint32)((uint32)0x1U <<  PINMUX_BALL_M17_SHIFT))
 #define PINMUX_BALL_M17_RTP_DATA_07                                  ((uint32)((uint32)0x2U <<  PINMUX_BALL_M17_SHIFT))
 #define PINMUX_BALL_M17_GIOB_5                                  ((uint32)((uint32)0x4U <<  PINMUX_BALL_M17_SHIFT))
 
 #define PINMUX_BALL_R3_EMIF_nRAS                                  ((uint32)((uint32)0x1U <<  PINMUX_BALL_R3_SHIFT))
-#define PINMUX_BALL_R3_GIOB_6                                  ((uint32)((uint32)0x2U <<  PINMUX_BALL_R3_SHIFT))
+#define PINMUX_BALL_R3_GIOB_6                                  ((uint32)((uint32)0x4U <<  PINMUX_BALL_R3_SHIFT))
 
 #define PINMUX_BALL_P3_EMIF_nWAIT                                  ((uint32)((uint32)0x1U <<  PINMUX_BALL_P3_SHIFT))
-#define PINMUX_BALL_P3_GIOB_7                                  ((uint32)((uint32)0x2U <<  PINMUX_BALL_P3_SHIFT))
+#define PINMUX_BALL_P3_GIOB_7                                  ((uint32)((uint32)0x4U <<  PINMUX_BALL_P3_SHIFT))
 
 #define PINMUX_BALL_D17_EMIF_nWE                                  ((uint32)((uint32)0x1U <<  PINMUX_BALL_D17_SHIFT))
 #define PINMUX_BALL_D17_EMIF_RNW                                  ((uint32)((uint32)0x2U <<  PINMUX_BALL_D17_SHIFT))
@@ -718,7 +718,7 @@ extern "C" {
 
 #define PINMUX_BALL_B2_MIBSPI3NCS_2                                  ((uint32)((uint32)0x1U <<  PINMUX_BALL_B2_SHIFT))
 #define PINMUX_BALL_B2_I2C1_SDA                                  ((uint32)((uint32)0x2U <<  PINMUX_BALL_B2_SHIFT))
-#define PINMUX_BALL_B2_N2HET1_27                                  ((uint32)((uint32)0x10U <<  PINMUX_BALL_B2_SHIFT))
+#define PINMUX_BALL_B2_N2HET1_27                                  ((uint32)((uint32)0x8U <<  PINMUX_BALL_B2_SHIFT))
 #define PINMUX_BALL_B2_nTZ1_2                                  ((uint32)((uint32)0x20U <<  PINMUX_BALL_B2_SHIFT))
 
 #define PINMUX_BALL_C3_MIBSPI3NCS_3                                  ((uint32)((uint32)0x1U <<  PINMUX_BALL_C3_SHIFT))
@@ -800,7 +800,7 @@ extern "C" {
 
 #define PINMUX_BALL_K18_N2HET1_00                                  ((uint32)((uint32)0x1U <<  PINMUX_BALL_K18_SHIFT))
 #define PINMUX_BALL_K18_MIBSPI4CLK                                  ((uint32)((uint32)0x2U <<  PINMUX_BALL_K18_SHIFT))
-#define PINMUX_BALL_K18_28_5                                  ((uint32)((uint32)0x20U <<  PINMUX_BALL_K18_SHIFT))
+#define PINMUX_BALL_K18_eTPWM2B                                  ((uint32)((uint32)0x20U <<  PINMUX_BALL_K18_SHIFT))
 
 #define PINMUX_BALL_V2_N2HET1_01                                  ((uint32)((uint32)0x1U <<  PINMUX_BALL_V2_SHIFT))
 #define PINMUX_BALL_V2_MIBSPI4NENA                                  ((uint32)((uint32)0x2U <<  PINMUX_BALL_V2_SHIFT))

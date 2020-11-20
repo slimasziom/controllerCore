@@ -1,12 +1,12 @@
 /** @file HL_sci.c 
 *   @brief SCI Driver Implementation File
-*   @date 03.Apr.2015
-*   @version 04.04.00
+*   @date 07-July-2017
+*   @version 04.07.00
 *
 */
 
 /* 
-* Copyright (C) 2009-2015 Texas Instruments Incorporated - www.ti.com  
+* Copyright (C) 2009-2016 Texas Instruments Incorporated - www.ti.com  
 * 
 * 
 *  Redistribution and use in source and binary forms, with or without 
@@ -45,7 +45,7 @@
 
 #include "HL_sci.h"
 #include "HL_sys_vim.h"
-
+#include "math.h"
 /* USER CODE BEGIN (1) */
 /* USER CODE END */
 /** @struct g_sciTransfer
@@ -62,6 +62,9 @@ static volatile struct g_sciTransfer
 } g_sciTransfer_t[4U];
 
 
+/* SourceId : SCI_SourceId_001 */
+/* DesignId : SCI_DesignId_001 */
+/* Requirements : HL_CONQ_SCI_SR5  */
 /** @fn void sciInit(void)
 *   @brief Initializes the SCI Driver
 *
@@ -157,6 +160,9 @@ void sciInit(void)
 }
 
 
+/* SourceId : SCI_SourceId_002 */
+/* DesignId : SCI_DesignId_002 */
+/* Requirements : HL_CONQ_SCI_SR6 */
 /** @fn void sciSetFunctional(sciBASE_t *sci, uint32 port)
 *   @brief Change functional behavior of pins at runtime.
 *   @param[in] sci   - sci module base address
@@ -178,6 +184,9 @@ void sciSetFunctional(sciBASE_t *sci, uint32 port)
 }
 
 
+/* SourceId : SCI_SourceId_003 */
+/* DesignId : SCI_DesignId_003 */
+/* Requirements : HL_CONQ_SCI_SR7 */
 /** @fn void sciSetBaudrate(sciBASE_t *sci, uint32 baud)
 *   @brief Change baudrate at runtime.
 *   @param[in] sci  - sci module base address
@@ -197,6 +206,7 @@ void sciSetBaudrate(sciBASE_t *sci, uint32 baud)
     /*SAFETYMCUSW 96 S MR:6.1 <APPROVED> "Calculations including int and float cannot be avoided" */
 	temp = (f*(baud));
 	temp2 = ((vclk)/((float64)temp))-1U;
+	temp2 = floor(temp2 + 0.5);        /* Rounding-off to the closest integer */
 	sci->BRS = (uint32)((uint32)temp2 & 0x00FFFFFFU);
 
 /* USER CODE BEGIN (7) */
@@ -204,6 +214,9 @@ void sciSetBaudrate(sciBASE_t *sci, uint32 baud)
 }
 
 
+/* SourceId : SCI_SourceId_004 */
+/* DesignId : SCI_DesignId_004 */
+/* Requirements : HL_CONQ_SCI_SR8 */
 /** @fn uint32 sciIsTxReady(sciBASE_t *sci)
 *   @brief Check if Tx buffer empty
 *   @param[in] sci - sci module base address
@@ -222,6 +235,9 @@ uint32 sciIsTxReady(sciBASE_t *sci)
 }
 
 
+/* SourceId : SCI_SourceId_005 */
+/* DesignId : SCI_DesignId_005 */
+/* Requirements : HL_CONQ_SCI_SR9 */
 /** @fn void sciSendByte(sciBASE_t *sci, uint8 byte)
 *   @brief Send Byte
 *   @param[in] sci  - sci module base address
@@ -248,6 +264,9 @@ void sciSendByte(sciBASE_t *sci, uint8 byte)
 }
 
 
+/* SourceId : SCI_SourceId_006 */
+/* DesignId : SCI_DesignId_006 */
+/* Requirements : HL_CONQ_SCI_SR10 */
 /** @fn void sciSend(sciBASE_t *sci, uint32 length, uint8 * data)
 *   @brief Send Data
 *   @param[in] sci    - sci module base address
@@ -318,6 +337,9 @@ void sciSend(sciBASE_t *sci, uint32 length, uint8 * data)
 }
 
 
+/* SourceId : SCI_SourceId_007 */
+/* DesignId : SCI_DesignId_007 */
+/* Requirements : HL_CONQ_SCI_SR11 */
 /** @fn uint32 sciIsRxReady(sciBASE_t *sci)
 *   @brief Check if Rx buffer full
 *   @param[in] sci - sci module base address
@@ -335,6 +357,9 @@ uint32 sciIsRxReady(sciBASE_t *sci)
     return sci->FLR & (uint32)SCI_RX_INT;
 }
 
+/* SourceId : SCI_SourceId_008 */
+/* DesignId : SCI_DesignId_008 */
+/* Requirements : HL_CONQ_SCI_SR12 */
 /** @fn uint32 sciIsIdleDetected(sciBASE_t *sci)
 *   @brief Check if Idle Period is Detected
 *   @param[in] sci - sci module base address
@@ -353,6 +378,9 @@ uint32 sciIsIdleDetected(sciBASE_t *sci)
 }
 
 
+/* SourceId : SCI_SourceId_009 */
+/* DesignId : SCI_DesignId_009 */
+/* Requirements : HL_CONQ_SCI_SR13 */
 /** @fn uint32 sciRxError(sciBASE_t *sci)
 *   @brief Return Rx Error flags
 *   @param[in] sci - sci module base address
@@ -374,6 +402,9 @@ uint32 sciRxError(sciBASE_t *sci)
 }
 
 
+/* SourceId : SCI_SourceId_010 */
+/* DesignId : SCI_DesignId_010 */
+/* Requirements : HL_CONQ_SCI_SR14 */
 /** @fn uint32 sciReceiveByte(sciBASE_t *sci)
 *   @brief Receive Byte
 *   @param[in] sci - sci module base address
@@ -399,6 +430,9 @@ uint32 sciReceiveByte(sciBASE_t *sci)
 }
 
 
+/* SourceId : SCI_SourceId_011 */
+/* DesignId : SCI_DesignId_011 */
+/* Requirements : HL_CONQ_SCI_SR15 */
 /** @fn void sciReceive(sciBASE_t *sci, uint32 length, uint8 * data)
 *   @brief Receive Data
 *   @param[in] sci    - sci module base address
@@ -453,6 +487,9 @@ void sciReceive(sciBASE_t *sci, uint32 length, uint8 * data)
 /* USER CODE END */
 }
 
+/* SourceId : SCI_SourceId_012 */
+/* DesignId : SCI_DesignId_014 */
+/* Requirements : HL_CONQ_SCI_SR18 */
 /** @fn void sciEnableLoopback(sciBASE_t *sci, loopBackType_t Loopbacktype)
 *   @brief Enable Loopback mode for self test
 *   @param[in] sci        - sci module base address
@@ -476,6 +513,9 @@ void sciEnableLoopback(sciBASE_t *sci, loopBackType_t Loopbacktype)
 /* USER CODE END */
 }
 
+/* SourceId : SCI_SourceId_013 */
+/* DesignId : SCI_DesignId_015 */
+/* Requirements : HL_CONQ_SCI_SR19 */
 /** @fn void sciDisableLoopback(sciBASE_t *sci)
 *   @brief Enable Loopback mode for self test
 *   @param[in] sci        - sci module base address
@@ -494,6 +534,9 @@ void sciDisableLoopback(sciBASE_t *sci)
 /* USER CODE END */
 }
 
+/* SourceId : SCI_SourceId_014 */
+/* DesignId : SCI_DesignId_012 */
+/* Requirements : HL_CONQ_SCI_SR16 */
 /** @fn sciEnableNotification(sciBASE_t *sci, uint32 flags)
 *   @brief Enable interrupts
 *   @param[in] sci   - sci module base address
@@ -523,6 +566,9 @@ void sciEnableNotification(sciBASE_t *sci, uint32 flags)
 }
 
 
+/* SourceId : SCI_SourceId_015 */
+/* DesignId : SCI_DesignId_013 */
+/* Requirements : HL_CONQ_SCI_SR17 */
 /** @fn sciDisableNotification(sciBASE_t *sci, uint32 flags)
 *   @brief Disable interrupts
 *   @param[in] sci   - sci module base address
@@ -551,6 +597,36 @@ void sciDisableNotification(sciBASE_t *sci, uint32 flags)
 /* USER CODE END */
 }
 
+/* SourceId : SCI_SourceId_016 */
+/* DesignId : SCI_DesignId_001 */
+/* Requirements :   */
+/** @fn sciEnterResetState(sciBASE_t *sci)
+*   @brief Enter reset state
+*   @param[in] sci   - sci module base address
+*   @note The SCI should only be configured while in reset state
+*/
+void sciEnterResetState(sciBASE_t *sci)
+{
+	sci->GCR1 &= 0xFFFFFF7FU;
+}
+
+/* SourceId : SCI_SourceId_017 */
+/* DesignId : SCI_DesignId_001 */
+/* Requirements :   */
+/** @fn scixitResetState(sciBASE_t *sci)
+*   @brief Exit reset state
+*   @param[in] sci   - sci module base address
+*   @note The SCI should only be configured while in reset state
+*/
+void sciExitResetState(sciBASE_t *sci)
+{
+	sci->GCR1 |= 0x00000080U;
+}
+
+
+/* SourceId : SCI_SourceId_018 */
+/* DesignId : SCI_DesignId_016 */
+/* Requirements : HL_CONQ_SCI_SR23 */
 /** @fn void sci1GetConfigValue(sci_config_reg_t *config_reg, config_value_type_t type)
 *   @brief Get the initial or current values of the SCI1 configuration registers
 *
@@ -606,6 +682,9 @@ void sci1GetConfigValue(sci_config_reg_t *config_reg, config_value_type_t type)
 /* USER CODE BEGIN (27) */
 /* USER CODE END */
 
+/* SourceId : SCI_SourceId_022 */
+/* DesignId : SCI_DesignId_017 */
+/* Requirements : HL_CONQ_SCI_SR20, HL_CONQ_SCI_SR21 */
 /** @fn void lin1HighLevelInterrupt(void)
 *   @brief Level 0 Interrupt for SCI1
 */

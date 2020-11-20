@@ -1,7 +1,7 @@
 /** @file HL_adc.c 
 *   @brief ADC Driver Source File
-*   @date 03.Apr.2015
-*   @version 04.04.00
+*   @date 07-July-2017
+*   @version 04.07.00
 *
 *   This file contains:
 *   - API Functions
@@ -11,7 +11,7 @@
 */
 
 /* 
-* Copyright (C) 2009-2015 Texas Instruments Incorporated - www.ti.com  
+* Copyright (C) 2009-2016 Texas Instruments Incorporated - www.ti.com  
 * 
 * 
 *  Redistribution and use in source and binary forms, with or without 
@@ -64,6 +64,9 @@
 */
 /* USER CODE BEGIN (2) */
 /* USER CODE END */
+/* SourceId : ADC_SourceId_001 */
+/* DesignId : ADC_DesignId_001 */
+/* Requirements : HL_CONQ_ADC_SR2 */
 void adcInit(void)
 {
 /* USER CODE BEGIN (3) */
@@ -404,6 +407,9 @@ static const uint32 s_adcFiFoSize[2U][3U] =
 *   This function starts a conversion of the ADC hardware group.
 *
 */
+/* SourceId : ADC_SourceId_002 */
+/* DesignId : ADC_DesignId_002 */
+/* Requirements : HL_CONQ_ADC_SR3 */
 void adcStartConversion(adcBASE_t *adc, uint32 group)
 {
     uint32 index = (adc == adcREG1) ? 0U : 1U;
@@ -440,6 +446,9 @@ void adcStartConversion(adcBASE_t *adc, uint32 group)
 *   This function stops a conversion of the ADC hardware group.
 *
 */
+/* SourceId : ADC_SourceId_003 */
+/* DesignId : ADC_DesignId_003 */
+/* Requirements : HL_CONQ_ADC_SR4 */
 void adcStopConversion(adcBASE_t *adc, uint32 group)
 {
 /* USER CODE BEGIN (10) */
@@ -471,6 +480,9 @@ void adcStopConversion(adcBASE_t *adc, uint32 group)
 *   This function resets the FiFo read and write pointers.
 *
 */
+/* SourceId : ADC_SourceId_004 */
+/* DesignId : ADC_DesignId_004 */
+/* Requirements : HL_CONQ_ADC_SR5 */
 void adcResetFiFo(adcBASE_t *adc, uint32 group)
 {
 /* USER CODE BEGIN (13) */
@@ -506,13 +518,18 @@ void adcResetFiFo(adcBASE_t *adc, uint32 group)
 *   This function writes a ADC message into a ADC message box.
 *
 */
+/* SourceId : ADC_SourceId_005 */
+/* DesignId : ADC_DesignId_005 */
+/* Requirements : HL_CONQ_ADC_SR6 */
 uint32 adcGetData(adcBASE_t *adc, uint32 group, adcData_t * data)
 {
-    uint32       i;
+    uint32  i;
     uint32  buf;
     uint32  mode;    
     uint32  index = (adc == adcREG1) ? 0U : 1U;
-    uint32       count = (adc->GxINTCR[group] >= 256U) ? s_adcFiFoSize[index][group] : (s_adcFiFoSize[index][group] - (uint32)(adc->GxINTCR[group] & 0xFFU));
+	
+	uint32  intcr_reg = adc->GxINTCR[group];
+    uint32  count = (intcr_reg >= 256U) ? s_adcFiFoSize[index][group] : (s_adcFiFoSize[index][group] - (uint32)(intcr_reg & 0xFFU));
     adcData_t *ptr = data; 
 
 /* USER CODE BEGIN (16) */
@@ -581,6 +598,9 @@ uint32 adcGetData(adcBASE_t *adc, uint32 group, adcData_t * data)
 *   This function checks FiFo buffer status.
 *
 */
+/* SourceId : ADC_SourceId_006 */
+/* DesignId : ADC_DesignId_006 */
+/* Requirements : HL_CONQ_ADC_SR7 */
 uint32 adcIsFifoFull(adcBASE_t *adc, uint32 group)
 {
     uint32 flags;
@@ -619,6 +639,9 @@ uint32 adcIsFifoFull(adcBASE_t *adc, uint32 group)
 *   This function checks if conversion is complete.
 *
 */
+/* SourceId : ADC_SourceId_007 */
+/* DesignId : ADC_DesignId_007 */
+/* Requirements : HL_CONQ_ADC_SR8 */
 uint32 adcIsConversionComplete(adcBASE_t *adc, uint32 group)
 {
     uint32 flags;
@@ -648,6 +671,9 @@ uint32 adcIsConversionComplete(adcBASE_t *adc, uint32 group)
 *   This function computes offset error using Calibration mode
 *
 */
+/* SourceId : ADC_SourceId_008 */
+/* DesignId : ADC_DesignId_010 */
+/* Requirements : HL_CONQ_ADC_SR11 */
 void adcCalibration(adcBASE_t *adc)
 {
 /* USER CODE BEGIN (25) */
@@ -662,7 +688,7 @@ void adcCalibration(adcBASE_t *adc)
 	backup_mode = adc->OPMODECR;
 	
 	/** - Enable 12-BIT ADC  */
-	adcREG1->OPMODECR |= 0x80000000U;
+	adc->OPMODECR |= 0x80000000U;
 
 	/* Disable all channels for conversion */
 	adc->GxSEL[0U]=0x00U;
@@ -749,6 +775,9 @@ void adcCalibration(adcBASE_t *adc)
 *   This function computes offset error using Mid Point Calibration mode
 *
 */
+/* SourceId : ADC_SourceId_009 */
+/* DesignId : ADC_DesignId_011 */
+/* Requirements : HL_CONQ_ADC_SR12 */
 uint32 adcMidPointCalibration(adcBASE_t *adc)
 {
 /* USER CODE BEGIN (27) */
@@ -763,7 +792,7 @@ uint32 adcMidPointCalibration(adcBASE_t *adc)
 	backup_mode = adc->OPMODECR;
 	
 	/** - Enable 12-BIT ADC  */
-	adcREG1->OPMODECR |= 0x80000000U;
+	adc->OPMODECR |= 0x80000000U;
 
 	/* Disable all channels for conversion */
 	adc->GxSEL[0U]=0x00U;
@@ -853,6 +882,9 @@ uint32 adcMidPointCalibration(adcBASE_t *adc)
 *   in continuous conversion mode when the FiFo buffer is full.
 *
 */
+/* SourceId : ADC_SourceId_010 */
+/* DesignId : ADC_DesignId_008 */
+/* Requirements : HL_CONQ_ADC_SR9 */
 void adcEnableNotification(adcBASE_t *adc, uint32 group)
 {
     uint32 notif = (((uint32)(adc->GxMODECR[group]) & 2U) == 2U) ? 1U : 8U;
@@ -886,6 +918,9 @@ void adcEnableNotification(adcBASE_t *adc, uint32 group)
 *
 *   This function will disable the notification of a conversion.
 */
+/* SourceId : ADC_SourceId_011 */
+/* DesignId : ADC_DesignId_008 */
+/* Requirements : HL_CONQ_ADC_SR9 */
 void adcDisableNotification(adcBASE_t *adc, uint32 group)
 {
 /* USER CODE BEGIN (33) */
@@ -907,9 +942,9 @@ void adcDisableNotification(adcBASE_t *adc, uint32 group)
 *
 *   This function will set the ADC EVT pin if configured as an output pin.
 */
-/* SourceId : ADC_SourceId_020 */
+/* SourceId : ADC_SourceId_012 */
 /* DesignId : ADC_DesignId_014 */
-/* Requirements : HL_SR529 */
+/* Requirements : HL_CONQ_ADC_SR13 */
 void adcSetEVTPin(adcBASE_t *adc, uint32 value)
 {
     adc->EVTOUT = value;
@@ -923,9 +958,9 @@ void adcSetEVTPin(adcBASE_t *adc, uint32 value)
 *
 *   This function will return the value of ADC EVT pin.
 */
-/* SourceId : ADC_SourceId_021 */
+/* SourceId : ADC_SourceId_013 */
 /* DesignId : ADC_DesignId_015 */
-/* Requirements : HL_SR529 */
+/* Requirements : HL_CONQ_ADC_SR14 */
 uint32 adcGetEVTPin(adcBASE_t *adc)
 {
     return adc->EVTIN;
@@ -946,6 +981,9 @@ uint32 adcGetEVTPin(adcBASE_t *adc)
 *   of the configuration registers to the struct pointed by config_reg
 *
 */
+/* SourceId : ADC_SourceId_014 */
+/* DesignId : ADC_DesignId_012 */
+/* Requirements : HL_CONQ_ADC_SR15 */
 void adc1GetConfigValue(adc_config_reg_t *config_reg, config_value_type_t type)
 {
 	if (type == InitialValue)

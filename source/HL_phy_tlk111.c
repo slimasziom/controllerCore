@@ -1,55 +1,18 @@
 /**
- *  \file   phy_dp83640.c
+ *  \file   phy_Tlk111.c
  *
- *  \brief  APIs for configuring DP83640.
+ *  \brief  APIs for configuring Tlk111.
  *
- *   This file contains the device abstraction APIs for PHY DP83640.
+ *   This file contains the device abstraction APIs for PHY Tlk111.
  */
 
-/* 
-* Copyright (C) 2009-2016 Texas Instruments Incorporated - www.ti.com  
-* 
-* 
-*  Redistribution and use in source and binary forms, with or without 
-*  modification, are permitted provided that the following conditions 
-*  are met:
-*
-*    Redistributions of source code must retain the above copyright 
-*    notice, this list of conditions and the following disclaimer.
-*
-*    Redistributions in binary form must reproduce the above copyright
-*    notice, this list of conditions and the following disclaimer in the 
-*    documentation and/or other materials provided with the   
-*    distribution.
-*
-*    Neither the name of Texas Instruments Incorporated nor the names of
-*    its contributors may be used to endorse or promote products derived
-*    from this software without specific prior written permission.
-*
-*  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 
-*  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT 
-*  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
-*  A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT 
-*  OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, 
-*  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT 
-*  LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
-*  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
-*  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT 
-*  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE 
-*  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-*
-*/
+/* Copyright (C) 2010 Texas Instruments Incorporated - www.ti.com
+ * ALL RIGHTS RESERVED
+ */
 
-
-/* USER CODE BEGIN (0) */
-/* USER CODE END */
- 
 #include "HL_sys_common.h"
 #include "HL_mdio.h"
-#include "HL_phy_dp83640.h"
-
-/* USER CODE BEGIN (1) */
-/* USER CODE END */
+#include "HL_phy_tlk111.h"
 
 /*******************************************************************************
 *                        API FUNCTION DEFINITIONS
@@ -65,8 +28,8 @@
  **/
 /* SourceId : ETH_SourceId_063 */
 /* DesignId : ETH_DesignId_063*/
-/* Requirements : HL_CONQ_EMAC_SR69 */
-uint32 Dp83640IDGet(uint32 mdioBaseAddr, uint32 phyAddr)
+/* Requirements : HL_ETH_SR49 */
+uint32 Tlk111IDGet(uint32 mdioBaseAddr, uint32 phyAddr)
 {
     uint32 id = 0U;
     uint16 data = 0U;
@@ -88,6 +51,14 @@ uint32 Dp83640IDGet(uint32 mdioBaseAddr, uint32 phyAddr)
     return id;
 }
 
+void Tlk111SwStrap(uint32 mdioBaseAddr, uint32 phyAddr)
+{
+    MDIOPhyRegWrite(mdioBaseAddr, phyAddr, (uint32)PHY_SWSCR1, Tlk111_SWSCR1_Val);
+    MDIOPhyRegWrite(mdioBaseAddr, phyAddr, (uint32)PHY_SWSCR2, Tlk111_SWSCR2_Val);
+    MDIOPhyRegWrite(mdioBaseAddr, phyAddr, (uint32)PHY_SWSCR3, Tlk111_SWSCR3_Val);
+    MDIOPhyRegWrite(mdioBaseAddr, phyAddr, (uint32)PHY_SWSCR1, (Tlk111_SWSCR1_Val | Tlk111_SWStrapDone));
+}
+
 /**
  * \brief   Reads the link status of the PHY.
  *
@@ -104,8 +75,8 @@ uint32 Dp83640IDGet(uint32 mdioBaseAddr, uint32 phyAddr)
  **/
 /* SourceId : ETH_SourceId_067 */
 /* DesignId : ETH_DesignId_067*/
-/* Requirements : HL_CONQ_EMAC_SR67 */
-boolean Dp83640LinkStatusGet(uint32 mdioBaseAddr,
+/* Requirements : HL_ETH_SR47 */
+boolean Tlk111LinkStatusGet(uint32 mdioBaseAddr,
                                    uint32 phyAddr,
                                    volatile uint32 retries)
 {
@@ -170,10 +141,10 @@ boolean Dp83640LinkStatusGet(uint32 mdioBaseAddr,
  * \param   phyAddr       PHY Adress.
  * \param   advVal        Autonegotiation advertisement value
  *          advVal can take the following any OR combination of the values \n
- *               DP83640_100BTX - 100BaseTX
- *               DP83640_100BTX_FD - Full duplex capabilty for 100BaseTX 
- *               DP83640_10BT - 10BaseT
- *               DP83640_10BT_FD - Full duplex capability for 10BaseT
+ *               Tlk111_100BTX - 100BaseTX
+ *               Tlk111_100BTX_FD - Full duplex capabilty for 100BaseTX
+ *               Tlk111_10BT - 10BaseT
+ *               Tlk111_10BT_FD - Full duplex capability for 10BaseT
  *
  * \return  status after autonegotiation \n
  *          TRUE if autonegotiation successful
@@ -182,8 +153,8 @@ boolean Dp83640LinkStatusGet(uint32 mdioBaseAddr,
  **/
 /* SourceId : ETH_SourceId_065 */
 /* DesignId : ETH_DesignId_065*/
-/* Requirements : HL_CONQ_EMAC_SR66 */
-boolean Dp83640AutoNegotiate(uint32 mdioBaseAddr,
+/* Requirements : HL_ETH_SR46 */
+boolean Tlk111AutoNegotiate(uint32 mdioBaseAddr,
                                    uint32 phyAddr, uint16 advVal)
 {
     volatile uint16 data = 0U, anar = 0U;
@@ -258,8 +229,8 @@ boolean Dp83640AutoNegotiate(uint32 mdioBaseAddr,
  **/
 /* SourceId : ETH_SourceId_066 */
 /* DesignId : ETH_DesignId_066*/
-/* Requirements : HL_CONQ_EMAC_SR68 */
-boolean Dp83640PartnerAbilityGet(uint32 mdioBaseAddr, 
+/* Requirements : HL_ETH_SR48 */
+boolean Tlk111PartnerAbilityGet(uint32 mdioBaseAddr,
                                        uint32 phyAddr,
                                        uint16 *ptnerAblty)
 {
@@ -278,18 +249,15 @@ boolean Dp83640PartnerAbilityGet(uint32 mdioBaseAddr,
  **/
 /* SourceId : ETH_SourceId_064 */
 /* DesignId : ETH_DesignId_064*/
-/* Requirements : HL_CONQ_EMAC_SR65 */
-void Dp83640Reset(uint32 mdioBaseAddr, uint32 phyAddr)
+/* Requirements : HL_ETH_SR44 */
+void Tlk111Reset(uint32 mdioBaseAddr, uint32 phyAddr)
 {
-	uint16 regVal = 0U;
-	uint16 *regPtr = &regVal;
-	MDIOPhyRegWrite(mdioBaseAddr, phyAddr, PHY_BCR, PHY_SOFTRESET);
-
-	(void)MDIOPhyRegRead(mdioBaseAddr, phyAddr, PHY_BCR, regPtr);
-	/* : This bit is self-clearing and returns 1 until the reset process is complete. */
-	while((regVal & PHY_SOFTRESET) != 0U)
+	uint32 delay = 0x1FFFU;
+	MDIOPhyRegWrite(mdioBaseAddr, phyAddr, PHY_BCR, PHY_LPBK_ENABLE);
+	/* A wait of 3us is required before allowing further operation. */
+	while(delay > 0U)
 	{
-		(void)MDIOPhyRegRead(mdioBaseAddr, phyAddr, PHY_BCR, regPtr);
+		delay--;
 	}
 }
 
@@ -303,13 +271,12 @@ void Dp83640Reset(uint32 mdioBaseAddr, uint32 phyAddr)
  **/
 /* SourceId : ETH_SourceId_069 */
 /* DesignId : ETH_DesignId_069*/
-/* Requirements : HL_CONQ_EMAC_SR72 */
-void Dp83640EnableLoopback(uint32 mdioBaseAddr, uint32 phyAddr)
+/* Requirements : HL_ETH_SR51 */
+void Tlk111EnableLoopback(uint32 mdioBaseAddr, uint32 phyAddr)
 {
 	uint32 delay = 0x1FFFU;
 	uint16 regVal = 0x0000U;
-	uint16 *regPtr = &regVal;
-	(void)MDIOPhyRegRead(mdioBaseAddr, phyAddr, (uint32)PHY_BCR, regPtr);
+	(void)MDIOPhyRegRead(mdioBaseAddr, phyAddr, (uint32)PHY_BCR, &regVal);
 	/* Disabling Auto Negotiate. */
 	/*SAFETYMCUSW 334 S MR:10.5 <APPROVED> "Only unsigned short values are used." */	
 	regVal &= (uint16)(~((uint16)PHY_AUTONEG_ENABLE));
@@ -334,13 +301,12 @@ void Dp83640EnableLoopback(uint32 mdioBaseAddr, uint32 phyAddr)
  **/
 /* SourceId : ETH_SourceId_070 */
 /* DesignId : ETH_DesignId_070*/
-/* Requirements : HL_CONQ_EMAC_SR73 */
-void Dp83640DisableLoopback(uint32 mdioBaseAddr, uint32 phyAddr)
+/* Requirements : HL_ETH_SR51 */
+void Tlk111DisableLoopback(uint32 mdioBaseAddr, uint32 phyAddr)
 {
 	uint32 delay = 0x1FFFU;
 	uint16 regVal = 0x0000U;
-	uint16 *regPtr = &regVal;
-	(void)MDIOPhyRegRead(mdioBaseAddr, phyAddr, (uint32)PHY_BCR, regPtr);
+	(void)MDIOPhyRegRead(mdioBaseAddr, phyAddr, (uint32)PHY_BCR, &regVal);
 
 	/* Enabling Loopback. */
 	/*SAFETYMCUSW 334 S MR:10.5 <APPROVED> "Only unsigned short values are used." */	
@@ -372,8 +338,8 @@ void Dp83640DisableLoopback(uint32 mdioBaseAddr, uint32 phyAddr)
  **/
 /* SourceId : ETH_SourceId_068 */
 /* DesignId : ETH_DesignId_068*/
-/* Requirements : HL_CONQ_EMAC_SR75 */
-uint64 Dp83640GetTimeStamp(uint32 mdioBaseAddr, uint32 phyAddr, phyTimeStamp_t type)
+/* Requirements : HL_ETH_SR53 */
+uint64 Tlk111GetTimeStamp(uint32 mdioBaseAddr, uint32 phyAddr, phyTimeStamp_t type)
 {
 	uint16 ts = 0U;
 	/* (MISRA-C:2004 10.1/R) MISRA error reported with Code Composer Studio MISRA checker (due to use of & ?) */
@@ -422,7 +388,7 @@ uint64 Dp83640GetTimeStamp(uint32 mdioBaseAddr, uint32 phyAddr, phyTimeStamp_t t
  *          TRUE if reading successful
  *          FALSE if reading failed
  **/
-boolean Dp83640PartnerSpdGet(uint32 mdioBaseAddr,
+boolean Tlk111PartnerSpdGet(uint32 mdioBaseAddr,
                             uint32 phyAddr,
                             uint16 *ptnerAblty)
 {
@@ -430,6 +396,4 @@ boolean Dp83640PartnerSpdGet(uint32 mdioBaseAddr,
                            ptnerAblty));
 }
 
-/* USER CODE BEGIN (2) */
-/* USER CODE END */
 /**************************** End Of File ***********************************/

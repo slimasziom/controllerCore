@@ -32,10 +32,18 @@
  *                                                                    TI_FEE_VIRTUALSECTOR_SIZE, 
  *                                                                    TI_FEE_PHYSICALSECTOR_SIZE, 
  *                                                                    TI_FEE_GENERATE_DEVICEANDVIRTUALSECTORSTRUC. 
+ * 01.23.00		  12Oct2015     Vishwanath Reddy     SDOCM00119455    Update version history.
+ * 01.23.01		  17Nov2015     Vishwanath Reddy     SDOCM00120161    Updated version history.
+ * 01.23.02		  10Mar2016     Vishwanath Reddy     SDOCM00121622    Updated version history.
+ * 01.23.03       04Aug2016     Vishwanath Reddy     SDOCM00122571    Update patch version FEE_SW_PATCH_VERSION.
+ * 01.23.04		  12Aug2016     Vishwanath Reddy     SDOCM00122592    TI_FEE_CHECK_BANK7_ACCESS is always turned on.
+ *                                                                    FEE_FLASH_CRC_ENABLE is renamed to 
+ *                                                                    FEE_FLASH_CHECKSUM_ENABLE. 
+ *                                                                    New macro FEE_USEPARTIALERASEDSECTOR added.
  *********************************************************************************************************************/
    
 /*
-* Copyright (C) 2009-2015 Texas Instruments Incorporated - www.ti.com  
+* Copyright (C) 2009-2016 Texas Instruments Incorporated - www.ti.com  
 * 
 * 
 *  Redistribution and use in source and binary forms, with or without 
@@ -109,8 +117,8 @@
 #define TI_FEE_OPERATING_FREQUENCY 				FEE_OPERATING_FREQUENCY
 /*SAFETYMCUSW 79 S MR:19.4 <APPROVED> "Reason - FEE_FLASH_ERROR_CORRECTION_ENABLE is a symbolic constant."*/
 #define TI_FEE_FLASH_ERROR_CORRECTION_ENABLE 	FEE_FLASH_ERROR_CORRECTION_ENABLE
-/*SAFETYMCUSW 79 S MR:19.4 <APPROVED> "Reason - FEE_FLASH_CRC_ENABLE is a symbolic constant."*/
-#define TI_FEE_FLASH_CRC_ENABLE					FEE_FLASH_CRC_ENABLE
+/*SAFETYMCUSW 79 S MR:19.4 <APPROVED> "Reason - FEE_FLASH_CHECKSUM_ENABLE is a symbolic constant."*/
+#define TI_FEE_FLASH_CHECKSUM_ENABLE			FEE_FLASH_CHECKSUM_ENABLE
 /*SAFETYMCUSW 79 S MR:19.4 <APPROVED> "Reason - FEE_FLASH_WRITECOUNTER_SAVE is a symbolic constant."*/
 #define TI_FEE_FLASH_WRITECOUNTER_SAVE 			FEE_FLASH_WRITECOUNTER_SAVE
 /*SAFETYMCUSW 79 S MR:19.4 <APPROVED> "Reason - NVM_DATASET_SELECTION_BITS is a symbolic constant."*/
@@ -139,10 +147,10 @@
 #define TI_FEE_POLLING_MODE						FEE_POLLING_MODE
 /*SAFETYMCUSW 79 S MR:19.4 <APPROVED> "Reason - FEE_CHECK_BANK7_ACCESS is a symbolic constant."*/
 #ifndef FEE_CHECK_BANK7_ACCESS
-#define TI_FEE_CHECK_BANK7_ACCESS				STD_OFF
+#define TI_FEE_CHECK_BANK7_ACCESS				STD_ON
 #else
 /*SAFETYMCUSW 79 S MR:19.4 <APPROVED> "Reason - FEE_CHECK_BANK7_ACCESS is a symbolic constant."*/
-#define TI_FEE_CHECK_BANK7_ACCESS				FEE_CHECK_BANK7_ACCESS
+#define TI_FEE_CHECK_BANK7_ACCESS				STD_ON
 #endif
 /*SAFETYMCUSW 79 S MR:19.4 <APPROVED> "Reason - FEE_TOTAL_BLOCKS_DATASETS is a symbolic constant."*/
 #define TI_FEE_TOTAL_BLOCKS_DATASETS			FEE_TOTAL_BLOCKS_DATASETS
@@ -152,6 +160,8 @@
 #define TI_FEE_PHYSICALSECTOR_SIZE				FEE_PHYSICALSECTOR_SIZE
 /*SAFETYMCUSW 79 S MR:19.4 <APPROVED> "Reason - FEE_GENERATE_DEVICEANDVIRTUALSECTORSTRUC is a symbolic constant."*/
 #define TI_FEE_GENERATE_DEVICEANDVIRTUALSECTORSTRUC	FEE_GENERATE_DEVICEANDVIRTUALSECTORSTRUC
+/*SAFETYMCUSW 79 S MR:19.4 <APPROVED> "Reason - FEE_USEPARTIALERASEDSECTOR is a symbolic constant."*/
+#define TI_FEE_USEPARTIALERASEDSECTOR			FEE_USEPARTIALERASEDSECTOR
 
 /*----------------------------------------------------------------------------*/
 /* Virtual Sector Configuration                                               */
@@ -169,6 +179,10 @@
 /* Block Configuration                                                        */
 /*SAFETYMCUSW 79 S MR:19.4 <APPROVED> "Reason - FEE_NUMBER_OF_BLOCKS is a symbolic constant."*/
 #define TI_FEE_NUMBER_OF_BLOCKS  				FEE_NUMBER_OF_BLOCKS
+/*SAFETYMCUSW 79 S MR:19.4 <APPROVED> "Reason - TI_FEE_VARIABLE_DATASETS is a symbolic constant."*/
+#define TI_FEE_VARIABLE_DATASETS  				STD_ON
+
+
 #endif	/* TI_FEE_DRIVER */
 
 #endif /* FEE_INTERFACE_H */

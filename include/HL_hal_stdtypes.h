@@ -1,14 +1,14 @@
 /** @file HL_hal_stdtypes.h
 *   @brief HALCoGen standard types header File
-*   @date 03.Apr.2015
-*   @version 04.04.00
+*   @date 07-July-2017
+*   @version 04.07.00
 *   
 *   This file contains:
 *   - Type and Global definitions which are relevant for all drivers.
 */
 
 /* 
-* Copyright (C) 2009-2015 Texas Instruments Incorporated - www.ti.com  
+* Copyright (C) 2009-2016 Texas Instruments Incorporated - www.ti.com  
 * 
 * 
 *  Redistribution and use in source and binary forms, with or without 
@@ -116,6 +116,42 @@ typedef double float64;
 #endif
 
 
+typedef uint8 Std_ReturnType;
+
+typedef struct
+{
+    uint16 vendorID;
+    uint16 moduleID;
+    uint8  instanceID;
+    uint8  sw_major_version;
+    uint8  sw_minor_version;
+    uint8  sw_patch_version;
+} Std_VersionInfoType;
+
+/*****************************************************************************/
+/* SYMBOL DEFINITIONS                                                        */
+/*****************************************************************************/
+#ifndef STATUSTYPEDEFINED
+  #define STATUSTYPEDEFINED
+  #define E_OK     0x00U
+
+  typedef unsigned char StatusType;
+#endif
+
+#ifndef E_NOT_OK
+#define E_NOT_OK   0x01U
+#endif
+
+#ifndef STD_ON
+#define STD_ON     0x01U
+#endif
+
+#ifndef STD_OFF
+#define STD_OFF    0x00U
+#endif
+
+
+
 /************************************************************/
 /* Global Definitions                                       */
 /************************************************************/
@@ -145,7 +181,7 @@ typedef double float64;
 /* Description:  Void pointer to 0                                           */
 /*****************************************************************************/
 #ifndef NULL_PTR
-#define NULL_PTR ((void *)0x0)
+#define NULL_PTR ((void *)0x0U)
 #endif
 /* USER CODE BEGIN (2) */
 /* USER CODE END */
