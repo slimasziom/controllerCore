@@ -33,6 +33,13 @@ void vReadRegisterBlock(FSM_TinyBms_Definition_t * const me, uint16_t uiADDR, ui
 void vWriteRegisterBlock(FSM_TinyBms_Definition_t * const me, uint16_t uiADDR, uint8_t uiRL, uint8_t *uiData, uint8_t uiDataLength);
 void vReadResponseBlock(FSM_TinyBms_Definition_t * const me, uint8_t *uiData, uint8_t uiDataLength);
 
+BaseType_t ReadBatteryPackVoltage(FSM_TinyBms_Definition_t * const me);
+BaseType_t ReadBatteryPackCurrent(FSM_TinyBms_Definition_t * const me);
+BaseType_t ReadBatteryPackMaxCellVoltage(FSM_TinyBms_Definition_t * const me);
+BaseType_t ReadBatteryPackMinCellVoltage(FSM_TinyBms_Definition_t * const me);
+BaseType_t ReadTinyBmsOnlineStatus(FSM_TinyBms_Definition_t * const me);
+
+
 /* Private Functions */
 void vTinyBmsFSMTaskInit(FSM_TinyBms_Definition_t * const me);
 //void vFSMTimerFunctionCallback(TimerHandle_t xTimer);
@@ -42,7 +49,6 @@ void vTinyBmsFSMTaskInit(FSM_TinyBms_Definition_t * const me);
 void vTinyBmsFSMTask(void *pvParameters){
     FSM_TinyBms_Definition_t me;
     xAppMsgBaseType_t xMsg;
-    xAppMsgCANType_t xCANMsg;
     void *(*activeState)(FSM_TinyBms_Definition_t * const me, xAppMsgBaseType_t *pxEventQueue ) = &vTinyBmsOfflineState;
 //    void *nextState = NULL;
     void *(*nextState)(FSM_TinyBms_Definition_t * const me, xAppMsgBaseType_t *pxEventQueue ) = NULL;
@@ -75,19 +81,6 @@ void vTinyBmsFSMTask(void *pvParameters){
                     (*activeState)(&me, &xMsg);
                 }
             }
-
-            if (xQueueReceive(xQueueBmsCANResponseHandle, &xCANMsg, 0) == pdTRUE)
-            {
-                nextState = (*activeState)(&me, &xCANMsg);     //TODO: remove warning
-                if (nextState != NULL){
-                    xMsg.eSignal = EXIT_SIG;
-                    (*activeState)(&me, &xMsg);
-                    activeState = nextState;
-                    xMsg.eSignal = ENTRY_SIG;
-                    (*activeState)(&me, &xMsg);
-                }
-            }
-
 
         /* 10Hz refresh rate */
         vTaskDelay(pdMS_TO_TICKS(100));
@@ -123,74 +116,31 @@ void * vTinyBmsOfflineState(FSM_TinyBms_Definition_t * const me, xAppMsgBaseType
 
 void * vTinyBmsGoOnlineState(FSM_TinyBms_Definition_t * const me, xAppMsgBaseType_t *pxEventQueue ){
     void *state;
-    uint16_t uiStatus;
-    uint8_t puiDataBytes[] = {0x18};
     state = NULL;
-
 
     switch(pxEventQueue->eSignal){
     case ENTRY_SIG:
-        me->xStateVariables.eState = GOING_ONLINE_STATE;
-        //send request for bms state: 2.1.10 in 'TinyBMS_Communication_Protocols.pdf'
-        vSendCANFrame(me, sizeof(puiDataBytes), puiDataBytes);
-        //start timer
-        break;
     case GO_ONLINE_SIG:
-        vSendCANFrame(me, sizeof(puiDataBytes), puiDataBytes);
-        break;
-    case OFFLINE_SIG:
-        state = &vTinyBmsOfflineState;
-        break;
-    case RESPONSE_SIG:
-        if (((xAppMsgCANType_t *)pxEventQueue)->uiData[1] == 0x18){
-            if(((xAppMsgCANType_t *)pxEventQueue)->uiData[0] == 0x01){
-                //if status ok, go to read, but first check status
-                uiStatus = ((xAppMsgCANType_t *)pxEventQueue)->uiData[3] * 16 + ((xAppMsgCANType_t *)pxEventQueue)->uiData[2];
-                switch(uiStatus){
-                case 0x91:
-                    me->xStateVariables.xBmsLiveData.eOnlineStatus = CHARGING_STATE;
-                    break;
-                case 0x92:
-                    me->xStateVariables.xBmsLiveData.eOnlineStatus = FULLY_CHARGED_STATE;
-                    break;
-                case 0x93:
-                    me->xStateVariables.xBmsLiveData.eOnlineStatus = DISCHARGING_STATE;
-                    break;
-                case 0x96:
-                    me->xStateVariables.xBmsLiveData.eOnlineStatus = REGENERATION_STATE;
-                    break;
-                case 0x97:
-                    me->xStateVariables.xBmsLiveData.eOnlineStatus = IDLE_STATE;
-                    break;
-                case 0x9B:
-                    me->xStateVariables.xBmsLiveData.eOnlineStatus = FAULT_STATE;
-                    break;
-                default:
-                    me->xStateVariables.xBmsLiveData.eOnlineStatus = FAULT_STATE;
-                    break;
-                }
-                state = &vTinyBmsReadRegistersState;
-            }
-            else
-            {
-                // response not ok, check error code
-                state = &vTinyBmsOfflineState;
-            }
+        me->xStateVariables.eState = GOING_ONLINE_STATE;
+        if( ReadTinyBmsOnlineStatus(me) == pdFALSE)
+        {
+            state = &vTinyBmsReadRegistersState;
         }
         else
         {
             state = &vTinyBmsOfflineState;
         }
+        //start timer
+        break;
+    case OFFLINE_SIG:
+        state = &vTinyBmsOfflineState;
         break;
     case TIMEOUT_SIG:
-        //no response so go offline
         state = &vTinyBmsOfflineState;
         break;
     case GET_STATUS_SIG:
         xQueueSend(pxEventQueue->pxReturnQueue, &me->xStateVariables, 0);
         break;
-    case EXIT_SIG:
-//        vFSMTimerStop(me->pxTimer);
     default:
         break;
     }
@@ -457,4 +407,139 @@ void vReadResponseBlock(FSM_TinyBms_Definition_t * const me, uint8_t *uiData, ui
 
 }
 /*-----------------------------------------------------------*/
+BaseType_t ReadBatteryPackVoltage(FSM_TinyBms_Definition_t * const me){
+    BaseType_t xReturn;
 
+    xAppMsgCANType_t xCANMsg;
+    uint8_t puiDataBytes[] = {0x14};
+
+    xReturn = pdTRUE;
+
+    //send request for bms state: 2.1.10 in 'TinyBMS_Communication_Protocols.pdf'
+    vSendCANFrame(me, sizeof(puiDataBytes), puiDataBytes);
+
+    if (xQueueReceive(xQueueBmsCANResponseHandle, &xCANMsg, 500) == pdTRUE){
+        if (xCANMsg.uiData[0] == 0x01 && xCANMsg.uiData[1] == 0x14 )
+        {
+//            me->xStateVariables.xBmsLiveData.fBatteryPackVoltage = (float_t)((xCANMsg.uiData[5] << 24) + (xCANMsg.uiData[4] << 16) + (xCANMsg.uiData[3] << 8) + xCANMsg.uiData[2]);
+            memcpy (&me->xStateVariables.xBmsLiveData.fBatteryPackVoltage, xCANMsg.uiData + 2, sizeof (float));
+            xReturn = pdFALSE;
+        }
+    }
+    return xReturn;
+}
+/*-----------------------------------------------------------*/
+
+BaseType_t ReadBatteryPackCurrent(FSM_TinyBms_Definition_t * const me){
+    BaseType_t xReturn;
+
+    xAppMsgCANType_t xCANMsg;
+    uint8_t puiDataBytes[] = {0x15};
+
+    xReturn = pdTRUE;
+
+    //send request for bms state: 2.1.10 in 'TinyBMS_Communication_Protocols.pdf'
+    vSendCANFrame(me, sizeof(puiDataBytes), puiDataBytes);
+
+    if (xQueueReceive(xQueueBmsCANResponseHandle, &xCANMsg, 500) == pdTRUE){
+        if (xCANMsg.uiData[0] == 0x01 && xCANMsg.uiData[1] == 0x15 )
+        {
+//            me->xStateVariables.xBmsLiveData.fBatteryPackVoltage = (float_t)((xCANMsg.uiData[5] << 24) + (xCANMsg.uiData[4] << 16) + (xCANMsg.uiData[3] << 8) + xCANMsg.uiData[2]);
+            memcpy (&me->xStateVariables.xBmsLiveData.fBatteryPackCurrent, xCANMsg.uiData + 2, sizeof (float));
+            xReturn = pdFALSE;
+        }
+    }
+    return xReturn;
+}
+/*-----------------------------------------------------------*/
+
+BaseType_t ReadBatteryPackMaxCellVoltage(FSM_TinyBms_Definition_t * const me){
+    BaseType_t xReturn;
+
+    xAppMsgCANType_t xCANMsg;
+    uint8_t puiDataBytes[] = {0x16};
+
+    xReturn = pdTRUE;
+
+    //send request for bms state: 2.1.10 in 'TinyBMS_Communication_Protocols.pdf'
+    vSendCANFrame(me, sizeof(puiDataBytes), puiDataBytes);
+
+    if (xQueueReceive(xQueueBmsCANResponseHandle, &xCANMsg, 500) == pdTRUE){
+        if (xCANMsg.uiData[0] == 0x01 && xCANMsg.uiData[1] == 0x16 )
+        {
+            me->xStateVariables.xBmsLiveData.uiBatteryMaxCellVoltage = (uint16_t)((xCANMsg.uiData[3] << 8) + xCANMsg.uiData[2]);
+            xReturn = pdFALSE;
+        }
+    }
+    return xReturn;
+}
+/*-----------------------------------------------------------*/
+
+BaseType_t ReadBatteryPackMinCellVoltage(FSM_TinyBms_Definition_t * const me){
+    BaseType_t xReturn;
+
+    xAppMsgCANType_t xCANMsg;
+    uint8_t puiDataBytes[] = {0x17};
+
+    xReturn = pdTRUE;
+
+    //send request for bms state: 2.1.10 in 'TinyBMS_Communication_Protocols.pdf'
+    vSendCANFrame(me, sizeof(puiDataBytes), puiDataBytes);
+
+    if (xQueueReceive(xQueueBmsCANResponseHandle, &xCANMsg, 500) == pdTRUE){
+        if (xCANMsg.uiData[0] == 0x01 && xCANMsg.uiData[1] == 0x17 )
+        {
+            me->xStateVariables.xBmsLiveData.uiBatteryMaxCellVoltage = (uint16_t)((xCANMsg.uiData[3] << 8) + xCANMsg.uiData[2]);
+            xReturn = pdFALSE;
+        }
+    }
+    return xReturn;
+}
+/*-----------------------------------------------------------*/
+
+BaseType_t ReadTinyBmsOnlineStatus(FSM_TinyBms_Definition_t * const me){
+    BaseType_t xReturn;
+    xAppMsgCANType_t xCANMsg;
+    uint16_t uiStatus;
+    uint8_t puiDataBytes[] = {0x18};
+
+    xReturn = pdTRUE;
+
+    //send request for bms state: 2.1.10 in 'TinyBMS_Communication_Protocols.pdf'
+    vSendCANFrame(me, sizeof(puiDataBytes), puiDataBytes);
+
+    if (xQueueReceive(xQueueBmsCANResponseHandle, &xCANMsg, 500) == pdTRUE){
+        if (xCANMsg.uiData[0] == 0x01 && xCANMsg.uiData[1] == 0x18 )
+        {
+            //if status ok, go to read, but first check status
+            uiStatus = xCANMsg.uiData[3] * 256 + xCANMsg.uiData[2];
+            switch(uiStatus)
+            {
+            case 0x91:
+                me->xStateVariables.xBmsLiveData.eOnlineStatus = CHARGING_STATE;
+                break;
+            case 0x92:
+                me->xStateVariables.xBmsLiveData.eOnlineStatus = FULLY_CHARGED_STATE;
+                break;
+            case 0x93:
+                me->xStateVariables.xBmsLiveData.eOnlineStatus = DISCHARGING_STATE;
+                break;
+            case 0x96:
+                me->xStateVariables.xBmsLiveData.eOnlineStatus = REGENERATION_STATE;
+                break;
+            case 0x97:
+                me->xStateVariables.xBmsLiveData.eOnlineStatus = IDLE_STATE;
+                break;
+            case 0x9B:
+                me->xStateVariables.xBmsLiveData.eOnlineStatus = FAULT_STATE;
+                break;
+            default:
+                me->xStateVariables.xBmsLiveData.eOnlineStatus = NONE_STATE;
+                break;
+            }
+            xReturn = pdFALSE;
+        }
+    }
+    return xReturn;
+}
+/*-----------------------------------------------------------*/
