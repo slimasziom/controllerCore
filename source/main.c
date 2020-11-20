@@ -137,8 +137,12 @@ void main(void)
 	/* Register Queues */
 	xQueueCtrlInputSignalHandle = xQueueCreate(10, sizeof(xAppMsgBaseType_t));
 	xQueueBmsInputSignalHandle = xQueueCreate(10, sizeof(xAppMsgBaseType_t));
-	xQueueRestAPIResponseHandle = xQueueCreate(10, sizeof(xBmsStateVariables_t));
-	xQueueCLIResponseHandle = xQueueCreate(10, sizeof(xBmsStateVariables_t));
+
+	xQueueRestAPICtrlResponseHandle = xQueueCreate(5, sizeof(xControllerStateVariables_t));
+	xQueueCLICtrlResponseHandle = xQueueCreate(5, sizeof(xControllerStateVariables_t));
+
+	xQueueRestAPIBmsResponseHandle = xQueueCreate(5, sizeof(xBmsStateVariables_t));
+    xQueueCLIBmsResponseHandle = xQueueCreate(5, sizeof(xBmsStateVariables_t));
 
 	/* Register some commands to CLI */
 #if ( configGENERATE_RUN_TIME_STATS == 1 )
@@ -161,14 +165,14 @@ void main(void)
 
 	xTaskCreate(vTask1, "HeartBeat", configMINIMAL_STACK_SIZE * 10, NULL, tskIDLE_PRIORITY + 3  | portPRIVILEGE_BIT, &xTask1Handle);
 	FreeRTOS_IPInit(ucIPAddress, ucNetMask, ucGatewayAddress, ucDNSServerAddress, emacAddress);
-
-	/* Start the command interpreter */
-	vStartUARTCommandInterpreterTask();
-
-    /* Start main controller task */
+//
+//	/* Start the command interpreter */
+//	vStartUARTCommandInterpreterTask();
+//
+//    /* Start main controller task */
     xTaskCreate(vMainControllerFSMTask, "MainControllerFSM", configMINIMAL_STACK_SIZE * 10, NULL, tskIDLE_PRIORITY + 5  | portPRIVILEGE_BIT, &xMainControllerTaskHandle);
-
-    /* Start tiny bms task */
+//
+//    /* Start tiny bms task */
     xTaskCreate(vTinyBmsFSMTask, "TinyBmsFSM", configMINIMAL_STACK_SIZE * 10, NULL, tskIDLE_PRIORITY + 4  | portPRIVILEGE_BIT, &xMainControllerTaskHandle);
 
 

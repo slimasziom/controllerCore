@@ -29,7 +29,11 @@ typedef struct {
 /* Queue handlers */
 extern xQueueHandle xQueueCtrlInputSignalHandle;
 extern xQueueHandle xQueueBmsInputSignalHandle;
-extern xQueueHandle xQueueRestAPIResponseHandle;
-extern xQueueHandle xQueueCLIResponseHandle;
+
+extern xQueueHandle xQueueRestAPICtrlResponseHandle;
+extern xQueueHandle xQueueCLICtrlResponseHandle;
+
+extern xQueueHandle xQueueRestAPIBmsResponseHandle;
+extern xQueueHandle xQueueCLIBmsResponseHandle;
 
 #endif /* INCLUDE_APP_QUEUES_H_ */

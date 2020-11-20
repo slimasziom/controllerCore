@@ -335,7 +335,7 @@ BaseType_t xMainControllerCommand( char *pcWriteBuffer, size_t xWriteBufferLen, 
 {
     char * pcParameter;
     BaseType_t lParameterStringLength, xReturn;
-    xAppMsgBaseType_t xMsg = {xQueueCLIResponseHandle, NONE_SIG};
+    xAppMsgBaseType_t xMsg = {xQueueCLICtrlResponseHandle, NONE_SIG};
     xControllerStateVariables_t xStateVariables;
 
     ( void ) pcWriteBuffer;
@@ -372,7 +372,7 @@ BaseType_t xMainControllerCommand( char *pcWriteBuffer, size_t xWriteBufferLen, 
     if (xMsg.eSignal==GET_STATUS_SIG)
     {
         /* wait for response */
-        if(xQueueReceive(xQueueCLIResponseHandle, &xStateVariables, 1000) == pdTRUE)
+        if(xQueueReceive(xQueueCLICtrlResponseHandle, &xStateVariables, 1000) == pdTRUE)
         {
             snprintf( pcWriteBuffer, xWriteBufferLen,
                       "Module: %s\r\n"

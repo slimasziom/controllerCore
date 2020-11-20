@@ -369,7 +369,7 @@ BaseType_t xMainControllerREST( char *pcWriteBuffer, size_t xWriteBufferLen, con
 {
     BaseType_t lParameterStringLength, xReturn;
     xControllerStateVariables_t xStateVariables;
-    xAppMsgBaseType_t xMsg = {xQueueRestAPIResponseHandle, GET_STATUS_SIG};
+    xAppMsgBaseType_t xMsg = {xQueueRestAPICtrlResponseHandle, GET_STATUS_SIG};
     char * pcParameter;
 
     /* Obtain the signal string. */
@@ -399,7 +399,7 @@ BaseType_t xMainControllerREST( char *pcWriteBuffer, size_t xWriteBufferLen, con
         break;
     case GET_STATUS_SIG:
         if(xQueueSend(xQueueCtrlInputSignalHandle, &xMsg, NULL) == pdTRUE){
-            if(xQueueReceive(xQueueRestAPIResponseHandle, &xStateVariables, 1000) == pdTRUE){
+            if(xQueueReceive(xQueueRestAPICtrlResponseHandle, &xStateVariables, 1000) == pdTRUE){
                 xMainControllerRESTStatusToJson(pcWriteBuffer, xWriteBufferLen, &xStateVariables);
             }
             else
@@ -541,7 +541,7 @@ static void xTinyBmsRESTStatusToJson( char *pcWriteBuffer, size_t xWriteBufferLe
 BaseType_t xTinyBmsREST(char *pcWriteBuffer, size_t xWriteBufferLen, const char *pcCommandString){
     BaseType_t lParameterStringLength, xReturn;
     xBmsStateVariables_t xStateVariables;
-    xAppMsgBaseType_t xMsg = {xQueueRestAPIResponseHandle, GET_STATUS_SIG};
+    xAppMsgBaseType_t xMsg = {xQueueRestAPIBmsResponseHandle, GET_STATUS_SIG};
     char * pcParameter;
 
     /* Obtain the signal string. */
@@ -574,7 +574,7 @@ BaseType_t xTinyBmsREST(char *pcWriteBuffer, size_t xWriteBufferLen, const char 
         break;
     case GET_STATUS_SIG:
         if(xQueueSend(xQueueBmsInputSignalHandle, &xMsg, NULL) == pdTRUE){
-            if(xQueueReceive(xQueueRestAPIResponseHandle, &xStateVariables, 1000) == pdTRUE){
+            if(xQueueReceive(xQueueRestAPIBmsResponseHandle, &xStateVariables, 1000) == pdTRUE){
                 xTinyBmsRESTStatusToJson(pcWriteBuffer, xWriteBufferLen, &xStateVariables);
             }
             else
