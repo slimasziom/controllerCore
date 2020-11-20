@@ -338,6 +338,17 @@ void _iCacheInvalidate_(void);
 
 
 /* USER CODE BEGIN (1) */
+
+/** @fn void _dcacheCleanRange_(unsigned int startAddress, unsigned int endAddress);
+*   @brief clean data cache address range
+*/
+void _dcacheCleanRange_(unsigned int startAddress, unsigned int endAddress);
+
+/** @fn void _dcacheInvalidateRange_(unsigned int startAddress, unsigned int endAddress);
+*   @brief invalidate data cache address range
+*/
+void _dcacheInvalidateRange_(unsigned int startAddress, unsigned int endAddress);
+
 /* USER CODE END */
 
 /**@}*/

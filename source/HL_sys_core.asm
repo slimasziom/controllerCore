@@ -712,7 +712,39 @@ _iCacheInvalidate_
         bx    lr
         .endasmfunc
 
+;-------------------------------------------------------------------------------
+; dcacheCleanRange
+; void _dcache_clean_range_(unsigned int startAddress, unsigned int endAddress);
+		.def  _dcacheCleanRange_
+        .asmfunc
+_dcacheCleanRange_
+		BIC   R0, R0, #7					; data cache line size -1
+loop:	MCR	  P15, #0, R0, C7, C10, #1		; clean D entry
+		ADD	  R0, R0, #8					; data cache line size
+		CMP	  R0, R1
+		BLO	  loop
+		MCR	  P15, #0, R0, C7, C10, #4		; data Synchronization Barrier
+		BX    LR
+        .endasmfunc
 
+;-------------------------------------------------------------------------------
+; dcacheInvalidateRange
+; void _dcacheInvalidateRange_(unsigned int startAddress, unsigned int endAddress);
+		.def  _dcacheInvalidateRange_
+        .asmfunc
+_dcacheInvalidateRange_
+		TST	  R0, #7						; data cache line size -1
+		MCR	  P15, #0, R0, C7, C10, #1		; clean D entry
+		TST	  R1, #7						; data cache line size -1
+		MCR	  P15, #0, R1, C7, c10, #1		; clean D entry
+		BIC	  R0, R0, #8					; data cache line size -1
+loop2:	MCR   P15, #0, R0, C7, C6, #1		; invalidate D entry
+		ADD	  R0, R0, #8					; data cache line size
+		CMP	  R0, R1
+		BLO   loop2
+		MCR	  P15, #0, R0, C7, C10, #4		; data Synchronization Barrier
+		BX    LR
+        .endasmfunc
 
 ;-------------------------------------------------------------------------------
 ; C++ construct table pointers
