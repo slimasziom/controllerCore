@@ -37,7 +37,12 @@ BaseType_t ReadBatteryPackVoltage(FSM_TinyBms_Definition_t * const me);
 BaseType_t ReadBatteryPackCurrent(FSM_TinyBms_Definition_t * const me);
 BaseType_t ReadBatteryPackMaxCellVoltage(FSM_TinyBms_Definition_t * const me);
 BaseType_t ReadBatteryPackMinCellVoltage(FSM_TinyBms_Definition_t * const me);
-BaseType_t ReadTinyBmsOnlineStatus(FSM_TinyBms_Definition_t * const me);
+BaseType_t ReadOnlineStatus(FSM_TinyBms_Definition_t * const me);
+BaseType_t ReadLifetimeCounter(FSM_TinyBms_Definition_t * const me);
+BaseType_t ReadEstimatedSOC(FSM_TinyBms_Definition_t * const me);
+BaseType_t ReadDeviceTemperatures(FSM_TinyBms_Definition_t * const me);
+BaseType_t ReadBatteryPackCellsVoltages(FSM_TinyBms_Definition_t * const me);
+BaseType_t ReadSettingsValues(FSM_TinyBms_Definition_t * const me);
 
 
 /* Private Functions */
@@ -122,7 +127,7 @@ void * vTinyBmsGoOnlineState(FSM_TinyBms_Definition_t * const me, xAppMsgBaseTyp
     case ENTRY_SIG:
     case GO_ONLINE_SIG:
         me->xStateVariables.eState = GOING_ONLINE_STATE;
-        if( ReadTinyBmsOnlineStatus(me) == pdFALSE)
+        if( ReadOnlineStatus(me) == pdFALSE)
         {
             state = &vTinyBmsReadRegistersState;
         }
@@ -415,7 +420,6 @@ BaseType_t ReadBatteryPackVoltage(FSM_TinyBms_Definition_t * const me){
 
     xReturn = pdTRUE;
 
-    //send request for bms state: 2.1.10 in 'TinyBMS_Communication_Protocols.pdf'
     vSendCANFrame(me, sizeof(puiDataBytes), puiDataBytes);
 
     if (xQueueReceive(xQueueBmsCANResponseHandle, &xCANMsg, 500) == pdTRUE){
@@ -438,7 +442,6 @@ BaseType_t ReadBatteryPackCurrent(FSM_TinyBms_Definition_t * const me){
 
     xReturn = pdTRUE;
 
-    //send request for bms state: 2.1.10 in 'TinyBMS_Communication_Protocols.pdf'
     vSendCANFrame(me, sizeof(puiDataBytes), puiDataBytes);
 
     if (xQueueReceive(xQueueBmsCANResponseHandle, &xCANMsg, 500) == pdTRUE){
@@ -461,7 +464,6 @@ BaseType_t ReadBatteryPackMaxCellVoltage(FSM_TinyBms_Definition_t * const me){
 
     xReturn = pdTRUE;
 
-    //send request for bms state: 2.1.10 in 'TinyBMS_Communication_Protocols.pdf'
     vSendCANFrame(me, sizeof(puiDataBytes), puiDataBytes);
 
     if (xQueueReceive(xQueueBmsCANResponseHandle, &xCANMsg, 500) == pdTRUE){
@@ -483,7 +485,6 @@ BaseType_t ReadBatteryPackMinCellVoltage(FSM_TinyBms_Definition_t * const me){
 
     xReturn = pdTRUE;
 
-    //send request for bms state: 2.1.10 in 'TinyBMS_Communication_Protocols.pdf'
     vSendCANFrame(me, sizeof(puiDataBytes), puiDataBytes);
 
     if (xQueueReceive(xQueueBmsCANResponseHandle, &xCANMsg, 500) == pdTRUE){
@@ -497,7 +498,7 @@ BaseType_t ReadBatteryPackMinCellVoltage(FSM_TinyBms_Definition_t * const me){
 }
 /*-----------------------------------------------------------*/
 
-BaseType_t ReadTinyBmsOnlineStatus(FSM_TinyBms_Definition_t * const me){
+BaseType_t ReadOnlineStatus(FSM_TinyBms_Definition_t * const me){
     BaseType_t xReturn;
     xAppMsgCANType_t xCANMsg;
     uint16_t uiStatus;
@@ -505,13 +506,11 @@ BaseType_t ReadTinyBmsOnlineStatus(FSM_TinyBms_Definition_t * const me){
 
     xReturn = pdTRUE;
 
-    //send request for bms state: 2.1.10 in 'TinyBMS_Communication_Protocols.pdf'
     vSendCANFrame(me, sizeof(puiDataBytes), puiDataBytes);
 
     if (xQueueReceive(xQueueBmsCANResponseHandle, &xCANMsg, 500) == pdTRUE){
         if (xCANMsg.uiData[0] == 0x01 && xCANMsg.uiData[1] == 0x18 )
         {
-            //if status ok, go to read, but first check status
             uiStatus = xCANMsg.uiData[3] * 256 + xCANMsg.uiData[2];
             switch(uiStatus)
             {
@@ -543,3 +542,119 @@ BaseType_t ReadTinyBmsOnlineStatus(FSM_TinyBms_Definition_t * const me){
     return xReturn;
 }
 /*-----------------------------------------------------------*/
+
+BaseType_t ReadLifetimeCounter(FSM_TinyBms_Definition_t * const me){
+    BaseType_t xReturn;
+
+    xAppMsgCANType_t xCANMsg;
+    uint8_t puiDataBytes[] = {0x19};
+
+    xReturn = pdTRUE;
+
+    vSendCANFrame(me, sizeof(puiDataBytes), puiDataBytes);
+
+    if (xQueueReceive(xQueueBmsCANResponseHandle, &xCANMsg, 500) == pdTRUE){
+        if (xCANMsg.uiData[0] == 0x01 && xCANMsg.uiData[1] == 0x19 )
+        {
+            me->xStateVariables.xBmsLiveData.uiLifetimeCounter = (uint32_t)((xCANMsg.uiData[5] << 24) + (xCANMsg.uiData[4] << 16) + (xCANMsg.uiData[3] << 8) + xCANMsg.uiData[2]);
+            xReturn = pdFALSE;
+        }
+    }
+    return xReturn;
+}
+/*-----------------------------------------------------------*/
+
+BaseType_t ReadEstimatedSOC(FSM_TinyBms_Definition_t * const me){
+    BaseType_t xReturn;
+
+    xAppMsgCANType_t xCANMsg;
+    uint8_t puiDataBytes[] = {0x1A};
+
+    xReturn = pdTRUE;
+
+    vSendCANFrame(me, sizeof(puiDataBytes), puiDataBytes);
+
+    if (xQueueReceive(xQueueBmsCANResponseHandle, &xCANMsg, 500) == pdTRUE){
+        if (xCANMsg.uiData[0] == 0x01 && xCANMsg.uiData[1] == 0x1A )
+        {
+            me->xStateVariables.xBmsLiveData.uiStateOfCharge = (uint32_t)((xCANMsg.uiData[5] << 24) + (xCANMsg.uiData[4] << 16) + (xCANMsg.uiData[3] << 8) + xCANMsg.uiData[2]);
+            xReturn = pdFALSE;
+        }
+    }
+    return xReturn;
+}
+/*-----------------------------------------------------------*/
+
+BaseType_t ReadDeviceTemperatures(FSM_TinyBms_Definition_t * const me){
+    BaseType_t xReturn;
+    BaseType_t i;
+    xAppMsgCANType_t xCANMsg;
+    uint8_t puiDataBytes[] = {0x1B};
+
+    xReturn = pdFALSE + 3;
+
+    vSendCANFrame(me, sizeof(puiDataBytes), puiDataBytes);
+
+    for(i=0; i<3; i++){
+        if (xQueueReceive(xQueueBmsCANResponseHandle, &xCANMsg, 500) == pdTRUE)
+        {
+            if (xCANMsg.uiData[0] == 0x01 && xCANMsg.uiData[1] == 0x1B )
+            {
+                switch(xCANMsg.uiData[5])
+                {
+                case 0x00:
+                    me->xStateVariables.xBmsLiveData.iTempInternal = (uint16_t)((xCANMsg.uiData[4] << 8) + xCANMsg.uiData[3]);
+                    break;
+                case 0x01:
+                    me->xStateVariables.xBmsLiveData.iExtSensorTemp1 = (uint16_t)((xCANMsg.uiData[4] << 8) + xCANMsg.uiData[3]);
+                    break;
+                case 0x02:
+                    me->xStateVariables.xBmsLiveData.iExtSensorTemp1 = (uint16_t)((xCANMsg.uiData[4] << 8) + xCANMsg.uiData[3]);
+                    break;
+                default:
+                    break;
+                }
+                xReturn--;
+            }
+        }
+    }
+    return xReturn;
+}
+/*-----------------------------------------------------------*/
+
+BaseType_t ReadBatteryPackCellsVoltages(FSM_TinyBms_Definition_t * const me){
+    BaseType_t xReturn;
+    BaseType_t i;
+    xAppMsgCANType_t xCANMsg;
+    uint8_t puiDataBytes[] = {0x1C};
+
+    xReturn = pdFALSE + NUMBER_OF_CELLS;
+
+    vSendCANFrame(me, sizeof(puiDataBytes), puiDataBytes);
+
+    for(i=0; i<NUMBER_OF_CELLS; i++){
+        if (xQueueReceive(xQueueBmsCANResponseHandle, &xCANMsg, 500) == pdTRUE)
+        {
+            if (xCANMsg.uiData[0] == 0x01 && xCANMsg.uiData[1] == 0x1C )
+            {
+                me->xStateVariables.xBmsLiveData.uiCellVoltages[xCANMsg.uiData[5]] = (uint16_t)((xCANMsg.uiData[4] << 8) + xCANMsg.uiData[3]);
+                xReturn--;
+            }
+        }
+    }
+    return xReturn;
+}
+/*-----------------------------------------------------------*/
+
+BaseType_t ReadSettingsValues(FSM_TinyBms_Definition_t * const me){
+    BaseType_t xReturn;
+
+    xAppMsgCANType_t xCANMsg;
+    uint8_t puiDataBytes[] = {0x1D};
+
+    xReturn = pdTRUE;
+
+    return xReturn;
+}
+/*-----------------------------------------------------------*/
+
