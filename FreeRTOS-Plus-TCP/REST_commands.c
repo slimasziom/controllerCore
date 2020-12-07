@@ -457,7 +457,7 @@ static void xTinyBmsRESTStatusToJson( char *pcWriteBuffer, size_t xWriteBufferLe
                   "\"Distance-Left\": %d, "
                   "\"SOC\": %d, "
                   "\"Int-Sensor-Temp\": %d, "
-                  "\"Online-Status\": %d, "
+                  "\"Online-Status\": \"%s\", "
                   "\"Balancing-Decision-Bits\": %d, "
                   "\"Real-Balancing-Bits\": %d, "
                   "\"No-Detected-Cells\": %d, "
@@ -514,7 +514,7 @@ static void xTinyBmsRESTStatusToJson( char *pcWriteBuffer, size_t xWriteBufferLe
       xStateVariables->xBmsLiveData.uiDistanceLeftToEmptyBat,
       xStateVariables->xBmsLiveData.uiStateOfCharge,
       xStateVariables->xBmsLiveData.iTempInternal,
-      xStateVariables->xBmsLiveData.eOnlineStatus,
+      pcStateNameFromThread(xStateVariables->xBmsLiveData.eOnlineStatus),
       xStateVariables->xBmsLiveData.uiBalancingDecisionBits,
       xStateVariables->xBmsLiveData.uiRealBalancingBits,
       xStateVariables->xBmsLiveData.uiNoDetectedCells,
