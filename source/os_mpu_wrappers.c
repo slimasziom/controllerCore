@@ -600,6 +600,7 @@ QueueHandle_t MPU_xQueueCreateMutexStatic( const uint8_t ucQueueType, StaticQueu
 	return xReturn;
 }
 #endif
+
 #endif
 
 /*----------------------------------------------------------------------------*/
@@ -615,9 +616,9 @@ QueueHandle_t MPU_xQueueCreateCountingSemaphore( const UBaseType_t uxMaxCount, c
 	return xReturn;
 }
 #endif
-#if configSUPPORT_STATIC_ALLOCATION == 1
 /*----------------------------------------------------------------------------*/
 
+#if configSUPPORT_STATIC_ALLOCATION == 1
 QueueHandle_t MPU_xQueueCreateCountingSemaphoreStatic( const UBaseType_t uxMaxCount, const UBaseType_t uxInitialCount, StaticQueue_t *pxStaticQueue )
 {
 	QueueHandle_t xReturn;
@@ -627,7 +628,9 @@ QueueHandle_t MPU_xQueueCreateCountingSemaphoreStatic( const UBaseType_t uxMaxCo
 	return xReturn;
 }
 #endif
+
 #endif
+
 /*----------------------------------------------------------------------------*/
 
 #if ( ( configUSE_MUTEXES == 1 ) && ( INCLUDE_xSemaphoreGetMutexHolder == 1 ) )
@@ -780,6 +783,17 @@ const char *MPU_pcQueueGetName( QueueHandle_t xQueue )
 
 /*----------------------------------------------------------------------------*/
 #if ( configUSE_TIMERS == 1 )
+#if( configSUPPORT_DYNAMIC_ALLOCATION == 1 )
+TimerHandle_t MPU_xTimerCreate( const char * const pcTimerName, const TickType_t xTimerPeriodInTicks, const UBaseType_t uxAutoReload, void * const pvTimerID, TimerCallbackFunction_t pxCallbackFunction )
+{
+    TimerHandle_t xReturn;
+    BaseType_t xRunningPrivileged = prvRaisePrivilege();
+    xReturn = xTimerCreate( pcTimerName, xTimerPeriodInTicks, uxAutoReload, pvTimerID, pxCallbackFunction );
+    portRESET_PRIVILEGE( xRunningPrivileged );
+    return xReturn;
+}
+#endif
+
 #if( configSUPPORT_STATIC_ALLOCATION == 1 )
 TimerHandle_t MPU_xTimerCreateStatic( const char * const pcTimerName, const TickType_t xTimerPeriodInTicks, const UBaseType_t uxAutoReload, void * const pvTimerID, TimerCallbackFunction_t pxCallbackFunction, StaticTimer_t *pxTimerBuffer )
 {
@@ -788,16 +802,6 @@ TimerHandle_t MPU_xTimerCreateStatic( const char * const pcTimerName, const Tick
 	xReturn = xTimerCreateStatic( pcTimerName, xTimerPeriodInTicks, uxAutoReload, pvTimerID, pxCallbackFunction, pxTimerBuffer );
 	portRESET_PRIVILEGE( xRunningPrivileged );
 	return xReturn;
-}
-#endif
-#if (configSUPPORT_DYNAMIC_ALLOCATION ==1 )
-TimerHandle_t MPU_xTimerCreate( const char * const pcTimerName, const TickType_t xTimerPeriodInTicks, const UBaseType_t uxAutoReload, void * const pvTimerID, TimerCallbackFunction_t pxCallbackFunction )
-{
-    TimerHandle_t xReturn;
-    BaseType_t xRunningPrivileged = prvRaisePrivilege();
-    xReturn = xTimerCreate( pcTimerName, xTimerPeriodInTicks, uxAutoReload, pvTimerID, pxCallbackFunction );
-    portRESET_PRIVILEGE( xRunningPrivileged );
-    return xReturn;
 }
 #endif
 
