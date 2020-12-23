@@ -235,7 +235,7 @@ void canInit(void)
     } /* Wait */
 
     canREG1->IF1MSK  = 0xC0000000U | (uint32)((uint32)((uint32)0x000007FFU & (uint32)0x000007FFU) << (uint32)18U);
-    canREG1->IF1ARB  = (uint32)0x80000000U | (uint32)0x00000000U | (uint32)0x20000000U | (uint32)((uint32)((uint32)3U & (uint32)0x000007FFU) << (uint32)18U);
+    canREG1->IF1ARB  = (uint32)0x80000000U | (uint32)0x00000000U | (uint32)0x20000000U | (uint32)((uint32)((uint32)0x0C7U & (uint32)0x000007FFU) << (uint32)18U);
     canREG1->IF1MCTL = 0x00001000U | (uint32)0x00000800U | (uint32)0x00000000U | (uint32)0x00000000U | (uint32)8U;
     canREG1->IF1CMD  = (uint8) 0xF8U;
     canREG1->IF1NO   = 3U;
@@ -254,10 +254,200 @@ void canInit(void)
     } /* Wait */
 
     canREG1->IF2MSK  = 0xC0000000U | (uint32)((uint32)((uint32)0x000007FFU & (uint32)0x000007FFU) << (uint32)18U);
-    canREG1->IF2ARB  = (uint32)0x80000000U | (uint32)0x00000000U | (uint32)0x20000000U | (uint32)((uint32)((uint32)4U & (uint32)0x000007FFU) << (uint32)18U);
-    canREG1->IF2MCTL = 0x00001000U | (uint32)0x00000800U | (uint32)0x00000000U | (uint32)0x00000000U | (uint32)8U;
+    canREG1->IF2ARB  = (uint32)0x80000000U | (uint32)0x00000000U | (uint32)0x00000000U | (uint32)((uint32)((uint32)0x0D0U & (uint32)0x000007FFU) << (uint32)18U);
+    canREG1->IF2MCTL = 0x00001000U | (uint32)0x00000400U | (uint32)0x00000000U | (uint32)0x00000000U | (uint32)8U;
     canREG1->IF2CMD  = (uint8) 0xF8U;
     canREG1->IF2NO   = 4U;
+
+    /** - Initialize message 5 
+    *     - Wait until IF1 is ready for use 
+    *     - Set message mask
+    *     - Set message control word
+    *     - Set message arbitration
+    *     - Set IF1 control byte
+    *     - Set IF1 message number
+    */
+    /*SAFETYMCUSW 28 D MR:NA <APPROVED> "Potentially infinite loop found - Hardware Status check for execution sequence" */
+    while ((canREG1->IF1STAT & 0x80U) ==0x80U)
+    { 
+    } /* Wait */
+
+    canREG1->IF1MSK  = 0xC0000000U | (uint32)((uint32)((uint32)0x000007FFU & (uint32)0x000007FFU) << (uint32)18U);
+    canREG1->IF1ARB  = (uint32)0x80000000U | (uint32)0x00000000U | (uint32)0x00000000U | (uint32)((uint32)((uint32)0x0D8U & (uint32)0x000007FFU) << (uint32)18U);
+    canREG1->IF1MCTL = 0x00001000U | (uint32)0x00000400U | (uint32)0x00000000U | (uint32)0x00000000U | (uint32)8U;
+    canREG1->IF1CMD  = (uint8) 0xF8U;
+    canREG1->IF1NO   = 5U;
+
+    /** - Initialize message 6 
+    *     - Wait until IF2 is ready for use 
+    *     - Set message mask
+    *     - Set message control word
+    *     - Set message arbitration
+    *     - Set IF2 control byte
+    *     - Set IF2 message number
+    */
+    /*SAFETYMCUSW 28 D MR:NA <APPROVED> "Potentially infinite loop found - Hardware Status check for execution sequence" */
+    while ((canREG1->IF2STAT & 0x80U) ==0x80U)
+    { 
+    } /* Wait */
+
+    canREG1->IF2MSK  = 0xC0000000U | (uint32)((uint32)((uint32)0x000007FFU & (uint32)0x000007FFU) << (uint32)18U);
+    canREG1->IF2ARB  = (uint32)0x80000000U | (uint32)0x00000000U | (uint32)0x00000000U | (uint32)((uint32)((uint32)0x0E0U & (uint32)0x000007FFU) << (uint32)18U);
+    canREG1->IF2MCTL = 0x00001000U | (uint32)0x00000400U | (uint32)0x00000000U | (uint32)0x00000000U | (uint32)8U;
+    canREG1->IF2CMD  = (uint8) 0xF8U;
+    canREG1->IF2NO   = 6U;
+
+    /** - Initialize message 7 
+    *     - Wait until IF1 is ready for use 
+    *     - Set message mask
+    *     - Set message control word
+    *     - Set message arbitration
+    *     - Set IF1 control byte
+    *     - Set IF1 message number
+    */
+    /*SAFETYMCUSW 28 D MR:NA <APPROVED> "Potentially infinite loop found - Hardware Status check for execution sequence" */
+    while ((canREG1->IF1STAT & 0x80U) ==0x80U)
+    { 
+    } /* Wait */
+
+    canREG1->IF1MSK  = 0xC0000000U | (uint32)((uint32)((uint32)0x000007FFU & (uint32)0x000007FFU) << (uint32)18U);
+    canREG1->IF1ARB  = (uint32)0x80000000U | (uint32)0x00000000U | (uint32)0x00000000U | (uint32)((uint32)((uint32)0x0F0U & (uint32)0x000007FFU) << (uint32)18U);
+    canREG1->IF1MCTL = 0x00001000U | (uint32)0x00000400U | (uint32)0x00000000U | (uint32)0x00000000U | (uint32)8U;
+    canREG1->IF1CMD  = (uint8) 0xF8U;
+    canREG1->IF1NO   = 7U;
+
+    /** - Initialize message 8 
+    *     - Wait until IF2 is ready for use 
+    *     - Set message mask
+    *     - Set message control word
+    *     - Set message arbitration
+    *     - Set IF2 control byte
+    *     - Set IF2 message number
+    */
+    /*SAFETYMCUSW 28 D MR:NA <APPROVED> "Potentially infinite loop found - Hardware Status check for execution sequence" */
+    while ((canREG1->IF2STAT & 0x80U) ==0x80U)
+    { 
+    } /* Wait */
+
+    canREG1->IF2MSK  = 0xC0000000U | (uint32)((uint32)((uint32)0x000007FFU & (uint32)0x000007FFU) << (uint32)18U);
+    canREG1->IF2ARB  = (uint32)0x80000000U | (uint32)0x00000000U | (uint32)0x00000000U | (uint32)((uint32)((uint32)0x0F8U & (uint32)0x000007FFU) << (uint32)18U);
+    canREG1->IF2MCTL = 0x00001000U | (uint32)0x00000400U | (uint32)0x00000000U | (uint32)0x00000000U | (uint32)8U;
+    canREG1->IF2CMD  = (uint8) 0xF8U;
+    canREG1->IF2NO   = 8U;
+
+    /** - Initialize message 9 
+    *     - Wait until IF1 is ready for use 
+    *     - Set message mask
+    *     - Set message control word
+    *     - Set message arbitration
+    *     - Set IF1 control byte
+    *     - Set IF1 message number
+    */
+    /*SAFETYMCUSW 28 D MR:NA <APPROVED> "Potentially infinite loop found - Hardware Status check for execution sequence" */
+    while ((canREG1->IF1STAT & 0x80U) ==0x80U)
+    { 
+    } /* Wait */
+
+    canREG1->IF1MSK  = 0xC0000000U | (uint32)((uint32)((uint32)0x000007FFU & (uint32)0x000007FFU) << (uint32)18U);
+    canREG1->IF1ARB  = (uint32)0x80000000U | (uint32)0x00000000U | (uint32)0x00000000U | (uint32)((uint32)((uint32)0x600U & (uint32)0x000007FFU) << (uint32)18U);
+    canREG1->IF1MCTL = 0x00001000U | (uint32)0x00000400U | (uint32)0x00000000U | (uint32)0x00000000U | (uint32)8U;
+    canREG1->IF1CMD  = (uint8) 0xF8U;
+    canREG1->IF1NO   = 9U;
+
+    /** - Initialize message 10 
+    *     - Wait until IF2 is ready for use 
+    *     - Set message mask
+    *     - Set message control word
+    *     - Set message arbitration
+    *     - Set IF2 control byte
+    *     - Set IF2 message number
+    */
+    /*SAFETYMCUSW 28 D MR:NA <APPROVED> "Potentially infinite loop found - Hardware Status check for execution sequence" */
+    while ((canREG1->IF2STAT & 0x80U) ==0x80U)
+    { 
+    } /* Wait */
+
+    canREG1->IF2MSK  = 0xC0000000U | (uint32)((uint32)((uint32)0x000007FFU & (uint32)0x000007FFU) << (uint32)18U);
+    canREG1->IF2ARB  = (uint32)0x80000000U | (uint32)0x00000000U | (uint32)0x00000000U | (uint32)((uint32)((uint32)0x610U & (uint32)0x000007FFU) << (uint32)18U);
+    canREG1->IF2MCTL = 0x00001000U | (uint32)0x00000400U | (uint32)0x00000000U | (uint32)0x00000000U | (uint32)8U;
+    canREG1->IF2CMD  = (uint8) 0xF8U;
+    canREG1->IF2NO   = 10U;
+
+    /** - Initialize message 11 
+    *     - Wait until IF1 is ready for use 
+    *     - Set message mask
+    *     - Set message control word
+    *     - Set message arbitration
+    *     - Set IF1 control byte
+    *     - Set IF1 message number
+    */
+    /*SAFETYMCUSW 28 D MR:NA <APPROVED> "Potentially infinite loop found - Hardware Status check for execution sequence" */
+    while ((canREG1->IF1STAT & 0x80U) ==0x80U)
+    { 
+    } /* Wait */
+
+    canREG1->IF1MSK  = 0xC0000000U | (uint32)((uint32)((uint32)0x000007FFU & (uint32)0x000007FFU) << (uint32)18U);
+    canREG1->IF1ARB  = (uint32)0x80000000U | (uint32)0x00000000U | (uint32)0x00000000U | (uint32)((uint32)((uint32)0x618U & (uint32)0x000007FFU) << (uint32)18U);
+    canREG1->IF1MCTL = 0x00001000U | (uint32)0x00000400U | (uint32)0x00000000U | (uint32)0x00000000U | (uint32)8U;
+    canREG1->IF1CMD  = (uint8) 0xF8U;
+    canREG1->IF1NO   = 11U;
+
+    /** - Initialize message 12 
+    *     - Wait until IF2 is ready for use 
+    *     - Set message mask
+    *     - Set message control word
+    *     - Set message arbitration
+    *     - Set IF2 control byte
+    *     - Set IF2 message number
+    */
+    /*SAFETYMCUSW 28 D MR:NA <APPROVED> "Potentially infinite loop found - Hardware Status check for execution sequence" */
+    while ((canREG1->IF2STAT & 0x80U) ==0x80U)
+    { 
+    } /* Wait */
+
+    canREG1->IF2MSK  = 0xC0000000U | (uint32)((uint32)((uint32)0x000007FFU & (uint32)0x000007FFU) << (uint32)18U);
+    canREG1->IF2ARB  = (uint32)0x80000000U | (uint32)0x00000000U | (uint32)0x00000000U | (uint32)((uint32)((uint32)0x620U & (uint32)0x000007FFU) << (uint32)18U);
+    canREG1->IF2MCTL = 0x00001000U | (uint32)0x00000400U | (uint32)0x00000000U | (uint32)0x00000000U | (uint32)8U;
+    canREG1->IF2CMD  = (uint8) 0xF8U;
+    canREG1->IF2NO   = 12U;
+
+    /** - Initialize message 13 
+    *     - Wait until IF1 is ready for use 
+    *     - Set message mask
+    *     - Set message control word
+    *     - Set message arbitration
+    *     - Set IF1 control byte
+    *     - Set IF1 message number
+    */
+    /*SAFETYMCUSW 28 D MR:NA <APPROVED> "Potentially infinite loop found - Hardware Status check for execution sequence" */
+    while ((canREG1->IF1STAT & 0x80U) ==0x80U)
+    { 
+    } /* Wait */
+
+    canREG1->IF1MSK  = 0xC0000000U | (uint32)((uint32)((uint32)0x000007FFU & (uint32)0x000007FFU) << (uint32)18U);
+    canREG1->IF1ARB  = (uint32)0x80000000U | (uint32)0x00000000U | (uint32)0x00000000U | (uint32)((uint32)((uint32)0x100U & (uint32)0x000007FFU) << (uint32)18U);
+    canREG1->IF1MCTL = 0x00001000U | (uint32)0x00000400U | (uint32)0x00000000U | (uint32)0x00000000U | (uint32)8U;
+    canREG1->IF1CMD  = (uint8) 0xF8U;
+    canREG1->IF1NO   = 13U;
+
+    /** - Initialize message 14 
+    *     - Wait until IF2 is ready for use 
+    *     - Set message mask
+    *     - Set message control word
+    *     - Set message arbitration
+    *     - Set IF2 control byte
+    *     - Set IF2 message number
+    */
+    /*SAFETYMCUSW 28 D MR:NA <APPROVED> "Potentially infinite loop found - Hardware Status check for execution sequence" */
+    while ((canREG1->IF2STAT & 0x80U) ==0x80U)
+    { 
+    } /* Wait */
+
+    canREG1->IF2MSK  = 0xC0000000U | (uint32)((uint32)((uint32)0x000007FFU & (uint32)0x000007FFU) << (uint32)18U);
+    canREG1->IF2ARB  = (uint32)0x80000000U | (uint32)0x00000000U | (uint32)0x00000000U | (uint32)((uint32)((uint32)0x108U & (uint32)0x000007FFU) << (uint32)18U);
+    canREG1->IF2MCTL = 0x00001000U | (uint32)0x00000400U | (uint32)0x00000000U | (uint32)0x00000000U | (uint32)8U;
+    canREG1->IF2CMD  = (uint8) 0xF8U;
+    canREG1->IF2NO   = 14U;
 
     /** - Setup IF1 for data transmission 
     *     - Wait until IF1 is ready for use 
