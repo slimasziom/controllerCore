@@ -108,4 +108,14 @@ static const REST_Command_Definition_t xTinyBmsRest =
     1 /* No parameters are expected. */
 };
 
+BaseType_t xMotorControllerREST(char *pcWriteBuffer, size_t xWriteBufferLen, const char *pcCommandString);
+/* Structure that defines the "main-controller" REST command. */
+static const REST_Command_Definition_t xMotorControllerRest =
+{
+    "motor-controller",
+    "{\"use\": \"motor controller status}",
+    ( pdREST_API_CALLBACK ) xMotorControllerREST,
+    1 /* No parameters are expected. */
+};
+
 #endif /* REST_COMMANDS_H_ */

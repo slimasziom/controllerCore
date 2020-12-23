@@ -590,3 +590,89 @@ BaseType_t xTinyBmsREST(char *pcWriteBuffer, size_t xWriteBufferLen, const char 
     return xReturn;
 }
 /*-----------------------------------------------------------*/
+
+void xMotorControllerRESTStatusToJson( char *pcWriteBuffer, size_t xWriteBufferLen, xMotorControllerStateVariables_t *xStateVariables){
+//    snprintf( pcWriteBuffer, xWriteBufferLen, "abc");
+    snprintf( pcWriteBuffer, xWriteBufferLen,
+      "{\"success\": \"OK\", \"result\": "
+          "{"
+              "\"Module\": \"%s\","
+              "\"State\": \"%s\","
+              "\"Live-Data\": "
+              "{"
+                  "\"Urange\": %d,"
+                  "\"Irange\": %d,"
+                  "\"Uref\": %d,"
+                  "\"Iref\": %d,"
+                  "\"Relative-Current\": %d,"
+                  "\"Current\": %f,"
+                  "\"Relative-Voltage\": %d,"
+                  "\"Voltage\": %f,"
+                  "\"Total-Charge\": %d"
+              "}"
+          "}"
+      "}",
+      xStateVariables->cModuleName,
+      pcStateNameFromThread(xStateVariables->eState),
+      xStateVariables->xMCLiveData.uiUrange,
+      xStateVariables->xMCLiveData.uiIrange,
+      xStateVariables->xMCLiveData.uiUref,
+      xStateVariables->xMCLiveData.uiIref,
+      xStateVariables->xMCLiveData.iRelCurrent,
+      xStateVariables->xMCLiveData.fCurrent,
+      xStateVariables->xMCLiveData.iRelVoltage,
+      xStateVariables->xMCLiveData.fVoltage,
+      xStateVariables->xMCLiveData.iTotalCharge);
+}
+/*-----------------------------------------------------------*/
+
+BaseType_t xMotorControllerREST(char *pcWriteBuffer, size_t xWriteBufferLen, const char *pcCommandString){
+    BaseType_t lParameterStringLength, xReturn;
+    xMotorControllerStateVariables_t xStateVariables;
+    xAppMsgBaseType_t xMsg = {xQueueRestAPIMotorCtrlResponseHandle, GET_STATUS_SIG};
+    char * pcParameter;
+
+    /* Obtain the signal string. */
+    pcParameter = ( char * ) FreeRTOS_RESTGetParameter
+                            (
+                                pcCommandString,        /* The command string itself. */
+                                1,                      /* Return the first parameter. */
+                                &lParameterStringLength /* Store the parameter string length. */
+                            );
+
+    ( void ) lParameterStringLength;
+
+    xReturn = pdFALSE;
+    ( void ) pcWriteBuffer;
+    ( void ) xWriteBufferLen;
+    ( void ) pcCommandString;
+
+    xMsg.eSignal = (ESignal) uiThreadSignalFromCommand(pcParameter);
+
+    switch(xMsg.eSignal){
+    case OFFLINE_SIG:
+    case GO_ONLINE_SIG:
+    case TIMEOUT_SIG:
+        xQueueSend(xQueueMotorCtrlInputSignalHandle, &xMsg, NULL);
+        snprintf( pcWriteBuffer, xWriteBufferLen, "{\"success\": \"OK\", \"result\": {\"message\": \"executed\"}}" );
+        break;
+    case GET_STATUS_SIG:
+        if(xQueueSend(xQueueMotorCtrlInputSignalHandle, &xMsg, NULL) == pdTRUE){
+            if(xQueueReceive(xQueueRestAPIMotorCtrlResponseHandle, &xStateVariables, 1000) == pdTRUE){
+                xMotorControllerRESTStatusToJson(pcWriteBuffer, xWriteBufferLen, &xStateVariables);
+            }
+            else
+            {
+                snprintf( pcWriteBuffer, xWriteBufferLen, "{\"success\": \"OK\", \"result\": \"response error\"}" );
+            }
+        }
+        else
+        {
+            snprintf( pcWriteBuffer, xWriteBufferLen, "{\"success\": \"OK\", \"result\": \"send error\"}" );
+        }
+        break;
+    }
+
+    return xReturn;
+}
+/*-----------------------------------------------------------*/

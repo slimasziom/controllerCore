@@ -41,7 +41,15 @@ typedef enum {
     FAULT_SIG,
     RESPONSE_SIG,
     TIMEOUT_SIG,
-    BMS_LAST_SIG                    // not used, last
+    BMS_LAST_SIG,                    // not used, last
+    MOTOR_DRIVER_STATE_SIG,
+    MOTOR_RANGE_REF_SIG,
+    MOTOR_SUPPLY_1_SIG,
+    MOTOR_MOTOR_1_SIG,
+    MOTOR_MOTOR_2_SIG,
+    MOTOR_MOTOR_3_SIG,
+    MOTOR_MOTOR_4_SIG,
+    MOTOR_LAST_SIG
 } ESignal;
 
 /* Application states */
@@ -196,8 +204,47 @@ typedef struct {
     char cModuleName[20];
     xBmsLvdt_t xBmsLiveData;
     xBmsSettings_t xBmsSettings;
-} xBmsStateVariables_t
-/****************** BMS END ******************/;
+} xBmsStateVariables_t;
+/****************** BMS END ******************/
+
+/****************** Motor Controller ******************/
+/* Motor controller thread settings struct */
+typedef struct {
+    uint8_t uiMotorConnected;               //base (24 def) + 2
+    uint8_t uiMotorAlgorithm;
+    uint8_t uiHighPriorityLimiter;
+    uint8_t uiMotorMode;
+    int8_t iTempMCU;
+    uint16_t uiLowPriorityLimiter;
+    uint16_t uiDeviceError;
+    uint16_t uiUrange;                      //base (24 def) + 3
+    uint16_t uiIrange;
+    uint16_t uiUref;
+    uint16_t uiIref;
+    int16_t iRelCurrent;                    //base (24 def) + 4
+    float_t fCurrent;
+    int16_t iRelVoltage;
+    float_t fVoltage;
+    int32_t iTotalCharge;
+    int16_t iRelAmplitudePhaseCurrent;      //base (24 def) + 6
+    int16_t iRelAplitudeLinkVoltage;
+    int32_t iEnergyPassed;
+    int16_t iRelMotorPower;                 //base (24 def) + 7
+    float_t fMotorPower;
+    int16_t iMechanicalAngle;
+    int16_t iRelRotorSpeed;
+    int32_t iRotorSpeed;
+    int16_t iOdometer;
+} xMtrCtrlLvdt_t;
+
+
+/* Bms thread struct */
+typedef struct {
+    EState eState;
+    char cModuleName[20];
+    xMtrCtrlLvdt_t xMCLiveData;
+} xMotorControllerStateVariables_t;
+/****************** Motor Controller END ******************/
 
 typedef struct {
     ESignal eSignal;

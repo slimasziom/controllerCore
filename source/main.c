@@ -64,7 +64,7 @@
 
 #include "FSM_maincontroller.h"
 #include "FSM_tinybms.h"
-
+#include "FSM_motor_controller.h"
 #include "HL_can.h"
 
 uint8 emacAddress[6U] =	{0x00U, 0x08U, 0xEEU, 0x03U, 0xA6U, 0x6CU};
@@ -82,7 +82,7 @@ uint8_t tx_data[DCAN_SIZE] = {0x18, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}; /
 uint8_t rx_data[DCAN_SIZE] = {0};
 
 /* Task handlers */
-xTaskHandle xTask1Handle, xTask2Handle, xServerWorkTaskHandle, xMainControllerTaskHandle;
+xTaskHandle xTask1Handle, xTask2Handle, xServerWorkTaskHandle, xMainControllerTaskHandle, xTinyBmsTaskHandle, xMotorControllerTaskHandle;
 extern xTaskHandle xIPTaskHandle;
 
 /* Tasks */
@@ -137,6 +137,7 @@ void main(void)
 	/* Register Queues */
 	xQueueCtrlInputSignalHandle = xQueueCreate(10, sizeof(xAppMsgBaseType_t));
 	xQueueBmsInputSignalHandle = xQueueCreate(10, sizeof(xAppMsgBaseType_t));
+	xQueueMotorCtrlInputSignalHandle = xQueueCreate(10, sizeof(xAppMsgBaseType_t));
 
 	xQueueRestAPICtrlResponseHandle = xQueueCreate(5, sizeof(xControllerStateVariables_t));
 	xQueueCLICtrlResponseHandle = xQueueCreate(5, sizeof(xControllerStateVariables_t));
@@ -144,7 +145,11 @@ void main(void)
 	xQueueRestAPIBmsResponseHandle = xQueueCreate(5, sizeof(xBmsStateVariables_t));
     xQueueCLIBmsResponseHandle = xQueueCreate(5, sizeof(xBmsStateVariables_t));
 
+    xQueueRestAPIMotorCtrlResponseHandle = xQueueCreate(5, sizeof(xMotorControllerStateVariables_t));
+    xQueueCLIMotorCtrlResponseHandle = xQueueCreate(5, sizeof(xMotorControllerStateVariables_t));
+
     xQueueBmsCANResponseHandle = xQueueCreate(16, sizeof(xAppMsgCANType_t));
+    xQueueMotorCANResponseHandle= xQueueCreate(16, sizeof(xAppMsgCANType_t));
 
 	/* Register some commands to CLI */
 #if ( configGENERATE_RUN_TIME_STATS == 1 )
@@ -164,6 +169,7 @@ void main(void)
 	/* Register some commands to REST */
     FreeRTOS_RESTRegisterCommand( &xMainControllerRest );
     FreeRTOS_RESTRegisterCommand( &xTinyBmsRest );
+    FreeRTOS_RESTRegisterCommand( &xMotorControllerRest );
 
 	xTaskCreate(vTask1, "HeartBeat", configMINIMAL_STACK_SIZE * 10, NULL, tskIDLE_PRIORITY + 3  | portPRIVILEGE_BIT, &xTask1Handle);
 	FreeRTOS_IPInit(ucIPAddress, ucNetMask, ucGatewayAddress, ucDNSServerAddress, emacAddress);
@@ -173,11 +179,12 @@ void main(void)
 //
 //    /* Start main controller task */
     xTaskCreate(vMainControllerFSMTask, "MainControllerFSM", configMINIMAL_STACK_SIZE * 10, NULL, tskIDLE_PRIORITY + 5  | portPRIVILEGE_BIT, &xMainControllerTaskHandle);
-//
-//    /* Start tiny bms task */
-    xTaskCreate(vTinyBmsFSMTask, "TinyBmsFSM", configMINIMAL_STACK_SIZE * 10, NULL, tskIDLE_PRIORITY + 4  | portPRIVILEGE_BIT, &xMainControllerTaskHandle);
 
+    /* Start tiny bms task */
+    xTaskCreate(vTinyBmsFSMTask, "TinyBmsFSM", configMINIMAL_STACK_SIZE * 10, NULL, tskIDLE_PRIORITY + 4  | portPRIVILEGE_BIT, &xTinyBmsTaskHandle);
 
+    /* Start motor controller task */
+    xTaskCreate(vMotorControllerFSMTask, "MotorControllerFSM", configMINIMAL_STACK_SIZE * 10, NULL, tskIDLE_PRIORITY + 4  | portPRIVILEGE_BIT, &xMotorControllerTaskHandle);
 	vTaskStartScheduler();
 	while(1);
 }
@@ -284,7 +291,7 @@ void gioNotification(gioPORT_t *port, uint32 bit)
 }
 
 void BSP_bmsCanSend(canBASE_t *node, uint32_t uiID, uint8_t uiDataLen, uint8_t *uiData){
-    canTransmit(node, canMESSAGE_BOX1, uiData);
+    canTransmit(node, uiID, uiData);
 }
 
 /* can interrupt notification (Not used but must be provided) */
@@ -299,6 +306,71 @@ void canMessageNotification(canBASE_t *node, uint32_t messageBox){
 
         xQueueSendToFrontFromISR(xQueueBmsCANResponseHandle, &eMsg, NULL);
     }
+
+    if(canIsRxMessageArrived(canREG1,canMESSAGE_BOX4))
+    {
+        success = canGetData(canREG1,canMESSAGE_BOX4, eMsg.uiData);
+        ( void ) success;
+
+        eMsg.xBase.eSignal = MOTOR_DRIVER_STATE_SIG;
+        xQueueSendToFrontFromISR(xQueueMotorCANResponseHandle, &eMsg, NULL);
+    }
+
+    if(canIsRxMessageArrived(canREG1,canMESSAGE_BOX5))
+    {
+        success = canGetData(canREG1,canMESSAGE_BOX5, eMsg.uiData);
+        ( void ) success;
+
+        eMsg.xBase.eSignal = MOTOR_RANGE_REF_SIG;
+        xQueueSendToFrontFromISR(xQueueMotorCANResponseHandle, &eMsg, NULL);
+    }
+
+    if(canIsRxMessageArrived(canREG1,canMESSAGE_BOX6))
+    {
+        success = canGetData(canREG1,canMESSAGE_BOX6, eMsg.uiData);
+        ( void ) success;
+
+        eMsg.xBase.eSignal = MOTOR_SUPPLY_1_SIG;
+        xQueueSendToFrontFromISR(xQueueMotorCANResponseHandle, &eMsg, NULL);
+    }
+
+    if(canIsRxMessageArrived(canREG1,canMESSAGE_BOX7))
+    {
+        success = canGetData(canREG1,canMESSAGE_BOX7, eMsg.uiData);
+        ( void ) success;
+
+        eMsg.xBase.eSignal = MOTOR_MOTOR_1_SIG;
+        xQueueSendToFrontFromISR(xQueueMotorCANResponseHandle, &eMsg, NULL);
+    }
+
+    if(canIsRxMessageArrived(canREG1,canMESSAGE_BOX8))
+    {
+        success = canGetData(canREG1,canMESSAGE_BOX8, eMsg.uiData);
+        ( void ) success;
+
+        eMsg.xBase.eSignal = MOTOR_MOTOR_1_SIG;
+        xQueueSendToFrontFromISR(xQueueMotorCANResponseHandle, &eMsg, NULL);
+    }
+
+    if(canIsRxMessageArrived(canREG1,canMESSAGE_BOX13))
+    {
+        success = canGetData(canREG1,canMESSAGE_BOX13, eMsg.uiData);
+        ( void ) success;
+
+        eMsg.xBase.eSignal = MOTOR_MOTOR_3_SIG;
+        xQueueSendToFrontFromISR(xQueueMotorCANResponseHandle, &eMsg, NULL);
+    }
+
+    if(canIsRxMessageArrived(canREG1,canMESSAGE_BOX14))
+    {
+        success = canGetData(canREG1,canMESSAGE_BOX14, eMsg.uiData);
+        ( void ) success;
+
+        eMsg.xBase.eSignal = MOTOR_MOTOR_4_SIG;
+        xQueueSendToFrontFromISR(xQueueMotorCANResponseHandle, &eMsg, NULL);
+    }
+
+    //TODO: MessageBoxes: 9-12
 }
 
 /** ***************************************************************************************************

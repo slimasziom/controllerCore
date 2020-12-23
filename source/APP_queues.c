@@ -11,6 +11,8 @@ xQueueHandle xQueueCtrlInputSignalHandle;
 
 xQueueHandle xQueueBmsInputSignalHandle;
 
+xQueueHandle xQueueMotorCtrlInputSignalHandle;
+
 xQueueHandle xQueueRestAPICtrlResponseHandle;
 
 xQueueHandle xQueueCLICtrlResponseHandle;
@@ -20,4 +22,10 @@ xQueueHandle xQueueRestAPIBmsResponseHandle;
 xQueueHandle xQueueCLIBmsResponseHandle;
 
 xQueueHandle xQueueBmsCANResponseHandle;
+
+xQueueHandle xQueueMotorCANResponseHandle;
+
+xQueueHandle xQueueRestAPIMotorCtrlResponseHandle;
+
+xQueueHandle xQueueCLIMotorCtrlResponseHandle;
 

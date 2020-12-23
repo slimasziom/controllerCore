@@ -62,6 +62,7 @@ void vTinyBmsFSMTask(void *pvParameters){
     me.xEventQueue = xQueueBmsInputSignalHandle;
     me.pxTimer = &xTimerTinyBmsHandle;
     me.pCanNode = canREG1;
+    me.uiCanID = canMESSAGE_BOX1;
 
     /* Initialization */
     me.xStateVariables.eState=NONE_STATE;
