@@ -18,8 +18,13 @@ void * vMotorControllerOfflineState(FSM_MotorController_Definition_t * const me,
 void * vMotorControllerIdleState(FSM_MotorController_Definition_t * const me, xAppMsgBaseType_t *pxEventQueue );
 
 BaseType_t SendSamplingSetup(FSM_MotorController_Definition_t * const me);
+BaseType_t ReadDriverState(FSM_MotorController_Definition_t * const me, uint8_t uiDataLen, uint8_t *uiData);
 BaseType_t ReadRangeAndRef(FSM_MotorController_Definition_t * const me, uint8_t uiDataLen, uint8_t *uiData);
 BaseType_t ReadSupply1(FSM_MotorController_Definition_t * const me, uint8_t uiDataLen, uint8_t *uiData);
+BaseType_t ReadMotor1(FSM_MotorController_Definition_t * const me, uint8_t uiDataLen, uint8_t *uiData);
+BaseType_t ReadMotor2(FSM_MotorController_Definition_t * const me, uint8_t uiDataLen, uint8_t *uiData);
+BaseType_t ReadMotor3(FSM_MotorController_Definition_t * const me, uint8_t uiDataLen, uint8_t *uiData);
+BaseType_t ReadMotor4(FSM_MotorController_Definition_t * const me, uint8_t uiDataLen, uint8_t *uiData);
 
 /* Private Functions */
 void vMotorControllerFSMTaskInit(FSM_MotorController_Definition_t * const me);
@@ -116,10 +121,12 @@ void * vMotorControllerIdleState(FSM_MotorController_Definition_t * const me, xA
     void *state;
     state = NULL;
     xAppMsgCANType_t xCANMsg;
+    static BaseType_t iter;
 
     switch(pxEventQueue->eSignal){
     case ENTRY_SIG:
         me->xStateVariables.eState = IDLE_STATE;
+        iter = 0;
         //start timer
 //        vFSMTimerStart(me->pxTimer, pdMS_TO_TICKS(100));   //check every 100ms
         break;
@@ -128,8 +135,10 @@ void * vMotorControllerIdleState(FSM_MotorController_Definition_t * const me, xA
         break;
     case TIMEOUT_SIG:
         if (xQueueReceive(me->xCANQueue, &xCANMsg, 0) == pdTRUE){
+            iter = 0;
             switch(xCANMsg.xBase.eSignal){
             case MOTOR_DRIVER_STATE_SIG:
+                ReadDriverState(me, 8, xCANMsg.uiData);
                 break;
             case MOTOR_RANGE_REF_SIG:
                 ReadRangeAndRef(me, 8, xCANMsg.uiData);
@@ -138,13 +147,23 @@ void * vMotorControllerIdleState(FSM_MotorController_Definition_t * const me, xA
                 ReadSupply1(me, 8, xCANMsg.uiData);
                 break;
             case MOTOR_MOTOR_1_SIG:
+                ReadMotor1(me, 8, xCANMsg.uiData);
                 break;
             case MOTOR_MOTOR_2_SIG:
+                ReadMotor2(me, 8, xCANMsg.uiData);
                 break;
             case MOTOR_MOTOR_3_SIG:
+                ReadMotor3(me, 8, xCANMsg.uiData);
                 break;
             case MOTOR_MOTOR_4_SIG:
+                ReadMotor4(me, 8, xCANMsg.uiData);
                 break;
+            }
+        }
+        else{
+            iter++;
+            if(iter > 100){
+                state = &vMotorControllerOfflineState;
             }
         }
         break;
@@ -187,6 +206,8 @@ void vMotorControllerFSMTaskInit(FSM_MotorController_Definition_t * const me){
     me->xStateVariables.xMCLiveData.iRelRotorSpeed = 0;
     me->xStateVariables.xMCLiveData.iRotorSpeed = 0;
     me->xStateVariables.xMCLiveData.iOdometer = 0;
+    me->xStateVariables.xMCLiveData.iTempMotor1 = 0;
+    me->xStateVariables.xMCLiveData.iTempMotor2 = 0;
 }
 
 //void vFSMTimerFunctionCallback(TimerHandle_t xTimer){
@@ -224,6 +245,22 @@ BaseType_t SendSamplingSetup(FSM_MotorController_Definition_t * const me){
     return xReturn;
 }
 /*-----------------------------------------------------------*/
+BaseType_t ReadDriverState(FSM_MotorController_Definition_t * const me, uint8_t uiDataLen, uint8_t *uiData){
+    BaseType_t xReturn = pdTRUE;
+
+    me->xStateVariables.xMCLiveData.uiMotorConnected = (uint8_t)uiData[0] && 0x0F;
+    me->xStateVariables.xMCLiveData.uiMotorAlgorithm = (uint8_t)uiData[0] >> 4;
+    me->xStateVariables.xMCLiveData.uiHighPriorityLimiter = (uint8_t)uiData[1];
+    me->xStateVariables.xMCLiveData.uiMotorMode = (uint8_t)uiData[2];
+    me->xStateVariables.xMCLiveData.iTempMCU = (int8_t)uiData[3];
+    me->xStateVariables.xMCLiveData.uiLowPriorityLimiter = (uint16_t)((uiData[4] << 8) + uiData[5]);
+    me->xStateVariables.xMCLiveData.uiDeviceError = (uint16_t)((uiData[6] << 8) + uiData[7]);
+
+    xReturn = pdFALSE;
+
+    return xReturn;
+}
+/*-----------------------------------------------------------*/
 
 BaseType_t ReadRangeAndRef(FSM_MotorController_Definition_t * const me, uint8_t uiDataLen, uint8_t *uiData){
     BaseType_t xReturn = pdTRUE;
@@ -254,3 +291,54 @@ BaseType_t ReadSupply1(FSM_MotorController_Definition_t * const me, uint8_t uiDa
 }
 /*-----------------------------------------------------------*/
 
+BaseType_t ReadMotor1(FSM_MotorController_Definition_t * const me, uint8_t uiDataLen, uint8_t *uiData){
+    BaseType_t xReturn = pdTRUE;
+
+    me->xStateVariables.xMCLiveData.iRelAmplitudePhaseCurrent = (int16_t)((uiData[0] << 8) + uiData[1]);
+    me->xStateVariables.xMCLiveData.iRelAplitudeLinkVoltage = (int16_t)((uiData[2] << 8) + uiData[3]);
+    me->xStateVariables.xMCLiveData.iEnergyPassed = (int32_t)((uiData[4] << 24) + (uiData[5] << 16) + (uiData[6] << 8) + uiData[7]);
+
+    xReturn = pdFALSE;
+
+    return xReturn;
+}
+/*-----------------------------------------------------------*/
+
+BaseType_t ReadMotor2(FSM_MotorController_Definition_t * const me, uint8_t uiDataLen, uint8_t *uiData){
+    BaseType_t xReturn = pdTRUE;
+
+    me->xStateVariables.xMCLiveData.iRelMotorPower = (int16_t)((uiData[0] << 8) + uiData[1]);    me->xStateVariables.xMCLiveData.iMechanicalAngle = (int16_t)((uiData[2] << 8) + uiData[3]);
+    me->xStateVariables.xMCLiveData.iRelRotorSpeed = (int16_t)((uiData[4] << 8) + uiData[5]);
+    me->xStateVariables.xMCLiveData.iOdometer = (int16_t)((uiData[6] << 8) + uiData[7]);
+
+
+    me->xStateVariables.xMCLiveData.fMotorPower = (float_t) me->xStateVariables.xMCLiveData.iRelMotorPower / 32768.0f * (float_t)me->xStateVariables.xMCLiveData.uiUrange * (float_t)me->xStateVariables.xMCLiveData.uiIrange;
+    me->xStateVariables.xMCLiveData.iRotorSpeed = (int32_t) me->xStateVariables.xMCLiveData.iRelRotorSpeed * 8;
+
+    xReturn = pdFALSE;
+
+    return xReturn;
+}
+/*-----------------------------------------------------------*/
+
+BaseType_t ReadMotor3(FSM_MotorController_Definition_t * const me, uint8_t uiDataLen, uint8_t *uiData){
+    BaseType_t xReturn = pdTRUE;
+
+    xReturn = pdFALSE;
+
+    return xReturn;
+}
+/*-----------------------------------------------------------*/
+
+BaseType_t ReadMotor4(FSM_MotorController_Definition_t * const me, uint8_t uiDataLen, uint8_t *uiData){
+    BaseType_t xReturn = pdTRUE;
+
+//    TODO: find:
+//    me->xStateVariables.xMCLiveData.iTempMotor1
+//    me->xStateVariables.xMCLiveData.iTempMotor2
+
+    xReturn = pdFALSE;
+
+    return xReturn;
+}
+/*-----------------------------------------------------------*/

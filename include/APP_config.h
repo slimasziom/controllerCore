@@ -235,6 +235,8 @@ typedef struct {
     int16_t iRelRotorSpeed;
     int32_t iRotorSpeed;
     int16_t iOdometer;
+    int8_t iTempMotor1;
+    int8_t iTempMotor2;
 } xMtrCtrlLvdt_t;
 
 

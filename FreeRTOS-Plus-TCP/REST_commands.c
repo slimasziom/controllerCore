@@ -600,6 +600,13 @@ void xMotorControllerRESTStatusToJson( char *pcWriteBuffer, size_t xWriteBufferL
               "\"State\": \"%s\","
               "\"Live-Data\": "
               "{"
+                  "\"Motor-Connected\": %s,"
+                  "\"Motor-Algorithm\": \"%s\","
+                  "\"High-Priority-Limiter\": %d,"
+                  "\"Motor-Mode\": %d,"
+                  "\"Temp-MCU\": %d,"
+                  "\"Low-Priority-Limiter\": %d,"
+                  "\"Device-Error\": %d,"
                   "\"Urange\": %d,"
                   "\"Irange\": %d,"
                   "\"Uref\": %d,"
@@ -608,12 +615,30 @@ void xMotorControllerRESTStatusToJson( char *pcWriteBuffer, size_t xWriteBufferL
                   "\"Current\": %f,"
                   "\"Relative-Voltage\": %d,"
                   "\"Voltage\": %f,"
-                  "\"Total-Charge\": %d"
+                  "\"Total-Charge\": %d,"
+                  "\"Relative-Amplitude-Phase-Current\": %d,"
+                  "\"Relative-Amplitude-Link-Voltage\": %d,"
+                  "\"Energy-Passed\": %d,"
+                  "\"Relative-Motor-Power\": %d,"
+                  "\"Motor-Power\": %f,"
+                  "\"Mechanical-Angle\": %d,"
+                  "\"Relative-Rotor-Speed\": %d,"
+                  "\"Rotor-Speed\": %d,"
+                  "\"Odometer\": %d,"
+                  "\"Temp-Motor1\": %d,"
+                  "\"Temp-Motor2\": %d"
               "}"
           "}"
       "}",
       xStateVariables->cModuleName,
       pcStateNameFromThread(xStateVariables->eState),
+      xStateVariables->xMCLiveData.uiMotorConnected ? "true" : "false",
+      xStateVariables->xMCLiveData.uiMotorAlgorithm == 1 ? "bldc" : xStateVariables->xMCLiveData.uiMotorAlgorithm == 2 ? "vector" : "incorrect",
+      xStateVariables->xMCLiveData.uiHighPriorityLimiter,
+      xStateVariables->xMCLiveData.uiMotorMode,
+      xStateVariables->xMCLiveData.iTempMCU,
+      xStateVariables->xMCLiveData.uiLowPriorityLimiter,
+      xStateVariables->xMCLiveData.uiDeviceError,
       xStateVariables->xMCLiveData.uiUrange,
       xStateVariables->xMCLiveData.uiIrange,
       xStateVariables->xMCLiveData.uiUref,
@@ -622,7 +647,18 @@ void xMotorControllerRESTStatusToJson( char *pcWriteBuffer, size_t xWriteBufferL
       xStateVariables->xMCLiveData.fCurrent,
       xStateVariables->xMCLiveData.iRelVoltage,
       xStateVariables->xMCLiveData.fVoltage,
-      xStateVariables->xMCLiveData.iTotalCharge);
+      xStateVariables->xMCLiveData.iTotalCharge,
+      xStateVariables->xMCLiveData.iRelAmplitudePhaseCurrent,      //base (24 def) + 6
+      xStateVariables->xMCLiveData.iRelAplitudeLinkVoltage,
+      xStateVariables->xMCLiveData.iEnergyPassed,
+      xStateVariables->xMCLiveData.iRelMotorPower,                 //base (24 def) + 7
+      xStateVariables->xMCLiveData.fMotorPower,
+      xStateVariables->xMCLiveData.iMechanicalAngle,
+      xStateVariables->xMCLiveData.iRelRotorSpeed,
+      xStateVariables->xMCLiveData.iRotorSpeed,
+      xStateVariables->xMCLiveData.iOdometer,
+      xStateVariables->xMCLiveData.iTempMotor1,
+      xStateVariables->xMCLiveData.iTempMotor2);
 }
 /*-----------------------------------------------------------*/
 
