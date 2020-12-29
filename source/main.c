@@ -348,7 +348,7 @@ void canMessageNotification(canBASE_t *node, uint32_t messageBox){
         success = canGetData(canREG1,canMESSAGE_BOX8, eMsg.uiData);
         ( void ) success;
 
-        eMsg.xBase.eSignal = MOTOR_MOTOR_1_SIG;
+        eMsg.xBase.eSignal = MOTOR_MOTOR_2_SIG;
         xQueueSendToFrontFromISR(xQueueMotorCANResponseHandle, &eMsg, NULL);
     }
 

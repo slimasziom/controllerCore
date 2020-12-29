@@ -11,6 +11,21 @@
 #define DEFAULT_NODE_ID     0x04
 #define CAN_TIMEOUT         2000U
 
+xMotorModeMapping_t xMotorModeMapping[] =
+{
+    { 0,     "Freewheel"            },
+    { 1,     "Voltage"              },
+    { 2,     "Current"              },
+    { 3,     "Voltage + freewheel"  },
+    { 4,     "Voltage brake"        },
+    { 5,     "Stator current"       },
+    { 6,     "Torque"               },
+    { 8,     "Brake"                },
+    { 9,     "Brake torque"         },
+    { 10,    "Brake + freewheel"    },
+    { 15,    "Brake short"          },
+};
+
 /* Timers */
 TimerHandle_t xTimerMotorControllerHandle = NULL;
 
@@ -307,7 +322,8 @@ BaseType_t ReadMotor1(FSM_MotorController_Definition_t * const me, uint8_t uiDat
 BaseType_t ReadMotor2(FSM_MotorController_Definition_t * const me, uint8_t uiDataLen, uint8_t *uiData){
     BaseType_t xReturn = pdTRUE;
 
-    me->xStateVariables.xMCLiveData.iRelMotorPower = (int16_t)((uiData[0] << 8) + uiData[1]);    me->xStateVariables.xMCLiveData.iMechanicalAngle = (int16_t)((uiData[2] << 8) + uiData[3]);
+    me->xStateVariables.xMCLiveData.iRelMotorPower = (int16_t)((uiData[0] << 8) + uiData[1]);
+    me->xStateVariables.xMCLiveData.iMechanicalAngle = (int16_t)((uiData[2] << 8) + uiData[3]);
     me->xStateVariables.xMCLiveData.iRelRotorSpeed = (int16_t)((uiData[4] << 8) + uiData[5]);
     me->xStateVariables.xMCLiveData.iOdometer = (int16_t)((uiData[6] << 8) + uiData[7]);
 
@@ -340,5 +356,26 @@ BaseType_t ReadMotor4(FSM_MotorController_Definition_t * const me, uint8_t uiDat
     xReturn = pdFALSE;
 
     return xReturn;
+}
+/*-----------------------------------------------------------*/
+
+#if !defined( ARRAY_SIZE )
+    #define ARRAY_SIZE(x) ( BaseType_t ) (sizeof ( x ) / sizeof ( x )[ 0 ] )
+#endif
+
+const char * pcMotorMode(uint8_t uiMotorMode)
+{
+    const char *pcModeName = xMotorModeMapping[0].cMode;
+    BaseType_t x;
+
+    for( x = 0; x < ARRAY_SIZE( xMotorModeMapping ); x++ )
+        {
+            if (xMotorModeMapping[x].uiMode == uiMotorMode){
+                pcModeName = xMotorModeMapping[x].cMode;
+                break;
+            }
+        }
+
+    return pcModeName;
 }
 /*-----------------------------------------------------------*/

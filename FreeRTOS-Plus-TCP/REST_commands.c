@@ -603,7 +603,7 @@ void xMotorControllerRESTStatusToJson( char *pcWriteBuffer, size_t xWriteBufferL
                   "\"Motor-Connected\": %s,"
                   "\"Motor-Algorithm\": \"%s\","
                   "\"High-Priority-Limiter\": %d,"
-                  "\"Motor-Mode\": %d,"
+                  "\"Motor-Mode\": \"%s\","
                   "\"Temp-MCU\": %d,"
                   "\"Low-Priority-Limiter\": %d,"
                   "\"Device-Error\": %d,"
@@ -635,7 +635,7 @@ void xMotorControllerRESTStatusToJson( char *pcWriteBuffer, size_t xWriteBufferL
       xStateVariables->xMCLiveData.uiMotorConnected ? "true" : "false",
       xStateVariables->xMCLiveData.uiMotorAlgorithm == 1 ? "bldc" : xStateVariables->xMCLiveData.uiMotorAlgorithm == 2 ? "vector" : "incorrect",
       xStateVariables->xMCLiveData.uiHighPriorityLimiter,
-      xStateVariables->xMCLiveData.uiMotorMode,
+      pcMotorMode(xStateVariables->xMCLiveData.uiMotorMode),
       xStateVariables->xMCLiveData.iTempMCU,
       xStateVariables->xMCLiveData.uiLowPriorityLimiter,
       xStateVariables->xMCLiveData.uiDeviceError,

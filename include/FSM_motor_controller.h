@@ -30,6 +30,14 @@
 
 /* FSM Task */
 void vMotorControllerFSMTask(void *pvParameters);
+const char * pcMotorMode(uint8_t uiMotorMode);
+
+typedef struct {
+    uint8_t uiMode;
+    const char *cMode;
+} xMotorModeMapping_t;
+
+extern xMotorModeMapping_t xMotorModeMapping[];
 
 /* The structure that defines FSM structure */
 typedef struct
