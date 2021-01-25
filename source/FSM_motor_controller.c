@@ -42,7 +42,7 @@ BaseType_t ReadMotor3(FSM_MotorController_Definition_t * const me, uint8_t uiDat
 BaseType_t ReadMotor4(FSM_MotorController_Definition_t * const me, uint8_t uiDataLen, uint8_t *uiData);
 
 /* Private Functions */
-void vMotorControllerFSMTaskInit(FSM_MotorController_Definition_t * const me);
+void vMotorControllerClearStateVariables(FSM_MotorController_Definition_t * const me);
 //void vFSMTimerFunctionCallback(TimerHandle_t xTimer);
 //void vFSMTimerStart(TimerHandle_t *xTimer, uint32_t uiPeriod);
 //void vFSMTimerStop(TimerHandle_t *xTimer);
@@ -62,8 +62,6 @@ void vMotorControllerFSMTask(void *pvParameters){
     /* Initialization */
     me.xStateVariables.eState=NONE_STATE;
     snprintf( me.xStateVariables.cModuleName, 20, "motor-ctrl-fsm");
-    /* init state variables */
-    vMotorControllerFSMTaskInit(&me);
 
     /* init first state */
     xMsg.eSignal = ENTRY_SIG;
@@ -101,6 +99,8 @@ void * vMotorControllerOfflineState(FSM_MotorController_Definition_t * const me,
     switch(pxEventQueue->eSignal){
     case ENTRY_SIG:
         me->xStateVariables.eState = OFFLINE_STATE;
+        /* clear state variables */
+        vMotorControllerClearStateVariables(me);
         SendSamplingSetup(me);
         iter = 0;
         break;
@@ -195,7 +195,7 @@ void * vMotorControllerIdleState(FSM_MotorController_Definition_t * const me, xA
 }
 /*-----------------------------------------------------------*/
 
-void vMotorControllerFSMTaskInit(FSM_MotorController_Definition_t * const me){
+void vMotorControllerClearStateVariables(FSM_MotorController_Definition_t * const me){
     me->xStateVariables.xMCLiveData.uiMotorConnected = 0;
     me->xStateVariables.xMCLiveData.uiMotorAlgorithm = 0;
     me->xStateVariables.xMCLiveData.uiHighPriorityLimiter = 0;
