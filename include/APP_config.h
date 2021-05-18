@@ -151,7 +151,7 @@ typedef struct {
 //    BMS_LAST_STATE            // not used, last
 //} EBmsState;
 
-/* Bms thread live data struct */
+/* TinyBms thread live data struct */
 typedef struct {
     uint16_t uiCellVoltages[NUMBER_OF_CELLS];       // reg: 0-15; res: 0.1mV
     /****************************** RESERVED *******************************/
@@ -176,7 +176,7 @@ typedef struct {
     float_t fSpeed;                                 // reg: 54/5; res: 1km/h
 } xBmsLvdt_t;
 
-/* Bms thread settings struct */
+/* TinyBms thread settings struct */
 typedef struct {
     uint16_t uiFullyChargedVoltage;                 // reg: 300;  res: 1mV
     uint16_t uiFullyDischargedVoltage;              // reg: 301;  res: 1mV
@@ -198,14 +198,14 @@ typedef struct {
     int16_t iLowTempChargerCutoff;                  // reg: 319;  res: 1C
 } xBmsSettings_t;
 
-/* Bms thread struct */
+/* TinyBms thread struct */
 typedef struct {
     EState eState;
     char cModuleName[20];
     xBmsLvdt_t xBmsLiveData;
     xBmsSettings_t xBmsSettings;
 } xBmsStateVariables_t;
-/****************** BMS END ******************/
+/****************** TinyBMS END ******************/
 
 /****************** Motor Controller ******************/
 /* Motor controller thread settings struct */

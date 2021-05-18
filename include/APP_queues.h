@@ -37,6 +37,9 @@ extern xQueueHandle xQueueCLICtrlResponseHandle;
 extern xQueueHandle xQueueRestAPIBmsResponseHandle;
 extern xQueueHandle xQueueCLIBmsResponseHandle;
 
+extern xQueueHandle xQueueRestAPIEmusBmsResponseHandle;
+extern xQueueHandle xQueueCLIEmusBmsResponseHandle;
+
 extern xQueueHandle xQueueBmsCANResponseHandle;
 extern xQueueHandle xQueueMotorCANResponseHandle;
 

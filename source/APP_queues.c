@@ -21,6 +21,10 @@ xQueueHandle xQueueRestAPIBmsResponseHandle;
 
 xQueueHandle xQueueCLIBmsResponseHandle;
 
+xQueueHandle xQueueRestAPIEmusBmsResponseHandle;
+
+xQueueHandle xQueueCLIEmusBmsResponseHandle;
+
 xQueueHandle xQueueBmsCANResponseHandle;
 
 xQueueHandle xQueueMotorCANResponseHandle;

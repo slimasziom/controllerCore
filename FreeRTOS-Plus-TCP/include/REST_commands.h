@@ -108,6 +108,16 @@ static const REST_Command_Definition_t xTinyBmsRest =
     1 /* No parameters are expected. */
 };
 
+BaseType_t xEmusBmsREST(char *pcWriteBuffer, size_t xWriteBufferLen, const char *pcCommandString);
+/* Structure that defines the "main-controller" REST command. */
+static const REST_Command_Definition_t xEmusBmsRest =
+{
+    "emus-bms",
+    "{\"use\": \"emus-bms?<command>: Sends command to emus-bms: go-offline/charge/finish-charge/discharge/regenerate/go-idle/go-fault/status\"}",
+    ( pdREST_API_CALLBACK ) xEmusBmsREST,
+    1 /* No parameters are expected. */
+};
+
 BaseType_t xMotorControllerREST(char *pcWriteBuffer, size_t xWriteBufferLen, const char *pcCommandString);
 /* Structure that defines the "main-controller" REST command. */
 static const REST_Command_Definition_t xMotorControllerRest =

@@ -63,7 +63,8 @@
 #include "APP_queues.h"
 
 #include "FSM_maincontroller.h"
-#include "FSM_tinybms.h"
+//#include "FSM_tinybms.h"
+#include "FSM_emusbms.h"
 #include "FSM_motor_controller.h"
 #include "HL_can.h"
 
@@ -76,13 +77,13 @@ static const uint8_t ucDNSServerAddress[4] = {configDNS_SERVER_ADDR0, configDNS_
 
 /* CAN */
 #define DCAN_SIZE           8
-static const uint32 s_canByteOrder[8U] = {3U, 2U, 1U, 0U, 7U, 6U, 5U, 4U};
+//static const uint32 s_canByteOrder[8U] = {3U, 2U, 1U, 0U, 7U, 6U, 5U, 4U};
 #define DCAN_TX_MESSAGE_BOX     canMESSAGE_BOX1
 uint8_t tx_data[DCAN_SIZE] = {0x18, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}; //{'H', 'E', 'R', 'C', 'U', 'L', 'E', 'S'};
 uint8_t rx_data[DCAN_SIZE] = {0};
 
 /* Task handlers */
-xTaskHandle xTask1Handle, xTask2Handle, xServerWorkTaskHandle, xMainControllerTaskHandle, xTinyBmsTaskHandle, xMotorControllerTaskHandle;
+xTaskHandle xTask1Handle, xTask2Handle, xServerWorkTaskHandle, xMainControllerTaskHandle, xTinyBmsTaskHandle, xEmusBmsTaskHandle, xMotorControllerTaskHandle;
 extern xTaskHandle xIPTaskHandle;
 
 /* Tasks */
@@ -142,8 +143,11 @@ void main(void)
 	xQueueRestAPICtrlResponseHandle = xQueueCreate(5, sizeof(xControllerStateVariables_t));
 	xQueueCLICtrlResponseHandle = xQueueCreate(5, sizeof(xControllerStateVariables_t));
 
-	xQueueRestAPIBmsResponseHandle = xQueueCreate(5, sizeof(xBmsStateVariables_t));
-    xQueueCLIBmsResponseHandle = xQueueCreate(5, sizeof(xBmsStateVariables_t));
+//	xQueueRestAPIBmsResponseHandle = xQueueCreate(5, sizeof(xBmsStateVariables_t));
+//  xQueueCLIBmsResponseHandle = xQueueCreate(5, sizeof(xBmsStateVariables_t));
+
+    xQueueRestAPIEmusBmsResponseHandle = xQueueCreate(5, sizeof(xEmusBmsStateVariables_t));
+    xQueueCLIEmusBmsResponseHandle = xQueueCreate(5, sizeof(xEmusBmsStateVariables_t));
 
     xQueueRestAPIMotorCtrlResponseHandle = xQueueCreate(5, sizeof(xMotorControllerStateVariables_t));
     xQueueCLIMotorCtrlResponseHandle = xQueueCreate(5, sizeof(xMotorControllerStateVariables_t));
@@ -168,7 +172,7 @@ void main(void)
 
 	/* Register some commands to REST */
     FreeRTOS_RESTRegisterCommand( &xMainControllerRest );
-    FreeRTOS_RESTRegisterCommand( &xTinyBmsRest );
+    FreeRTOS_RESTRegisterCommand( &xEmusBmsRest );
     FreeRTOS_RESTRegisterCommand( &xMotorControllerRest );
 
 	xTaskCreate(vTask1, "HeartBeat", configMINIMAL_STACK_SIZE * 10, NULL, tskIDLE_PRIORITY + 3  | portPRIVILEGE_BIT, &xTask1Handle);
@@ -181,7 +185,10 @@ void main(void)
     xTaskCreate(vMainControllerFSMTask, "MainControllerFSM", configMINIMAL_STACK_SIZE * 10, NULL, tskIDLE_PRIORITY + 5  | portPRIVILEGE_BIT, &xMainControllerTaskHandle);
 
     /* Start tiny bms task */
-    xTaskCreate(vTinyBmsFSMTask, "TinyBmsFSM", configMINIMAL_STACK_SIZE * 10, NULL, tskIDLE_PRIORITY + 4  | portPRIVILEGE_BIT, &xTinyBmsTaskHandle);
+//    xTaskCreate(vTinyBmsFSMTask, "TinyBmsFSM", configMINIMAL_STACK_SIZE * 10, NULL, tskIDLE_PRIORITY + 4  | portPRIVILEGE_BIT, &xTinyBmsTaskHandle);
+
+    /* Start emus bms task */
+    xTaskCreate(vEmusBmsFSMTask, "BmsFSM", configMINIMAL_STACK_SIZE * 10, NULL, tskIDLE_PRIORITY + 4  | portPRIVILEGE_BIT, &xEmusBmsTaskHandle);
 
     /* Start motor controller task */
     xTaskCreate(vMotorControllerFSMTask, "MotorControllerFSM", configMINIMAL_STACK_SIZE * 10, NULL, tskIDLE_PRIORITY + 4  | portPRIVILEGE_BIT, &xMotorControllerTaskHandle);

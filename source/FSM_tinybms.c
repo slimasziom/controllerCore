@@ -662,8 +662,8 @@ BaseType_t ReadBatteryPackCellsVoltages(FSM_TinyBms_Definition_t * const me){
 BaseType_t ReadSettingsValues(FSM_TinyBms_Definition_t * const me){
     BaseType_t xReturn;
 
-    xAppMsgCANType_t xCANMsg;
-    uint8_t puiDataBytes[] = {0x1D, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
+//    xAppMsgCANType_t xCANMsg;
+//    uint8_t puiDataBytes[] = {0x1D, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
 
     xReturn = pdTRUE;
 
