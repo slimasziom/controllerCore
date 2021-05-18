@@ -16,6 +16,8 @@
 #include "APP_config.h"
 #include "APP_queues.h"
 
+#include "FSM_emusbms.h"
+
 extern hdkif_t hdkif_data[MAX_EMAC_INSTANCE];
 
 /* Helper functions */
@@ -574,6 +576,284 @@ BaseType_t xTinyBmsREST(char *pcWriteBuffer, size_t xWriteBufferLen, const char 
         if(xQueueSend(xQueueBmsInputSignalHandle, &xMsg, NULL) == pdTRUE){
             if(xQueueReceive(xQueueRestAPIBmsResponseHandle, &xStateVariables, 1000) == pdTRUE){
                 xTinyBmsRESTStatusToJson(pcWriteBuffer, xWriteBufferLen, &xStateVariables);
+            }
+            else
+            {
+                snprintf( pcWriteBuffer, xWriteBufferLen, "{\"success\": \"OK\", \"result\": \"response error\"}" );
+            }
+        }
+        else
+        {
+            snprintf( pcWriteBuffer, xWriteBufferLen, "{\"success\": \"OK\", \"result\": \"send error\"}" );
+        }
+        break;
+    }
+
+    return xReturn;
+}
+/*-----------------------------------------------------------*/
+
+static void xEmusBmsRESTStatusToJson( char *pcWriteBuffer, size_t xWriteBufferLen, xEmusBmsStateVariables_t *xStateVariables){
+    snprintf( pcWriteBuffer, xWriteBufferLen,
+    "{\"success\": \"OK\", \"result\": "
+        "{"
+            "\"Module\": \"%s\", "
+            "\"State\": \"%s\", "
+            "\"Overall-Parameters\": "
+            "{"
+                "\"Input-Signals\":"
+                "{"
+                    "\"Ignition-Key\": %d, "
+                    "\"Charger-Mains\": %d, "
+                    "\"Fast-Charge\": %d, "
+                    "\"Leakage-Sensor\": %d "
+                "}, "
+                "\"Output-Signals\":"
+                "{"
+                    "\"Charger-Enable\": %d, "
+                    "\"Heater-Enable\": %d, "
+                    "\"Battery-Contactor\": %d, "
+                    "\"Battery-Fan\": %d, "
+                    "\"Power-Reduction\": %d, "
+                    "\"Charging-Interlock\": %d, "
+                    "\"DC-DC-Control\": %d, "
+                    "\"Contactor-Pre-Charge\": %d "
+                "}, "
+                "\"Number-of-Live-Cells\": %d, "
+                "\"Charging-Stage\": %d, "
+                "\"Charging-Stage-Duration\": %d, "
+                "\"Last-Charging-Error\": %d"
+            "}, "
+            "\"Diagnostic-Codes\": "
+            "{"
+                "\"Protection-Flags\":"
+                "{"
+                    "\"Under-Voltage\": %d, "
+                    "\"Over-Voltage\": %d, "
+                    "\"Discharge-Over-Current\": %d, "
+                    "\"Charge-Over-Current\": %d, "
+                    "\"Cell-Module-Overheat\": %d, "
+                    "\"Leakage\": %d, "
+                    "\"No-Cell-Communication\": %d, "
+                    "\"Reserved\": %d, "
+                    "\"Reserved\": %d, "
+                    "\"Reserved\": %d, "
+                    "\"Reserved\": %d, "
+                    "\"Cell-Overheat\": %d, "
+                    "\"No-Current-Sensor\": %d, "
+                    "\"Pack-Under-Voltage\": %d, "
+                    "\"Reserved\": %d, "
+                    "\"Reserved\": %d "
+                "}, "
+                "\"Warning-Reduction-Flags\":"
+                "{"
+                    "\"Low-Voltage\": %d, "
+                    "\"High-Current\": %d, "
+                    "\"High-Temperature\": %d "
+                "}, "
+                "\"Battery-Status-Flags\":"
+                "{"
+                    "\"Cell-Voltages-Validity\": %d, "
+                    "\"Cell-Modules-Temperatures-Validity\": %d, "
+                    "\"Cell-Balancing-Rates-Validity\": %d, "
+                    "\"Number-Of-Live-Cells-Validity\": %d, "
+                    "\"Battery-Charging-Finished\": %d, "
+                    "\"Cell-Temperatures-Validity\": %d, "
+                    "\"Reserved\": %d, "
+                    "\"Reserved\": %d"
+                "}"
+            "}, "
+            "\"Battery-Voltage-Overall-Parameters\":"
+            "{"
+                "\"Min-Cell-Voltage\": %.2f, "
+                "\"Max-Cell-Voltage\": %.2f, "
+                "\"Avg-Cell-Voltage\": %.2f, "
+                "\"Total-Voltage\": %.2f"
+            "}, "
+            "\"Cell-Module-Temperature-Overall-Parameters\":"
+            "{"
+                "\"Min-Cell-Module-Temperature\": %d, "
+                "\"Max-Cell-Module-Temperature\": %d, "
+                "\"Avg-Cell-Module-Temperature\": %d"
+            "}, "
+            "\"Cell-Temperature-Overall-Parameters\":"
+            "{"
+                "\"Min-Cell-Temperature\": %d, "
+                "\"Max-Cell-Temperature\": %d, "
+                "\"Avg-Cell-Temperature\": %d"
+            "}, "
+            "\"Cell-Balancing-Rate-Overall-Parameters\":"
+            "{"
+                "\"Min-Cell-Balancing\": %d, "
+                "\"Max-Cell-Balancing\": %d, "
+                "\"Avg-Cell-Balancing\": %d"
+            "}, "
+            "\"State-of-Charge-Parameters\":"
+            "{"
+                "\"Current\": %f, "
+                "\"Estimated-Charge\": %f, "
+                "\"Estimated-State-Of-Charge\": %d"
+            "}, "
+            "\"Energy-Parameters\":"
+            "{"
+                "\"Estimated-Consumption\": %d, "
+                "\"Estimated-Energy\": %.2f, "
+                "\"Estimated-Distance-Left\": %.1f, "
+                "\"Distance-Traveled\": %.1f"
+            "}"
+        "}"
+    "}",
+    xStateVariables->cModuleName,
+    pcStateNameFromThread(xStateVariables->eState),
+    xStateVariables->xEmusBmsOverallPars.uiInputSignals && INPUT_SIGNALS_IGNITION_KEY_BIT,
+    xStateVariables->xEmusBmsOverallPars.uiInputSignals && INPUT_SIGNALS_CHARGER_MAINS_BIT,
+    xStateVariables->xEmusBmsOverallPars.uiInputSignals && INPUT_SIGNALS_FAST_CHARGE_BIT,
+    xStateVariables->xEmusBmsOverallPars.uiInputSignals && INPUT_SIGNALS_LEAKAGE_SENSOR_BIT,
+
+    xStateVariables->xEmusBmsOverallPars.uiOutputSignals && OUTPUT_SIGNALS_CHARGER_ENABLE_BIT,
+    xStateVariables->xEmusBmsOverallPars.uiOutputSignals && OUTPUT_SIGNALS_HEATER_ENABLE_BIT,
+    xStateVariables->xEmusBmsOverallPars.uiOutputSignals && OUTPUT_SIGNALS_BATTERY_CONTACTOR_BIT,
+    xStateVariables->xEmusBmsOverallPars.uiOutputSignals && OUTPUT_SIGNALS_BATTERY_FAN_BIT,
+    xStateVariables->xEmusBmsOverallPars.uiOutputSignals && OUTPUT_SIGNALS_POWER_REDUCTION_BIT,
+    xStateVariables->xEmusBmsOverallPars.uiOutputSignals && OUTPUT_SIGNALS_CHARGING_INTERLOCK_BIT,
+    xStateVariables->xEmusBmsOverallPars.uiOutputSignals && OUTPUT_SIGNALS_DCDC_CONTROL_BIT,
+    xStateVariables->xEmusBmsOverallPars.uiOutputSignals && OUTPUT_SIGNALS_CONTACTOR_PRECHARGE_BIT,
+
+    xStateVariables->xEmusBmsOverallPars.uiNumberOfLiveCells,
+    xStateVariables->xEmusBmsOverallPars.uiChargingStage,
+    xStateVariables->xEmusBmsOverallPars.uiChargingStageDuration,
+    xStateVariables->xEmusBmsOverallPars.uiLastChargingError,
+
+    xStateVariables->xEmusBmsDiagnosticCodes.uiProtectionFlags && PROTECTION_FLAG_UNDER_VOLTAGE_BIT,
+    xStateVariables->xEmusBmsDiagnosticCodes.uiProtectionFlags && PROTECTION_FLAG_OVER_VOLTAGE_BIT,
+    xStateVariables->xEmusBmsDiagnosticCodes.uiProtectionFlags && PROTECTION_FLAG_DISCHARGE_OVER_CURRENT_BIT,
+    xStateVariables->xEmusBmsDiagnosticCodes.uiProtectionFlags && PROTECTION_FLAG_CHARGE_OVER_CURRENT_BIT,
+    xStateVariables->xEmusBmsDiagnosticCodes.uiProtectionFlags && PROTECTION_FLAG_CELL_MODULE_OVERHEAT_BIT,
+    xStateVariables->xEmusBmsDiagnosticCodes.uiProtectionFlags && PROTECTION_FLAG_LEAKAGE_BIT,
+    xStateVariables->xEmusBmsDiagnosticCodes.uiProtectionFlags && PROTECTION_FLAG_NO_CELL_COMMUNICATION_BIT,
+    xStateVariables->xEmusBmsDiagnosticCodes.uiProtectionFlags && PROTECTION_FLAG_RESERVED_BIT,
+    xStateVariables->xEmusBmsDiagnosticCodes.uiProtectionFlags && PROTECTION_FLAG_RESERVED_BIT,
+    xStateVariables->xEmusBmsDiagnosticCodes.uiProtectionFlags && PROTECTION_FLAG_RESERVED_BIT,
+    xStateVariables->xEmusBmsDiagnosticCodes.uiProtectionFlags && PROTECTION_FLAG_RESERVED_BIT,
+    xStateVariables->xEmusBmsDiagnosticCodes.uiProtectionFlags && PROTECTION_FLAG_CELL_OVERHEAT_BIT,
+    xStateVariables->xEmusBmsDiagnosticCodes.uiProtectionFlags && PROTECTION_FLAG_NO_CURRENT_SENSOR_BIT,
+    xStateVariables->xEmusBmsDiagnosticCodes.uiProtectionFlags && PROTECTION_FLAG_PACK_UNDER_VOLTAGE_BIT,
+    xStateVariables->xEmusBmsDiagnosticCodes.uiProtectionFlags && PROTECTION_FLAG_RESERVED_BIT,
+    xStateVariables->xEmusBmsDiagnosticCodes.uiProtectionFlags && PROTECTION_FLAG_RESERVED_BIT,
+
+    xStateVariables->xEmusBmsDiagnosticCodes.uiWarningFlags && WARNING_REDUCTION_FLAG_LOW_VOLTAGE_BIT,
+    xStateVariables->xEmusBmsDiagnosticCodes.uiWarningFlags && WARNING_REDUCTION_FLAG_HIGH_CURRENT_BIT,
+    xStateVariables->xEmusBmsDiagnosticCodes.uiWarningFlags && WARNING_REDUCTION_FLAG_HIGH_TEMP_BIT,
+
+    xStateVariables->xEmusBmsDiagnosticCodes.uiBatteryStatusFlags && BATTERY_STATUS_FLAG_CELL_VOLTAGES_VALIDITY_BIT,
+    xStateVariables->xEmusBmsDiagnosticCodes.uiBatteryStatusFlags && BATTERY_STATUS_FLAG_CELL_MODULE_TEMPERATURES_VALIDITY_BIT,
+    xStateVariables->xEmusBmsDiagnosticCodes.uiBatteryStatusFlags && BATTERY_STATUS_FLAG_CELL_BALANCING_RATES_VALIDITY_BIT,
+    xStateVariables->xEmusBmsDiagnosticCodes.uiBatteryStatusFlags && BATTERY_STATUS_FLAG_NUMBER_OF_LIVE_CELLS_VALIDITY_BIT,
+    xStateVariables->xEmusBmsDiagnosticCodes.uiBatteryStatusFlags && BATTERY_STATUS_FLAG_BATTERY_CHARGING_FINISHED_BIT,
+    xStateVariables->xEmusBmsDiagnosticCodes.uiBatteryStatusFlags && BATTERY_STATUS_FLAG_CELL_TEMPERATURES_VALIDITY_BIT,
+    xStateVariables->xEmusBmsDiagnosticCodes.uiBatteryStatusFlags && BATTERY_STATUS_FLAG_RESERVED_BIT,
+    xStateVariables->xEmusBmsDiagnosticCodes.uiBatteryStatusFlags && BATTERY_STATUS_FLAG_RESERVED_BIT,
+
+    xStateVariables->xEmusBmsBatVolOverallPars.fMinCellVoltage,
+    xStateVariables->xEmusBmsBatVolOverallPars.fMaxCellVoltage,
+    xStateVariables->xEmusBmsBatVolOverallPars.fAvgCellVoltage,
+    xStateVariables->xEmusBmsBatVolOverallPars.fTotalVoltage,
+
+    xStateVariables->xEmusBmsCellModuleTempOverallPars.iMinCellModuleTemp,
+    xStateVariables->xEmusBmsCellModuleTempOverallPars.iMaxCellModuleTemp,
+    xStateVariables->xEmusBmsCellModuleTempOverallPars.iAvgCellModuleTemp,
+
+    xStateVariables->xEmusBmsCellTempOverallPars.iMinCellTemp,
+    xStateVariables->xEmusBmsCellTempOverallPars.iMaxCellTemp,
+    xStateVariables->xEmusBmsCellTempOverallPars.iAvgCellTemp,
+
+    xStateVariables->xEmusBmsCellBalancingRateOverallPars.uiMinCellBalancing,
+    xStateVariables->xEmusBmsCellBalancingRateOverallPars.uiMaxCellBalancing,
+    xStateVariables->xEmusBmsCellBalancingRateOverallPars.uiAvgCellBalancing,
+
+    xStateVariables->xEmusBmsSOC.fCurrent,
+    xStateVariables->xEmusBmsSOC.fEstimatedCharge,
+    xStateVariables->xEmusBmsSOC.uiEstimatedSOC,
+
+    xStateVariables->xEmusBmsEnergyParameters.uiEstimatedConsumption,
+    xStateVariables->xEmusBmsEnergyParameters.fEstimatedEnergy,
+    xStateVariables->xEmusBmsEnergyParameters.fEstimatedDistanceLeft,
+    xStateVariables->xEmusBmsEnergyParameters.fEstimatedDistanceTraveled
+
+//    "\"Individual-Cell-Voltages\":"
+//    "{"
+//        "\"Cell-Voltage-1\": %.2f, "
+//        "\"Cell-Voltage-2\": %.2f, "
+//        "\"Cell-Voltage-3\": %.2f, "
+//        "\"Cell-Voltage-4\": %.2f, "
+//        "\"Cell-Voltage-5\": %.2f, "
+//        "\"Cell-Voltage-6\": %.2f, "
+//        "\"Cell-Voltage-7\": %.2f, "
+//        "\"Cell-Voltage-8\": %.2f, "
+//        "\"Cell-Voltage-9\": %.2f, "
+//        "\"Cell-Voltage-10\": %.2f, "
+//        "\"Cell-Voltage-11\": %.2f, "
+//        "\"Cell-Voltage-12\": %.2f"
+//    "}"
+//    xStateVariables->fEmusBmsIndividualCellVoltages[0],
+//    xStateVariables->fEmusBmsIndividualCellVoltages[1],
+//    xStateVariables->fEmusBmsIndividualCellVoltages[2],
+//    xStateVariables->fEmusBmsIndividualCellVoltages[3],
+//    xStateVariables->fEmusBmsIndividualCellVoltages[4],
+//    xStateVariables->fEmusBmsIndividualCellVoltages[5],
+//    xStateVariables->fEmusBmsIndividualCellVoltages[6],
+//    xStateVariables->fEmusBmsIndividualCellVoltages[7],
+//    xStateVariables->fEmusBmsIndividualCellVoltages[8],
+//    xStateVariables->fEmusBmsIndividualCellVoltages[9],
+//    xStateVariables->fEmusBmsIndividualCellVoltages[10],
+//    xStateVariables->fEmusBmsIndividualCellVoltages[11]
+
+    );
+
+
+//        float_t fEmusBmsIndividualCellVoltages[NUMBER_OF_CELLS];
+//        uint8_t uiEmusBmsIndividualCellModuleTemperatures[1];
+//        uint8_t uiEmusBmsIndividualCellTemperatures[NUMBER_OF_CELLS];
+//        uint8_t uiEmusBmsIndividualCellBalancingRate[NUMBER_OF_CELLS];
+}
+/*-----------------------------------------------------------*/
+
+BaseType_t xEmusBmsREST(char *pcWriteBuffer, size_t xWriteBufferLen, const char *pcCommandString){
+    BaseType_t lParameterStringLength, xReturn;
+    xEmusBmsStateVariables_t xStateVariables;
+    xAppMsgBaseType_t xMsg = {xQueueRestAPIEmusBmsResponseHandle, GET_STATUS_SIG};
+    char * pcParameter;
+
+    /* Obtain the signal string. */
+    pcParameter = ( char * ) FreeRTOS_RESTGetParameter
+                            (
+                                pcCommandString,        /* The command string itself. */
+                                1,                      /* Return the first parameter. */
+                                &lParameterStringLength /* Store the parameter string length. */
+                            );
+
+    ( void ) lParameterStringLength;
+
+    xReturn = pdFALSE;
+    ( void ) pcWriteBuffer;
+    ( void ) xWriteBufferLen;
+    ( void ) pcCommandString;
+
+    xMsg.eSignal = (ESignal) uiThreadSignalFromCommand(pcParameter);
+
+    switch(xMsg.eSignal){
+    case OFFLINE_SIG:
+    case GO_ONLINE_SIG:
+    case IDLE_SIG:
+    case FAULT_SIG:
+    case TIMEOUT_SIG:
+        xQueueSend(xQueueBmsInputSignalHandle, &xMsg, NULL);
+        snprintf( pcWriteBuffer, xWriteBufferLen, "{\"success\": \"OK\", \"result\": {\"message\": \"executed\"}}" );
+        break;
+    case GET_STATUS_SIG:
+        if(xQueueSend(xQueueBmsInputSignalHandle, &xMsg, NULL) == pdTRUE){
+            if(xQueueReceive(xQueueRestAPIEmusBmsResponseHandle, &xStateVariables, 1000) == pdTRUE){
+                xEmusBmsRESTStatusToJson(pcWriteBuffer, xWriteBufferLen, &xStateVariables);
             }
             else
             {
