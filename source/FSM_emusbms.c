@@ -97,6 +97,12 @@ void * vEmusBmsOfflineState(FSM_EmusBms_Definition_t * const me, xAppMsgBaseType
 //        }
         break;
     case GET_STATUS_SIG:
+    case GET_PARS_OVERALL_SIG:
+    case GET_DIAG_CODES_SIG:
+    case GET_CELL_OVERALL_SIG:
+    case GET_BAT_OVERALL_SIG:
+    case GET_CELL_VOLS_SIG:
+    case GET_CELL_TEMPS_SIG:
         xQueueSend(pxEventQueue->pxReturnQueue, &me->xStateVariables, 0);
         break;
     case EXIT_SIG:

@@ -52,15 +52,15 @@ void vEmusBmsFSMTask(void *pvParameters);
 #define PROTECTION_FLAG_CELL_MODULE_OVERHEAT_BIT   (4u)
 #define PROTECTION_FLAG_LEAKAGE_BIT                (5u)
 #define PROTECTION_FLAG_NO_CELL_COMMUNICATION_BIT  (6u)
-#define PROTECTION_FLAG_RESERVED_BIT               (7u)
-#define PROTECTION_FLAG_RESERVED_BIT               (8u)
-#define PROTECTION_FLAG_RESERVED_BIT               (9u)
-#define PROTECTION_FLAG_RESERVED_BIT               (10u)
+#define PROTECTION_FLAG_RESERVED_7_BIT             (7u)
+#define PROTECTION_FLAG_RESERVED_8_BIT             (8u)
+#define PROTECTION_FLAG_RESERVED_9_BIT             (9u)
+#define PROTECTION_FLAG_RESERVED_10_BIT            (10u)
 #define PROTECTION_FLAG_CELL_OVERHEAT_BIT          (11u)
 #define PROTECTION_FLAG_NO_CURRENT_SENSOR_BIT      (12u)
 #define PROTECTION_FLAG_PACK_UNDER_VOLTAGE_BIT     (13u)
-#define PROTECTION_FLAG_RESERVED_BIT               (14u)
-#define PROTECTION_FLAG_RESERVED_BIT               (15u)
+#define PROTECTION_FLAG_RESERVED_14_BIT            (14u)
+#define PROTECTION_FLAG_RESERVED_15_BIT            (15u)
 
 #define WARNING_REDUCTION_FLAG_LOW_VOLTAGE_BIT     (0u)
 #define WARNING_REDUCTION_FLAG_HIGH_CURRENT_BIT    (1u)
@@ -72,8 +72,8 @@ void vEmusBmsFSMTask(void *pvParameters);
 #define BATTERY_STATUS_FLAG_NUMBER_OF_LIVE_CELLS_VALIDITY_BIT       (3u)
 #define BATTERY_STATUS_FLAG_BATTERY_CHARGING_FINISHED_BIT           (4u)
 #define BATTERY_STATUS_FLAG_CELL_TEMPERATURES_VALIDITY_BIT          (5u)
-#define BATTERY_STATUS_FLAG_RESERVED_BIT                            (6u)
-#define BATTERY_STATUS_FLAG_RESERVED_BIT                            (7u)
+#define BATTERY_STATUS_FLAG_RESERVED_6_BIT                          (6u)
+#define BATTERY_STATUS_FLAG_RESERVED_7_BIT                          (7u)
 
 enum eChargingStage {
     CHARGING_STAGE_DISCONNECTED,
