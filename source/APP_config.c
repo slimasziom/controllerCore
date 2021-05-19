@@ -81,10 +81,8 @@ xThreadMapping_t xThreadMapping[] =
     { TIMEOUT_SIG,           FAULT_STATE,            "timeout",             ""              },
     { GET_PARS_OVERALL_SIG,  NONE_STATE,             "parameters-overall",  ""              },
     { GET_DIAG_CODES_SIG,    NONE_STATE,             "diagnostic-codes",    ""              },
-    { GET_CELL_OVERALL_SIG,  NONE_STATE,             "cell-overall",        ""              },
     { GET_BAT_OVERALL_SIG,   NONE_STATE,             "battery-overall",     ""              },
-    { GET_CELL_VOLS_SIG,     NONE_STATE,             "cell-voltages",       ""              },
-    { GET_CELL_TEMPS_SIG,    NONE_STATE,             "cell-temperatures",   ""              },
+    { GET_INDIV_CELLS_SIG,   NONE_STATE,             "individual-cells",    ""              },
 };
 
 #if !defined( ARRAY_SIZE )

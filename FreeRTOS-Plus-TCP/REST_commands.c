@@ -26,6 +26,8 @@ static void xTinyBmsRESTStatusToJson( char *pcWriteBuffer, size_t xWriteBufferLe
 static void xEmusBmsRESTStatusToJson( char *pcWriteBuffer, size_t xWriteBufferLen, xEmusBmsStateVariables_t *xStateVariables);
 static void xEmusBmsRESTOverallParametersToJson( char *pcWriteBuffer, size_t xWriteBufferLen, xEmusBmsStateVariables_t *xStateVariables);
 static void xEmusBmsRESTDiagnosticCodesToJson( char *pcWriteBuffer, size_t xWriteBufferLen, xEmusBmsStateVariables_t *xStateVariables);
+static void xEmusBmsRESTBatteryOverallToJson( char *pcWriteBuffer, size_t xWriteBufferLen, xEmusBmsStateVariables_t *xStateVariables);
+static void xEmusBmsRESTIndividualCellsToJson( char *pcWriteBuffer, size_t xWriteBufferLen, xEmusBmsStateVariables_t *xStateVariables);
 
 void xMainControllerRESTStatusToJson( char *pcWriteBuffer, size_t xWriteBufferLen, xControllerStateVariables_t *xStateVariables){
     snprintf( pcWriteBuffer, xWriteBufferLen,
@@ -400,6 +402,7 @@ static void xEmusBmsRESTStatusToJson( char *pcWriteBuffer, size_t xWriteBufferLe
 //        uint8_t uiEmusBmsIndividualCellBalancingRate[NUMBER_OF_CELLS];
 }
 /*-----------------------------------------------------------*/
+
 static void xEmusBmsRESTOverallParametersToJson( char *pcWriteBuffer, size_t xWriteBufferLen, xEmusBmsStateVariables_t *xStateVariables){
     snprintf( pcWriteBuffer, xWriteBufferLen,
     "{\"success\": \"OK\", \"result\": "
@@ -457,6 +460,8 @@ static void xEmusBmsRESTOverallParametersToJson( char *pcWriteBuffer, size_t xWr
 
     );
 }
+/*-----------------------------------------------------------*/
+
 static void xEmusBmsRESTDiagnosticCodesToJson( char *pcWriteBuffer, size_t xWriteBufferLen, xEmusBmsStateVariables_t *xStateVariables){
     snprintf( pcWriteBuffer, xWriteBufferLen,
     "{\"success\": \"OK\", \"result\": "
@@ -539,7 +544,241 @@ static void xEmusBmsRESTDiagnosticCodesToJson( char *pcWriteBuffer, size_t xWrit
 
     );
 }
+/*-----------------------------------------------------------*/
 
+static void xEmusBmsRESTBatteryOverallToJson( char *pcWriteBuffer, size_t xWriteBufferLen, xEmusBmsStateVariables_t *xStateVariables){
+    snprintf( pcWriteBuffer, xWriteBufferLen,
+    "{\"success\": \"OK\", \"result\": "
+        "{"
+            "\"Module\": \"%s\", "
+            "\"State\": \"%s\", "
+            "\"Battery-Voltage-Overall-Parameters\":"
+            "{"
+                "\"Min-Cell-Voltage\": %.2f, "
+                "\"Max-Cell-Voltage\": %.2f, "
+                "\"Avg-Cell-Voltage\": %.2f, "
+                "\"Total-Voltage\": %.2f"
+            "}, "
+            "\"Cell-Module-Temperature-Overall-Parameters\":"
+            "{"
+                "\"Min-Cell-Module-Temperature\": %d, "
+                "\"Max-Cell-Module-Temperature\": %d, "
+                "\"Avg-Cell-Module-Temperature\": %d"
+            "}, "
+            "\"Cell-Temperature-Overall-Parameters\":"
+            "{"
+                "\"Min-Cell-Temperature\": %d, "
+                "\"Max-Cell-Temperature\": %d, "
+                "\"Avg-Cell-Temperature\": %d"
+            "}, "
+            "\"Cell-Balancing-Rate-Overall-Parameters\":"
+            "{"
+                "\"Min-Cell-Balancing\": %d, "
+                "\"Max-Cell-Balancing\": %d, "
+                "\"Avg-Cell-Balancing\": %d"
+            "}, "
+            "\"State-of-Charge-Parameters\":"
+            "{"
+                "\"Current\": %f, "
+                "\"Estimated-Charge\": %f, "
+                "\"Estimated-State-Of-Charge\": %d"
+            "}, "
+            "\"Energy-Parameters\":"
+            "{"
+                "\"Estimated-Consumption\": %d, "
+                "\"Estimated-Energy\": %.2f, "
+                "\"Estimated-Distance-Left\": %.1f, "
+                "\"Distance-Traveled\": %.1f"
+            "}"
+        "}"
+    "}",
+    xStateVariables->cModuleName,
+    pcStateNameFromThread(xStateVariables->eState),
+
+    xStateVariables->xEmusBmsBatVolOverallPars.fMinCellVoltage,
+    xStateVariables->xEmusBmsBatVolOverallPars.fMaxCellVoltage,
+    xStateVariables->xEmusBmsBatVolOverallPars.fAvgCellVoltage,
+    xStateVariables->xEmusBmsBatVolOverallPars.fTotalVoltage,
+
+    xStateVariables->xEmusBmsCellModuleTempOverallPars.iMinCellModuleTemp,
+    xStateVariables->xEmusBmsCellModuleTempOverallPars.iMaxCellModuleTemp,
+    xStateVariables->xEmusBmsCellModuleTempOverallPars.iAvgCellModuleTemp,
+
+    xStateVariables->xEmusBmsCellTempOverallPars.iMinCellTemp,
+    xStateVariables->xEmusBmsCellTempOverallPars.iMaxCellTemp,
+    xStateVariables->xEmusBmsCellTempOverallPars.iAvgCellTemp,
+
+    xStateVariables->xEmusBmsCellBalancingRateOverallPars.uiMinCellBalancing,
+    xStateVariables->xEmusBmsCellBalancingRateOverallPars.uiMaxCellBalancing,
+    xStateVariables->xEmusBmsCellBalancingRateOverallPars.uiAvgCellBalancing,
+
+    xStateVariables->xEmusBmsSOC.fCurrent,
+    xStateVariables->xEmusBmsSOC.fEstimatedCharge,
+    xStateVariables->xEmusBmsSOC.uiEstimatedSOC,
+
+    xStateVariables->xEmusBmsEnergyParameters.uiEstimatedConsumption,
+    xStateVariables->xEmusBmsEnergyParameters.fEstimatedEnergy,
+    xStateVariables->xEmusBmsEnergyParameters.fEstimatedDistanceLeft,
+    xStateVariables->xEmusBmsEnergyParameters.fEstimatedDistanceTraveled
+    );
+}
+/*-----------------------------------------------------------*/
+
+
+static void xEmusBmsRESTIndividualCellsToJson( char *pcWriteBuffer, size_t xWriteBufferLen, xEmusBmsStateVariables_t *xStateVariables){
+    snprintf( pcWriteBuffer, xWriteBufferLen,
+    "{\"success\": \"OK\", \"result\": "
+        "{"
+            "\"Module\": \"%s\", "
+            "\"State\": \"%s\", "
+            "\"Expected-Number-of-Cells\": %d, "
+            "\"Number-of-Live-Cells\": %d, "
+            "\"Individual-Cells\":"
+            "{"
+                "\"%d\": "
+                "{"
+                    "\"Voltage\": %.2f, "
+                    "\"Balancing\": %d, "
+                    "\"Temperature\": %d"
+                "}, "
+                "\"%d\": "
+                "{"
+                    "\"Voltage\": %.2f, "
+                    "\"Balancing\": %d, "
+                    "\"Temperature\": %d"
+                "}, "
+                "\"%d\": "
+                "{"
+                    "\"Voltage\": %.2f, "
+                    "\"Balancing\": %d, "
+                    "\"Temperature\": %d"
+                "}, "
+                "\"%d\": "
+                "{"
+                    "\"Voltage\": %.2f, "
+                    "\"Balancing\": %d, "
+                    "\"Temperature\": %d"
+                "}, "
+                "\"%d\": "
+                "{"
+                    "\"Voltage\": %.2f, "
+                    "\"Balancing\": %d, "
+                    "\"Temperature\": %d"
+                "}, "
+                "\"%d\": "
+                "{"
+                    "\"Voltage\": %.2f, "
+                    "\"Balancing\": %d, "
+                    "\"Temperature\": %d"
+                "}, "
+                "\"%d\": "
+                "{"
+                    "\"Voltage\": %.2f, "
+                    "\"Balancing\": %d, "
+                    "\"Temperature\": %d"
+                "}, "
+                "\"%d\": "
+                "{"
+                    "\"Voltage\": %.2f, "
+                    "\"Balancing\": %d, "
+                    "\"Temperature\": %d"
+                "}, "
+                "\"%d\": "
+                "{"
+                    "\"Voltage\": %.2f, "
+                    "\"Balancing\": %d, "
+                    "\"Temperature\": %d"
+                "}, "
+                "\"%d\": "
+                "{"
+                    "\"Voltage\": %.2f, "
+                    "\"Balancing\": %d, "
+                    "\"Temperature\": %d"
+                "}, "
+                "\"%d\": "
+                "{"
+                    "\"Voltage\": %.2f, "
+                    "\"Balancing\": %d, "
+                    "\"Temperature\": %d"
+                "}, "
+                "\"%d\": "
+                "{"
+                    "\"Voltage\": %.2f, "
+                    "\"Balancing\": %d, "
+                    "\"Temperature\": %d"
+                "}"
+            "}"
+        "}"
+    "}",
+    xStateVariables->cModuleName,
+    pcStateNameFromThread(xStateVariables->eState),
+    NUMBER_OF_CELLS,
+    xStateVariables->xEmusBmsOverallPars.uiNumberOfLiveCells,
+
+    0,
+    xStateVariables->fEmusBmsIndividualCellVoltages[0],
+    xStateVariables->uiEmusBmsIndividualCellBalancingRate[0],
+    xStateVariables->uiEmusBmsIndividualCellTemperatures[0],
+
+    1,
+    xStateVariables->fEmusBmsIndividualCellVoltages[1],
+    xStateVariables->uiEmusBmsIndividualCellBalancingRate[1],
+    xStateVariables->uiEmusBmsIndividualCellTemperatures[1],
+
+    2,
+    xStateVariables->fEmusBmsIndividualCellVoltages[2],
+    xStateVariables->uiEmusBmsIndividualCellBalancingRate[2],
+    xStateVariables->uiEmusBmsIndividualCellTemperatures[2],
+
+    3,
+    xStateVariables->fEmusBmsIndividualCellVoltages[3],
+    xStateVariables->uiEmusBmsIndividualCellBalancingRate[3],
+    xStateVariables->uiEmusBmsIndividualCellTemperatures[3],
+
+    4,
+    xStateVariables->fEmusBmsIndividualCellVoltages[4],
+    xStateVariables->uiEmusBmsIndividualCellBalancingRate[4],
+    xStateVariables->uiEmusBmsIndividualCellTemperatures[4],
+
+    5,
+    xStateVariables->fEmusBmsIndividualCellVoltages[5],
+    xStateVariables->uiEmusBmsIndividualCellBalancingRate[5],
+    xStateVariables->uiEmusBmsIndividualCellTemperatures[5],
+
+    6,
+    xStateVariables->fEmusBmsIndividualCellVoltages[6],
+    xStateVariables->uiEmusBmsIndividualCellBalancingRate[6],
+    xStateVariables->uiEmusBmsIndividualCellTemperatures[6],
+
+    7,
+    xStateVariables->fEmusBmsIndividualCellVoltages[7],
+    xStateVariables->uiEmusBmsIndividualCellBalancingRate[7],
+    xStateVariables->uiEmusBmsIndividualCellTemperatures[7],
+
+    8,
+    xStateVariables->fEmusBmsIndividualCellVoltages[8],
+    xStateVariables->uiEmusBmsIndividualCellBalancingRate[8],
+    xStateVariables->uiEmusBmsIndividualCellTemperatures[8],
+
+    9,
+    xStateVariables->fEmusBmsIndividualCellVoltages[9],
+    xStateVariables->uiEmusBmsIndividualCellBalancingRate[9],
+    xStateVariables->uiEmusBmsIndividualCellTemperatures[9],
+
+    10,
+    xStateVariables->fEmusBmsIndividualCellVoltages[10],
+    xStateVariables->uiEmusBmsIndividualCellBalancingRate[10],
+    xStateVariables->uiEmusBmsIndividualCellTemperatures[10],
+
+    11,
+    xStateVariables->fEmusBmsIndividualCellVoltages[11],
+    xStateVariables->uiEmusBmsIndividualCellBalancingRate[11],
+    xStateVariables->uiEmusBmsIndividualCellTemperatures[11]
+
+    );
+
+}
+/*-----------------------------------------------------------*/
 
 BaseType_t xEmusBmsREST(char *pcWriteBuffer, size_t xWriteBufferLen, const char *pcCommandString){
     BaseType_t lParameterStringLength, xReturn;
@@ -576,10 +815,8 @@ BaseType_t xEmusBmsREST(char *pcWriteBuffer, size_t xWriteBufferLen, const char 
     case GET_STATUS_SIG:
     case GET_PARS_OVERALL_SIG:
     case GET_DIAG_CODES_SIG:
-    case GET_CELL_OVERALL_SIG:
     case GET_BAT_OVERALL_SIG:
-    case GET_CELL_VOLS_SIG:
-    case GET_CELL_TEMPS_SIG:
+    case GET_INDIV_CELLS_SIG:
         if(xQueueSend(xQueueBmsInputSignalHandle, &xMsg, NULL) == pdTRUE){
             if(xQueueReceive(xQueueRestAPIEmusBmsResponseHandle, &xStateVariables, 1000) == pdTRUE){
                 switch(xMsg.eSignal){
@@ -592,11 +829,16 @@ BaseType_t xEmusBmsREST(char *pcWriteBuffer, size_t xWriteBufferLen, const char 
                 case GET_DIAG_CODES_SIG:
                     xEmusBmsRESTDiagnosticCodesToJson(pcWriteBuffer, xWriteBufferLen, &xStateVariables);
                     break;
+                case GET_BAT_OVERALL_SIG:
+                    xEmusBmsRESTBatteryOverallToJson(pcWriteBuffer, xWriteBufferLen, &xStateVariables);
+                    break;
+                case GET_INDIV_CELLS_SIG:
+                    xEmusBmsRESTIndividualCellsToJson(pcWriteBuffer, xWriteBufferLen, &xStateVariables);
+                    break;
                 default:
                     xEmusBmsRESTStatusToJson(pcWriteBuffer, xWriteBufferLen, &xStateVariables);
                     break;
                 }
-
             }
             else
             {
