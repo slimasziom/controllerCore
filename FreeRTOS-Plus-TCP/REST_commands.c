@@ -296,110 +296,42 @@ static void xEmusBmsRESTStatusToJson( char *pcWriteBuffer, size_t xWriteBufferLe
         "{"
             "\"Module\": \"%s\", "
             "\"State\": \"%s\", "
-            "\"Battery-Voltage-Overall-Parameters\":"
+            "\"Status\":"
             "{"
+                "\"Total-Voltage\": %.2f, "
+                "\"Current\": %.1f, "
+                "\"Estimated-Energy\": %.2f, "
+                "\"Estimated-State-Of-Charge\": %d, "
+                "\"Charging-Stage\": %d, "
+                "\"Charging-Stage-Duration\": %d, "
+                "\"Protection-Flags\": %d, "
+                "\"Warning-Reduction-Flags\": %d, "
+                "\"Battery-Status-Flags\": %d, "
                 "\"Min-Cell-Voltage\": %.2f, "
                 "\"Max-Cell-Voltage\": %.2f, "
-                "\"Avg-Cell-Voltage\": %.2f, "
-                "\"Total-Voltage\": %.2f"
-            "}, "
-            "\"Cell-Module-Temperature-Overall-Parameters\":"
-            "{"
-                "\"Min-Cell-Module-Temperature\": %d, "
-                "\"Max-Cell-Module-Temperature\": %d, "
-                "\"Avg-Cell-Module-Temperature\": %d"
-            "}, "
-            "\"Cell-Temperature-Overall-Parameters\":"
-            "{"
                 "\"Min-Cell-Temperature\": %d, "
-                "\"Max-Cell-Temperature\": %d, "
-                "\"Avg-Cell-Temperature\": %d"
-            "}, "
-            "\"Cell-Balancing-Rate-Overall-Parameters\":"
-            "{"
-                "\"Min-Cell-Balancing\": %d, "
-                "\"Max-Cell-Balancing\": %d, "
-                "\"Avg-Cell-Balancing\": %d"
-            "}, "
-            "\"State-of-Charge-Parameters\":"
-            "{"
-                "\"Current\": %f, "
-                "\"Estimated-Charge\": %f, "
-                "\"Estimated-State-Of-Charge\": %d"
-            "}, "
-            "\"Energy-Parameters\":"
-            "{"
-                "\"Estimated-Consumption\": %d, "
-                "\"Estimated-Energy\": %.2f, "
-                "\"Estimated-Distance-Left\": %.1f, "
-                "\"Distance-Traveled\": %.1f"
+                "\"Max-Cell-Temperature\": %d"
             "}"
         "}"
     "}",
     xStateVariables->cModuleName,
     pcStateNameFromThread(xStateVariables->eState),
 
+    xStateVariables->xEmusBmsBatVolOverallPars.fTotalVoltage,
+    xStateVariables->xEmusBmsSOC.fCurrent,
+    xStateVariables->xEmusBmsEnergyParameters.fEstimatedEnergy,
+    xStateVariables->xEmusBmsSOC.uiEstimatedSOC,
+    xStateVariables->xEmusBmsOverallPars.uiChargingStage,
+    xStateVariables->xEmusBmsOverallPars.uiChargingStageDuration,
+    xStateVariables->xEmusBmsDiagnosticCodes.uiProtectionFlags,
+    xStateVariables->xEmusBmsDiagnosticCodes.uiWarningFlags,
+    xStateVariables->xEmusBmsDiagnosticCodes.uiBatteryStatusFlags,
     xStateVariables->xEmusBmsBatVolOverallPars.fMinCellVoltage,
     xStateVariables->xEmusBmsBatVolOverallPars.fMaxCellVoltage,
-    xStateVariables->xEmusBmsBatVolOverallPars.fAvgCellVoltage,
-    xStateVariables->xEmusBmsBatVolOverallPars.fTotalVoltage,
-
-    xStateVariables->xEmusBmsCellModuleTempOverallPars.iMinCellModuleTemp,
-    xStateVariables->xEmusBmsCellModuleTempOverallPars.iMaxCellModuleTemp,
-    xStateVariables->xEmusBmsCellModuleTempOverallPars.iAvgCellModuleTemp,
-
     xStateVariables->xEmusBmsCellTempOverallPars.iMinCellTemp,
-    xStateVariables->xEmusBmsCellTempOverallPars.iMaxCellTemp,
-    xStateVariables->xEmusBmsCellTempOverallPars.iAvgCellTemp,
-
-    xStateVariables->xEmusBmsCellBalancingRateOverallPars.uiMinCellBalancing,
-    xStateVariables->xEmusBmsCellBalancingRateOverallPars.uiMaxCellBalancing,
-    xStateVariables->xEmusBmsCellBalancingRateOverallPars.uiAvgCellBalancing,
-
-    xStateVariables->xEmusBmsSOC.fCurrent,
-    xStateVariables->xEmusBmsSOC.fEstimatedCharge,
-    xStateVariables->xEmusBmsSOC.uiEstimatedSOC,
-
-    xStateVariables->xEmusBmsEnergyParameters.uiEstimatedConsumption,
-    xStateVariables->xEmusBmsEnergyParameters.fEstimatedEnergy,
-    xStateVariables->xEmusBmsEnergyParameters.fEstimatedDistanceLeft,
-    xStateVariables->xEmusBmsEnergyParameters.fEstimatedDistanceTraveled
-
-//    "\"Individual-Cell-Voltages\":"
-//    "{"
-//        "\"Cell-Voltage-1\": %.2f, "
-//        "\"Cell-Voltage-2\": %.2f, "
-//        "\"Cell-Voltage-3\": %.2f, "
-//        "\"Cell-Voltage-4\": %.2f, "
-//        "\"Cell-Voltage-5\": %.2f, "
-//        "\"Cell-Voltage-6\": %.2f, "
-//        "\"Cell-Voltage-7\": %.2f, "
-//        "\"Cell-Voltage-8\": %.2f, "
-//        "\"Cell-Voltage-9\": %.2f, "
-//        "\"Cell-Voltage-10\": %.2f, "
-//        "\"Cell-Voltage-11\": %.2f, "
-//        "\"Cell-Voltage-12\": %.2f"
-//    "}"
-//    xStateVariables->fEmusBmsIndividualCellVoltages[0],
-//    xStateVariables->fEmusBmsIndividualCellVoltages[1],
-//    xStateVariables->fEmusBmsIndividualCellVoltages[2],
-//    xStateVariables->fEmusBmsIndividualCellVoltages[3],
-//    xStateVariables->fEmusBmsIndividualCellVoltages[4],
-//    xStateVariables->fEmusBmsIndividualCellVoltages[5],
-//    xStateVariables->fEmusBmsIndividualCellVoltages[6],
-//    xStateVariables->fEmusBmsIndividualCellVoltages[7],
-//    xStateVariables->fEmusBmsIndividualCellVoltages[8],
-//    xStateVariables->fEmusBmsIndividualCellVoltages[9],
-//    xStateVariables->fEmusBmsIndividualCellVoltages[10],
-//    xStateVariables->fEmusBmsIndividualCellVoltages[11]
+    xStateVariables->xEmusBmsCellTempOverallPars.iMaxCellTemp
 
     );
-
-
-//        float_t fEmusBmsIndividualCellVoltages[NUMBER_OF_CELLS];
-//        uint8_t uiEmusBmsIndividualCellModuleTemperatures[1];
-//        uint8_t uiEmusBmsIndividualCellTemperatures[NUMBER_OF_CELLS];
-//        uint8_t uiEmusBmsIndividualCellBalancingRate[NUMBER_OF_CELLS];
 }
 /*-----------------------------------------------------------*/
 
@@ -579,7 +511,7 @@ static void xEmusBmsRESTBatteryOverallToJson( char *pcWriteBuffer, size_t xWrite
             "}, "
             "\"State-of-Charge-Parameters\":"
             "{"
-                "\"Current\": %f, "
+                "\"Current\": %.1f, "
                 "\"Estimated-Charge\": %f, "
                 "\"Estimated-State-Of-Charge\": %d"
             "}, "
