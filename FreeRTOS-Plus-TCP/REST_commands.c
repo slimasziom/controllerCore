@@ -558,6 +558,7 @@ static void xEmusBmsRESTBatteryOverallToJson( char *pcWriteBuffer, size_t xWrite
 
 
 static void xEmusBmsRESTIndividualCellsToJson( char *pcWriteBuffer, size_t xWriteBufferLen, xEmusBmsStateVariables_t *xStateVariables){
+    BaseType_t i;
     snprintf( pcWriteBuffer, xWriteBufferLen,
     "{\"success\": \"OK\", \"result\": "
         "{"
@@ -566,149 +567,34 @@ static void xEmusBmsRESTIndividualCellsToJson( char *pcWriteBuffer, size_t xWrit
             "\"Expected-Number-of-Cells\": %d, "
             "\"Number-of-Live-Cells\": %d, "
             "\"Individual-Cells\":"
-            "{"
-                "\"%d\": "
-                "{"
-                    "\"Voltage\": %.2f, "
-                    "\"Balancing\": %d, "
-                    "\"Temperature\": %d"
-                "}, "
-                "\"%d\": "
-                "{"
-                    "\"Voltage\": %.2f, "
-                    "\"Balancing\": %d, "
-                    "\"Temperature\": %d"
-                "}, "
-                "\"%d\": "
-                "{"
-                    "\"Voltage\": %.2f, "
-                    "\"Balancing\": %d, "
-                    "\"Temperature\": %d"
-                "}, "
-                "\"%d\": "
-                "{"
-                    "\"Voltage\": %.2f, "
-                    "\"Balancing\": %d, "
-                    "\"Temperature\": %d"
-                "}, "
-                "\"%d\": "
-                "{"
-                    "\"Voltage\": %.2f, "
-                    "\"Balancing\": %d, "
-                    "\"Temperature\": %d"
-                "}, "
-                "\"%d\": "
-                "{"
-                    "\"Voltage\": %.2f, "
-                    "\"Balancing\": %d, "
-                    "\"Temperature\": %d"
-                "}, "
-                "\"%d\": "
-                "{"
-                    "\"Voltage\": %.2f, "
-                    "\"Balancing\": %d, "
-                    "\"Temperature\": %d"
-                "}, "
-                "\"%d\": "
-                "{"
-                    "\"Voltage\": %.2f, "
-                    "\"Balancing\": %d, "
-                    "\"Temperature\": %d"
-                "}, "
-                "\"%d\": "
-                "{"
-                    "\"Voltage\": %.2f, "
-                    "\"Balancing\": %d, "
-                    "\"Temperature\": %d"
-                "}, "
-                "\"%d\": "
-                "{"
-                    "\"Voltage\": %.2f, "
-                    "\"Balancing\": %d, "
-                    "\"Temperature\": %d"
-                "}, "
-                "\"%d\": "
-                "{"
-                    "\"Voltage\": %.2f, "
-                    "\"Balancing\": %d, "
-                    "\"Temperature\": %d"
-                "}, "
-                "\"%d\": "
-                "{"
-                    "\"Voltage\": %.2f, "
-                    "\"Balancing\": %d, "
-                    "\"Temperature\": %d"
-                "}"
-            "}"
-        "}"
-    "}",
+            "{",
     xStateVariables->cModuleName,
     pcStateNameFromThread(xStateVariables->eState),
     NUMBER_OF_CELLS,
-    xStateVariables->xEmusBmsOverallPars.uiNumberOfLiveCells,
-
-    0,
-    xStateVariables->fEmusBmsIndividualCellVoltages[0],
-    xStateVariables->uiEmusBmsIndividualCellBalancingRate[0],
-    xStateVariables->uiEmusBmsIndividualCellTemperatures[0],
-
-    1,
-    xStateVariables->fEmusBmsIndividualCellVoltages[1],
-    xStateVariables->uiEmusBmsIndividualCellBalancingRate[1],
-    xStateVariables->uiEmusBmsIndividualCellTemperatures[1],
-
-    2,
-    xStateVariables->fEmusBmsIndividualCellVoltages[2],
-    xStateVariables->uiEmusBmsIndividualCellBalancingRate[2],
-    xStateVariables->uiEmusBmsIndividualCellTemperatures[2],
-
-    3,
-    xStateVariables->fEmusBmsIndividualCellVoltages[3],
-    xStateVariables->uiEmusBmsIndividualCellBalancingRate[3],
-    xStateVariables->uiEmusBmsIndividualCellTemperatures[3],
-
-    4,
-    xStateVariables->fEmusBmsIndividualCellVoltages[4],
-    xStateVariables->uiEmusBmsIndividualCellBalancingRate[4],
-    xStateVariables->uiEmusBmsIndividualCellTemperatures[4],
-
-    5,
-    xStateVariables->fEmusBmsIndividualCellVoltages[5],
-    xStateVariables->uiEmusBmsIndividualCellBalancingRate[5],
-    xStateVariables->uiEmusBmsIndividualCellTemperatures[5],
-
-    6,
-    xStateVariables->fEmusBmsIndividualCellVoltages[6],
-    xStateVariables->uiEmusBmsIndividualCellBalancingRate[6],
-    xStateVariables->uiEmusBmsIndividualCellTemperatures[6],
-
-    7,
-    xStateVariables->fEmusBmsIndividualCellVoltages[7],
-    xStateVariables->uiEmusBmsIndividualCellBalancingRate[7],
-    xStateVariables->uiEmusBmsIndividualCellTemperatures[7],
-
-    8,
-    xStateVariables->fEmusBmsIndividualCellVoltages[8],
-    xStateVariables->uiEmusBmsIndividualCellBalancingRate[8],
-    xStateVariables->uiEmusBmsIndividualCellTemperatures[8],
-
-    9,
-    xStateVariables->fEmusBmsIndividualCellVoltages[9],
-    xStateVariables->uiEmusBmsIndividualCellBalancingRate[9],
-    xStateVariables->uiEmusBmsIndividualCellTemperatures[9],
-
-    10,
-    xStateVariables->fEmusBmsIndividualCellVoltages[10],
-    xStateVariables->uiEmusBmsIndividualCellBalancingRate[10],
-    xStateVariables->uiEmusBmsIndividualCellTemperatures[10],
-
-    11,
-    xStateVariables->fEmusBmsIndividualCellVoltages[11],
-    xStateVariables->uiEmusBmsIndividualCellBalancingRate[11],
-    xStateVariables->uiEmusBmsIndividualCellTemperatures[11]
-
+    xStateVariables->xEmusBmsOverallPars.uiNumberOfLiveCells
     );
 
+
+    for(i = 0; i<NUMBER_OF_CELLS; i++){
+        snprintf( pcWriteBuffer + strlen(pcWriteBuffer), xWriteBufferLen - strlen(pcWriteBuffer),
+            "\"%d\": "
+            "{"
+              "\"Voltage\": %.2f, "
+              "\"Balancing\": %d, "
+              "\"Temperature\": %d"
+            "}, ",
+            i,
+            xStateVariables->fEmusBmsIndividualCellVoltages[i],
+            xStateVariables->uiEmusBmsIndividualCellBalancingRate[i],
+            xStateVariables->uiEmusBmsIndividualCellTemperatures[i]
+         );
+    }
+
+    snprintf( pcWriteBuffer + strlen(pcWriteBuffer) - 2, xWriteBufferLen - strlen(pcWriteBuffer) + 2,
+            "}"
+        "}"
+    "}"
+     );
 }
 /*-----------------------------------------------------------*/
 
