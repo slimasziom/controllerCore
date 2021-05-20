@@ -76,6 +76,18 @@ typedef enum {
     LAST_STATE            // not used, last
 } EState;
 
+
+/* Driving Modes */
+typedef enum {
+    NONE_DRIVING_MODE,          // not used, first
+    LEARN_DRIVING_MODE,
+    ECO_DRIVING_MODE,
+    SPORT_DRIVING_MODE,
+    RACING_DRIVING_MODE,
+    LAUNCH_CONTROL_DRIVING_MODE,
+    LAST_DRIVING_MODE            // not used, last
+} EDrivingMode;
+
 /************* MAIN CONTROLLER *************/
 ///* Controller input signals */
 //typedef enum {
@@ -101,26 +113,59 @@ typedef enum {
 //    CONTROLLER_LAST_STATE,          // not used, last
 //} EControllerState;
 
-/* Controller thread settings struct */
-typedef struct {
-    uint8_t uiPar_a;
-    uint8_t uiPar_b;
-    uint8_t uiPar_c;
-    char cOffsetType[20];
-} xOffset_t;
 
-/* Controller thread settings struct */
+
+/* Controller thread lights struct */
 typedef struct {
-    uint8_t uiPower;
-    uint8_t bOffset;
-    xOffset_t xOffsetSettings;
-} xCtsv_t;
+    uint8_t uiLeftIndicator;
+    uint8_t uiRightIndicator;
+    uint8_t uiBreak;
+    uint8_t uiDaytime;
+    uint8_t uiHeadLowBeam;
+    uint8_t uiHeadHighBeam;
+    uint8_t uiTail;
+} xLights_t;
+
+/* Controller thread motor struct */
+typedef struct {
+    uint8_t uiWarnings;
+    uint8_t uiErrors;
+    int8_t iTempMotor;
+    int8_t iTempMCU;
+
+    float_t fMotorPower;
+    int32_t iRotorSpeed;
+    int32_t iSpeed;
+
+    int16_t iOdometer;
+} xMotor_t;
+
+/* Controller thread battery struct */
+typedef struct {
+    uint8_t uiWarnings;
+    uint8_t uiErrors;
+
+    int8_t iMaxCellTemp;
+    int8_t iMaxCellModuleTemp;
+    uint8_t uiEstimatedSOC;
+    uint16_t uiEstimatedConsumption;
+    float_t fEstimatedEnergy;
+    float_t fEstimatedDistanceLeft;
+} xBattery_t;
 
 /* Controller thread struct */
 typedef struct {
     EState eState;
     char cModuleName[20];
-    xCtsv_t xSettings;
+
+    EDrivingMode eDrivingMode;
+    uint8_t uiWarnings;
+    uint8_t uiErrors;
+
+    xLights_t xLights;
+    xMotor_t xMotor;
+    xBattery_t xBattery;
+
 } xControllerStateVariables_t;
 /************* MAIN CONTROLLER END *************/
 

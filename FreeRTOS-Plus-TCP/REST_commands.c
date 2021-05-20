@@ -31,32 +31,82 @@ static void xEmusBmsRESTIndividualCellsToJson( char *pcWriteBuffer, size_t xWrit
 
 void xMainControllerRESTStatusToJson( char *pcWriteBuffer, size_t xWriteBufferLen, xControllerStateVariables_t *xStateVariables){
     snprintf( pcWriteBuffer, xWriteBufferLen,
-      "{\"success\": \"OK\", \"result\": "
-          "{"
-              "\"Module\": \"%s\","
-              "\"State\": \"%s\","
-              "\"Settings\": "
-              "{"
-                  "\"Power\": %d,"
-                  "\"Offset\": %s,"
-                  "\"Offset Settings\": "
-                  "{"
-                      "\"Type\": \"%s\","
-                      "\"Parameter A\": %d, "
-                      "\"Parameter B\": %d, "
-                      "\"Parameter C\": %d "
-                  "}"
-              "}"
-          "}"
-      "}",
-      xStateVariables->cModuleName,
-      pcStateNameFromThread(xStateVariables->eState),
-      xStateVariables->xSettings.uiPower,
-      xStateVariables->xSettings.bOffset ? "true" : "false",
-      xStateVariables->xSettings.xOffsetSettings.cOffsetType,
-      xStateVariables->xSettings.xOffsetSettings.uiPar_a,
-      xStateVariables->xSettings.xOffsetSettings.uiPar_b,
-      xStateVariables->xSettings.xOffsetSettings.uiPar_c);
+    "{\"success\": \"OK\", \"result\": "
+        "{"
+        "\"Module\": \"%s\","
+        "\"State\": \"%s\","
+        "\"Status\": "
+            "{"
+                "\"Driving-Mode\": %d, "
+                "\"Errors\": %d, "
+                "\"Warnings\": %d, "
+                "\"Lights\": "
+                "{"
+                    "\"Break\": %d, "
+                    "\"Daytime\": %d, "
+                    "\"Head-High-Beam\": %d, "
+                    "\"Head-Low-Beam\": %d, "
+                    "\"Left-Indicator\": %d, "
+                    "\"Right-Indicator\": %d, "
+                    "\"Tail\": %d"
+                "}, "
+                "\"Battery\": "
+                "{"
+                    "\"Estimated-Distance-Left\": %.1f, "
+                    "\"Estimated-Energy\": %.2f, "
+                    "\"Max-Cell-Module-Temp\": %d, "
+                    "\"Max-Cell-Temp\": %d, "
+                    "\"Estimated-Consumption\": %d, "
+                    "\"Estimated-SOC\": %d, "
+                    "\"Errors\": %d, "
+                    "\"Warnings\": %d"
+                "}, "
+                "\"Motor\": "
+                "{"
+                    "\"fMotorPower\": %.1f, "
+                    "\"Odometer\": %d, "
+                    "\"Rotor-Speed\": %d, "
+                    "\"Speed\": %d, "
+                    "\"Temp-MCU\": %d, "
+                    "\"Temp-Motor\": %d, "
+                    "\"Errors\": %d, "
+                    "\"Warnings\": %d"
+                "}"
+            "}"
+        "}"
+    "}",
+    xStateVariables->cModuleName,
+    pcStateNameFromThread(xStateVariables->eState),
+    xStateVariables->eDrivingMode = ECO_DRIVING_MODE,
+    xStateVariables->uiErrors,
+    xStateVariables->uiWarnings,
+
+    xStateVariables->xLights.uiBreak,
+    xStateVariables->xLights.uiDaytime,
+    xStateVariables->xLights.uiHeadHighBeam,
+    xStateVariables->xLights.uiHeadLowBeam,
+    xStateVariables->xLights.uiLeftIndicator,
+    xStateVariables->xLights.uiRightIndicator,
+    xStateVariables->xLights.uiTail,
+
+    xStateVariables->xBattery.fEstimatedDistanceLeft,
+    xStateVariables->xBattery.fEstimatedEnergy,
+    xStateVariables->xBattery.iMaxCellModuleTemp,
+    xStateVariables->xBattery.iMaxCellTemp,
+    xStateVariables->xBattery.uiEstimatedConsumption,
+    xStateVariables->xBattery.uiEstimatedSOC,
+    xStateVariables->xBattery.uiErrors,
+    xStateVariables->xBattery.uiWarnings,
+
+    xStateVariables->xMotor.fMotorPower,
+    xStateVariables->xMotor.iOdometer,
+    xStateVariables->xMotor.iRotorSpeed,
+    xStateVariables->xMotor.iSpeed,
+    xStateVariables->xMotor.iTempMCU,
+    xStateVariables->xMotor.iTempMotor,
+    xStateVariables->xMotor.uiErrors,
+    xStateVariables->xMotor.uiWarnings
+    );
 }
 /*-----------------------------------------------------------*/
 

@@ -374,25 +374,26 @@ BaseType_t xMainControllerCommand( char *pcWriteBuffer, size_t xWriteBufferLen, 
         /* wait for response */
         if(xQueueReceive(xQueueCLICtrlResponseHandle, &xStateVariables, 1000) == pdTRUE)
         {
-            snprintf( pcWriteBuffer, xWriteBufferLen,
-                      "Module: %s\r\n"
-                      "State: %s\n\r"
-                      "Settings:\n\r"
-                      "    Power: %d\n\r"
-                      "    Offset: %s\n\r"
-                      "    Offset Settings:\n\r"
-                      "        Type: %s\n\r"
-                      "        Parameter A: %d\n\r"
-                      "        Parameter B: %d\n\r"
-                      "        Parameter C: %d\n\r",
-                      xStateVariables.cModuleName,
-                      pcStateNameFromThread(xStateVariables.eState),
-                      xStateVariables.xSettings.uiPower,
-                      xStateVariables.xSettings.bOffset ? "true" : "false",
-                      xStateVariables.xSettings.xOffsetSettings.cOffsetType,
-                      xStateVariables.xSettings.xOffsetSettings.uiPar_a,
-                      xStateVariables.xSettings.xOffsetSettings.uiPar_b,
-                      xStateVariables.xSettings.xOffsetSettings.uiPar_c);
+            snprintf( pcWriteBuffer, xWriteBufferLen, "deprecated");
+//            snprintf( pcWriteBuffer, xWriteBufferLen,
+//                      "Module: %s\r\n"
+//                      "State: %s\n\r"
+//                      "Settings:\n\r"
+//                      "    Power: %d\n\r"
+//                      "    Offset: %s\n\r"
+//                      "    Offset Settings:\n\r"
+//                      "        Type: %s\n\r"
+//                      "        Parameter A: %d\n\r"
+//                      "        Parameter B: %d\n\r"
+//                      "        Parameter C: %d\n\r",
+//                      xStateVariables.cModuleName,
+//                      pcStateNameFromThread(xStateVariables.eState),
+//                      xStateVariables.xSettings.uiPower,
+//                      xStateVariables.xSettings.bOffset ? "true" : "false",
+//                      xStateVariables.xSettings.xOffsetSettings.cOffsetType,
+//                      xStateVariables.xSettings.xOffsetSettings.uiPar_a,
+//                      xStateVariables.xSettings.xOffsetSettings.uiPar_b,
+//                      xStateVariables.xSettings.xOffsetSettings.uiPar_c);
         }
         else
         {

@@ -17,6 +17,8 @@ void vFSMTimerFunctionCallback(TimerHandle_t xTimer);
 void vFSMTimerStart(TimerHandle_t *xTimer, uint32_t uiPeriod);
 void vFSMTimerStop(TimerHandle_t *xTimer);
 
+void vClearStateVariables(FSM_MainController_Definition_t * const me);
+
 void vMainControllerFSMTask(void *pvParameters){
     FSM_MainController_Definition_t me;
     xAppMsgBaseType_t xMsg;
@@ -26,13 +28,8 @@ void vMainControllerFSMTask(void *pvParameters){
 //    void *nextState = NULL;
     void *(*nextState)(FSM_MainController_Definition_t * const me, xAppMsgBaseType_t *pxEventQueue ) = NULL;
     /* Initialization */
-    me.xStateVariables.xSettings.uiPower=93;
-    me.xStateVariables.xSettings.bOffset= true;
-    me.xStateVariables.xSettings.xOffsetSettings.uiPar_a=32;
-    me.xStateVariables.xSettings.xOffsetSettings.uiPar_b=64;
-    me.xStateVariables.xSettings.xOffsetSettings.uiPar_c=12;
     snprintf( me.xStateVariables.cModuleName, 20, "main-controller-fsm");
-    snprintf( me.xStateVariables.xSettings.xOffsetSettings.cOffsetType, 20, "default");
+    vClearStateVariables(&me);
 
     me.xEventQueue = xQueueCtrlInputSignalHandle;
     me.pxTimer = &xTimerMainControllerHandle;
@@ -180,6 +177,39 @@ void * vMainControllerPauseState(FSM_MainController_Definition_t * const me, xAp
     return state;
 }
 /*-----------------------------------------------------------*/
+
+void vClearStateVariables(FSM_MainController_Definition_t * const me){
+    me->xStateVariables.eDrivingMode = ECO_DRIVING_MODE;
+    me->xStateVariables.uiErrors = 0;
+    me->xStateVariables.uiWarnings = 0;
+
+    me->xStateVariables.xLights.uiBreak = 0;
+    me->xStateVariables.xLights.uiDaytime = 0;
+    me->xStateVariables.xLights.uiHeadHighBeam = 0;
+    me->xStateVariables.xLights.uiHeadLowBeam = 0;
+    me->xStateVariables.xLights.uiLeftIndicator = 0;
+    me->xStateVariables.xLights.uiRightIndicator = 0;
+    me->xStateVariables.xLights.uiTail = 0;
+
+    me->xStateVariables.xBattery.fEstimatedDistanceLeft = 0.0;
+    me->xStateVariables.xBattery.fEstimatedEnergy = 0.0;
+    me->xStateVariables.xBattery.iMaxCellModuleTemp = 0;
+    me->xStateVariables.xBattery.iMaxCellTemp = 0;
+    me->xStateVariables.xBattery.uiEstimatedConsumption = 0;
+    me->xStateVariables.xBattery.uiEstimatedSOC = 0;
+    me->xStateVariables.xBattery.uiErrors = 0;
+    me->xStateVariables.xBattery.uiWarnings = 0;
+
+    me->xStateVariables.xMotor.fMotorPower = 0.0;
+    me->xStateVariables.xMotor.iOdometer = 0;
+    me->xStateVariables.xMotor.iRotorSpeed = 0;
+    me->xStateVariables.xMotor.iSpeed = 0;
+    me->xStateVariables.xMotor.iTempMCU = 0;
+    me->xStateVariables.xMotor.iTempMotor = 0;
+    me->xStateVariables.xMotor.uiErrors = 0;
+    me->xStateVariables.xMotor.uiWarnings = 0;
+
+}
 
 void vFSMTimerFunctionCallback(TimerHandle_t xTimer){
     gioToggleBit(gioPORTB, 7);
