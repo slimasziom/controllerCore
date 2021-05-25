@@ -79,10 +79,10 @@ xThreadMapping_t xThreadMapping[] =
     { IDLE_SIG,              IDLE_STATE,             "go-idle",             "idle"          },
     { FAULT_SIG,             FAULT_STATE,            "go-fault",            "fault"         },
     { TIMEOUT_SIG,           FAULT_STATE,            "timeout",             ""              },
-    { GET_PARS_OVERALL_SIG,  NONE_STATE,             "parameters-overall",  ""              },
-    { GET_DIAG_CODES_SIG,    NONE_STATE,             "diagnostic-codes",    ""              },
-    { GET_BAT_OVERALL_SIG,   NONE_STATE,             "battery-overall",     ""              },
-    { GET_INDIV_CELLS_SIG,   NONE_STATE,             "individual-cells",    ""              },
+    { GET_PARS_OVERALL_SIG,  NONE_STATE,             "overall",             ""              },
+    { GET_DIAG_CODES_SIG,    NONE_STATE,             "diagnostic",          ""              },
+    { GET_BAT_ELECTRICAL_SIG,   NONE_STATE,          "electrical",            ""              },
+    { GET_INDIV_CELLS_SIG,   NONE_STATE,             "cells",               ""              },
 };
 
 #if !defined( ARRAY_SIZE )

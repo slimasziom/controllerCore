@@ -92,8 +92,8 @@ BaseType_t xMainControllerREST(char *pcWriteBuffer, size_t xWriteBufferLen, cons
 /* Structure that defines the "main-controller" REST command. */
 static const REST_Command_Definition_t xMainControllerRest =
 {
-    "main-controller",
-    "{\"use\": \"main-controller?<command>: Sends command to main-controller: run/stop/pause/emergency/status\"}",
+    "core",
+    "{\"use\": \"main-controller?<command>: Sends command to core controller: run/stop/pause/emergency/status\"}",
     ( pdREST_API_CALLBACK ) xMainControllerREST,
     1 /* No parameters are expected. */
 };
@@ -112,8 +112,8 @@ BaseType_t xEmusBmsREST(char *pcWriteBuffer, size_t xWriteBufferLen, const char 
 /* Structure that defines the "main-controller" REST command. */
 static const REST_Command_Definition_t xEmusBmsRest =
 {
-    "emus-bms",
-    "{\"use\": \"emus-bms?<command>: Sends command to emus-bms: go-offline/charge/finish-charge/discharge/regenerate/go-idle/go-fault/status\"}",
+    "battery",
+    "{\"use\": \"emus-bms?<command>: Sends command to battery controller: go-offline/charge/finish-charge/discharge/regenerate/go-idle/go-fault/status\"}",
     ( pdREST_API_CALLBACK ) xEmusBmsREST,
     1 /* No parameters are expected. */
 };
@@ -122,7 +122,7 @@ BaseType_t xMotorControllerREST(char *pcWriteBuffer, size_t xWriteBufferLen, con
 /* Structure that defines the "main-controller" REST command. */
 static const REST_Command_Definition_t xMotorControllerRest =
 {
-    "motor-controller",
+    "motor",
     "{\"use\": \"motor controller status}",
     ( pdREST_API_CALLBACK ) xMotorControllerREST,
     1 /* No parameters are expected. */

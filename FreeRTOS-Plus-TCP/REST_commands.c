@@ -617,7 +617,7 @@ static void xEmusBmsRESTIndividualCellsToJson( char *pcWriteBuffer, size_t xWrit
             "\"Expected-Number-of-Cells\": %d, "
             "\"Number-of-Live-Cells\": %d, "
             "\"Individual-Cells\":"
-            "{",
+            "[",
     xStateVariables->cModuleName,
     pcStateNameFromThread(xStateVariables->eState),
     NUMBER_OF_CELLS,
@@ -627,8 +627,9 @@ static void xEmusBmsRESTIndividualCellsToJson( char *pcWriteBuffer, size_t xWrit
 
     for(i = 0; i<NUMBER_OF_CELLS; i++){
         snprintf( pcWriteBuffer + strlen(pcWriteBuffer), xWriteBufferLen - strlen(pcWriteBuffer),
-            "\"%d\": "
+//            "\"%d\": "
             "{"
+              "\"Id\": %d, "
               "\"Voltage\": %.2f, "
               "\"Balancing\": %d, "
               "\"Temperature\": %d"
@@ -641,7 +642,7 @@ static void xEmusBmsRESTIndividualCellsToJson( char *pcWriteBuffer, size_t xWrit
     }
 
     snprintf( pcWriteBuffer + strlen(pcWriteBuffer) - 2, xWriteBufferLen - strlen(pcWriteBuffer) + 2,
-            "}"
+            "]"
         "}"
     "}"
      );
@@ -683,7 +684,7 @@ BaseType_t xEmusBmsREST(char *pcWriteBuffer, size_t xWriteBufferLen, const char 
     case GET_STATUS_SIG:
     case GET_PARS_OVERALL_SIG:
     case GET_DIAG_CODES_SIG:
-    case GET_BAT_OVERALL_SIG:
+    case GET_BAT_ELECTRICAL_SIG:
     case GET_INDIV_CELLS_SIG:
         if(xQueueSend(xQueueBmsInputSignalHandle, &xMsg, NULL) == pdTRUE){
             if(xQueueReceive(xQueueRestAPIEmusBmsResponseHandle, &xStateVariables, 1000) == pdTRUE){
@@ -697,7 +698,7 @@ BaseType_t xEmusBmsREST(char *pcWriteBuffer, size_t xWriteBufferLen, const char 
                 case GET_DIAG_CODES_SIG:
                     xEmusBmsRESTDiagnosticCodesToJson(pcWriteBuffer, xWriteBufferLen, &xStateVariables);
                     break;
-                case GET_BAT_OVERALL_SIG:
+                case GET_BAT_ELECTRICAL_SIG:
                     xEmusBmsRESTBatteryOverallToJson(pcWriteBuffer, xWriteBufferLen, &xStateVariables);
                     break;
                 case GET_INDIV_CELLS_SIG:
@@ -734,7 +735,7 @@ void xMotorControllerRESTStatusToJson( char *pcWriteBuffer, size_t xWriteBufferL
           "{"
               "\"Module\": \"%s\","
               "\"State\": \"%s\","
-              "\"Live-Data\": "
+              "\"Status\": "
               "{"
                   "\"Motor-Connected\": %s,"
                   "\"Motor-Algorithm\": \"%s\","
